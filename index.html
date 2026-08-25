@@ -58,9 +58,34 @@
         .camisa-manga-esq, .camisa-manga-dir { position: absolute; width: 35px; height: 45px; background: #fff; top: 15px; border: 5px solid #000; border-radius: 8px; box-sizing: border-box; }
         .camisa-manga-esq { left: 0; transform: rotate(20deg); } .camisa-manga-dir { right: 0; transform: rotate(-20deg); }
 
-        #top-bar { display: none; justify-content: space-between; align-items: center; width: 100%; max-width: 800px; margin-bottom: 10px; padding: 10px 30px; box-sizing: border-box; position: relative; z-index: 10; }
-        .score-box { font-size: 32px; display: flex; align-items: center; gap: 15px; font-weight: 900; }
-        #timer { font-size: 28px; background: rgba(0,0,0,0.8); padding: 5px 20px; border-radius: 8px; color: #f1c40f; border: 1px solid #333; }
+        /* NOVO DESIGN DO PLACAR PROFISSIONAL */
+        #top-bar { 
+            display: none; /* Alterado para flex via JS quando ativado */
+            align-items: center; 
+            justify-content: center; 
+            width: 100%; 
+            max-width: 800px; 
+            margin-bottom: 15px; 
+            padding: 10px 30px; 
+            box-sizing: border-box; 
+            position: relative; 
+            z-index: 10;
+        }
+        .time-nome { flex: 1; font-size: 28px; font-weight: 900; white-space: nowrap; }
+        .esquerdo { text-align: left; }
+        .direito { text-align: right; }
+        .pontuacao { font-size: 36px; padding: 0 25px; font-weight: 900; }
+        #timer { 
+            background-color: #000; 
+            color: #f1c40f; 
+            padding: 5px 20px; 
+            border-radius: 8px; 
+            font-size: 28px; 
+            text-align: center; 
+            min-width: 85px; 
+            border: 1px solid #333; 
+            font-weight: 900;
+        }
 
         #placar-penaltis { display: none; position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); padding: 8px 25px; border-radius: 15px; z-index: 10; border: 2px solid #444; white-space: nowrap; }
         .bolinha { width: 16px; height: 16px; border-radius: 50%; border: 3px solid #555; display: inline-block; margin: 0 4px; background: rgba(255,255,255,0.1); }
@@ -193,13 +218,15 @@
         </div>
     </div>
 
-    <!-- HUD DA PARTIDA -->
+    <!-- HUD DA PARTIDA COM NOVO LAYOUT -->
     <button id="btn-voltar-partida" class="btn-ingame" onclick="voltarMenu()">⏴ VOLTAR AO MENU</button>
 
     <div id="top-bar" class="glass-panel">
-        <div class="score-box" id="sb-p1"><span id="nome-p1">P1</span> <span id="score1">0</span></div>
+        <div class="time-nome esquerdo" id="nome-p1">P1</div>
+        <div class="pontuacao" id="score1">0</div>
         <div id="timer">03:00</div>
-        <div class="score-box" id="sb-p2"><span id="score2">0</span> <span id="nome-p2">P2</span></div>
+        <div class="pontuacao" id="score2">0</div>
+        <div class="time-nome direito" id="nome-p2">P2</div>
     </div>
     
     <div id="placar-penaltis">
@@ -264,10 +291,9 @@
             showScreen('screen-online-host'); uiText('txt-codigo-sala', "GERANDO...");
 
             try {
-                // Ao criar a sala, usa o ID gerado e a configuração STUN para furar o Firewall
-                peer = new Peer(myRoomID, peerConfig);
+                peer = new Peer('iaesball-' + myRoomID, peerConfig);
                 
-                peer.on('open', (id) => { uiText('txt-codigo-sala', id); });
+                peer.on('open', (id) => { uiText('txt-codigo-sala', myRoomID); });
                 
                 peer.on('connection', (connection) => { 
                     conn = connection; 
@@ -284,12 +310,12 @@
                         }
                     });
 
-                    // HOST AVANÇA ASSIM QUE CONECTA (Sem esperar confirmações)
+                    // HOST AVANÇA ASSIM QUE CONECTA (Sem esperar confirmações extras)
                     setTimeout(() => { showScreen('screen-mode'); }, 1000); 
                 });
                 
                 peer.on('error', (err) => { 
-                    if (err.type === 'unavailable-id') { iniciarHost(); } // Tenta outro ID se colidir
+                    if (err.type === 'unavailable-id') { iniciarHost(); } 
                     else { uiText('status-conexao', "Erro na rede. Clique Cancelar e tente novamente."); console.error(err); }
                 });
             } catch (e) {
@@ -308,7 +334,7 @@
                 peer = new Peer(peerConfig);
                 peer.on('open', (id) => {
                     uiText('status-conexao-client', "Buscando sala " + val + "...");
-                    conn = peer.connect(val, { reliable: true });
+                    conn = peer.connect('iaesball-' + val, { reliable: true });
                     
                     let conectou = false;
                     const appCliente = () => {
@@ -375,7 +401,7 @@
                 else if (estadoJogo === 'FIM') {
                     uiText('texto-gol', data.msg); uiColor('texto-gol', '#fff');
                     uiHide('texto-estado'); uiShow('mensagem-overlay', 'flex'); document.getElementById('mensagem-overlay').style.background = 'rgba(0,0,0,0.8)';
-                    uiHide('botoes-fim-jogo'); // O client não clica em jogar novamente
+                    uiHide('botoes-fim-jogo'); // O client sai apenas via botão voltar pro menu manual
                 }
                 else if (estadoJogo === 'JOGANDO') resetarUICompleta();
                 else if (estadoJogo === 'PAUSADO') {
@@ -439,30 +465,33 @@
             document.getElementById('bar-top').style.height = '0'; document.getElementById('bar-bottom').style.height = '0';
         }
 
-        // --- LIMPEZA BLINDADA DE FÍSICA PARA EVITAR BUGS DE RENDERIZAÇÃO ---
+        // LIMPEZA SEGURA E ABSOLUTA DO MATTER JS
         function limparMotorFisico() {
             try {
-                if (runner) { Matter.Runner.stop(runner); runner = null; }
+                if (runner) { Runner.stop(runner); runner = null; }
                 if (render) {
-                    Matter.Render.stop(render);
-                    if (render.canvas) render.canvas.remove();
+                    Render.stop(render);
+                    if (render.canvas && render.canvas.parentNode) { render.canvas.parentNode.removeChild(render.canvas); }
                     render = null;
                 }
                 if (engine) {
-                    Matter.Events.off(engine);
-                    Matter.Composite.clear(engine.world, false); 
+                    Events.off(engine);
+                    Composite.clear(engine.world, false, true); 
+                    Engine.clear(engine);
                     engine = null;
                 }
-            } catch(e) { console.error("Ignorando resquícios do motor:", e); }
-            
-            const mc = document.getElementById('matter-container');
-            if (mc) mc.innerHTML = ''; 
+                const mc = document.getElementById('matter-container');
+                if (mc) mc.innerHTML = ''; 
+                
+                const bgCanvas = document.getElementById('field-canvas');
+                if (bgCanvas) { const ctx = bgCanvas.getContext('2d'); ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height); }
+            } catch(e) { console.error("Erro na limpeza:", e); }
         }
 
-        // --- CONTROLES DE TECLADO 100% LIBERADOS NO MENU ---
+        // CONTROLES DE TECLADO (LIVRES NO MENU)
         const keys = {};
         window.addEventListener('keydown', (e) => { 
-            if (estadoJogo === 'MENU') return; // Libera totalmente o teclado se estiver no menu!
+            if (estadoJogo === 'MENU') return; // Libera totalmente a digitação de inputs
             if (e.target.tagName === 'INPUT') return; 
 
             if (e.code === 'Enter' || e.code === 'Space') { if(document.activeElement && document.activeElement.tagName !== 'INPUT') document.activeElement.blur(); e.preventDefault(); }
@@ -475,9 +504,8 @@
             if(e.code) keys[e.code.toLowerCase()] = false; if(e.key) keys[e.key.toLowerCase()] = false;
         });
 
-        // Só rouba o foco do jogador se a partida tiver começado
         function forceFocus() {
-            if (estadoJogo === 'MENU') return;
+            if (estadoJogo === 'MENU') return; // Não rouba foco no menu
             if(document.activeElement && document.activeElement.blur && document.activeElement.tagName !== 'INPUT') { document.activeElement.blur(); }
             const wrapper = document.getElementById('game-wrapper'); if(wrapper) wrapper.focus();
         }
@@ -579,11 +607,10 @@
         function voltarMenu() {
             estadoJogo = 'MENU';
             limparMotorFisico();
-            
             uiHide('game-wrapper'); uiHide('top-bar'); uiHide('btn-voltar-partida'); uiHide('placar-penaltis'); 
             resetarUICompleta();
             
-            // GARANTE ZERAR OS TIMES AO VOLTAR
+            // Zera 100% as variáveis de jogo anterior
             timeTemporario = "";
             cfgP1 = { time: "", uni: 1, cores: {} };
             cfgP2 = { time: "", uni: 1, cores: {} };
@@ -604,15 +631,18 @@
             historicoPosicoes = []; particulas = []; resetarUICompleta();
             frameReplay = 0; rewindIndex = 0; dashP1 = 0; dashP2 = 0; delayTimer = 0; onMessageEnd = null;
 
+            if (!cfgP1 || !cfgP1.cores) cfgP1 = { time: "P1", uni: 1, cores: {bg: "#3498db", line: "#fff", num: "#fff"} };
+            if (!cfgP2 || !cfgP2.cores) cfgP2 = { time: "P2", uni: 1, cores: {bg: "#e74c3c", line: "#fff", num: "#fff"} };
+
             uiText('score1', "0"); uiText('score2', "0");
-            uiShow('btn-voltar-partida'); uiShow('top-bar', 'flex'); 
-            document.getElementById('top-bar').style.maxWidth = selCampoW + 'px';
+            uiShow('btn-voltar-partida'); 
+            uiShow('top-bar', 'flex'); 
             uiHide('botoes-fim-jogo');
             
             uiText('nome-p1', cfgP1.time ? cfgP1.time.substring(0, 3).toUpperCase() : 'P1');
-            uiColor('sb-p1', obterCorTextoVisivel(cfgP1.cores?.bg));
+            uiColor('nome-p1', obterCorTextoVisivel(cfgP1.cores.bg));
             uiText('nome-p2', cfgP2.time ? cfgP2.time.substring(0, 3).toUpperCase() : 'P2');
-            uiColor('sb-p2', obterCorTextoVisivel(cfgP2.cores?.bg));
+            uiColor('nome-p2', obterCorTextoVisivel(cfgP2.cores.bg));
 
             uiShow('game-wrapper'); 
             const wrapper = document.getElementById('game-wrapper');
@@ -630,7 +660,7 @@
                 forceFocus();
             } catch(e) {
                 console.error("ERRO GRAVE NA ENGINE:", e);
-                alert("Houve um erro no carregamento da partida. Tente atualizar a página.");
+                alert("Houve um erro no carregamento da partida. Voltando ao Menu.");
                 voltarMenu();
             }
         }
@@ -719,8 +749,8 @@
             const golDir = Bodies.rectangle(selCampoW - 40, selCampoH/2, 30, golSize, { isSensor: true, isStatic: true, label: 'golDir', render: { visible: false } });
 
             bola = Bodies.circle(selCampoW/2, selCampoH/2, 12, { label: 'bola', restitution: 0.8, frictionAir: 0.012, density: 0.002, render: { fillStyle: '#ff9800', strokeStyle: '#fff', lineWidth: 2 } });
-            player1 = Bodies.circle(selCampoW * 0.25, selCampoH/2, 22, { label: 'p1', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP1.cores?.bg||'#3498db', strokeStyle: cfgP1.cores?.line||'#fff', lineWidth: 3 } });
-            player2 = Bodies.circle(selCampoW * 0.75, selCampoH/2, 22, { label: 'p2', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP2.cores?.bg||'#e74c3c', strokeStyle: cfgP2.cores?.line||'#fff', lineWidth: 3 } });
+            player1 = Bodies.circle(selCampoW * 0.25, selCampoH/2, 22, { label: 'p1', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP1.cores?.bg||'#fff', strokeStyle: cfgP1.cores?.line||'#000', lineWidth: 3 } });
+            player2 = Bodies.circle(selCampoW * 0.75, selCampoH/2, 22, { label: 'p2', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP2.cores?.bg||'#000', strokeStyle: cfgP2.cores?.line||'#fff', lineWidth: 3 } });
 
             Composite.add(engine.world, [...walls, golEsq, golDir, bola, player1, player2]);
 
