@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>IAES BALL - Versão Definitiva Pro</title>
+    <title>IAES BALL - Versão Definitiva Pro 3.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
@@ -69,7 +69,7 @@
         .divisoria { display: inline-block; width: 2px; height: 20px; background: #777; margin: 0 15px; vertical-align: bottom; }
 
         #game-wrapper { position: relative; display: none; border-radius: 8px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); outline: none; cursor: default; }
-        #field-canvas, #matter-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        #field-canvas, #matter-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
         #field-canvas { z-index: 1; } #matter-container { z-index: 2; pointer-events: none; }
         .cine-bar { position: absolute; left: 0; width: 100%; height: 0; background: #000; z-index: 5; transition: height 0.4s ease; }
         #bar-top { top: 0; } #bar-bottom { bottom: 0; }
@@ -88,7 +88,7 @@
         #btn-skip-replay { bottom: 25px; right: 25px; display: none; background: rgba(231, 76, 60, 0.9); }
         #btn-proximo-penalti { top: 25px; right: 25px; background: rgba(231, 76, 60, 0.9); border-color: #f1c40f; display: none; }
 
-        .input-sala { padding: 15px; font-size: 18px; border-radius: 8px; border: 2px solid #3498db; background: #222; color: #fff; text-align: center; margin-bottom: 15px; width: 80%; font-family: 'Montserrat'; font-weight: bold; outline: none; user-select: auto; }
+        .input-sala { padding: 15px; font-size: 24px; border-radius: 8px; border: 2px solid #3498db; background: #222; color: #fff; text-align: center; margin-bottom: 15px; width: 80%; font-family: 'Montserrat'; font-weight: bold; outline: none; letter-spacing: 3px; }
         .input-sala:focus { border-color: #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); }
         .codigo-sala { font-size: 40px; color: #2ecc71; letter-spacing: 5px; margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.5); border-radius: 10px; border: 2px dashed #2ecc71; }
         #status-conexao { margin-top: 15px; font-size: 14px; color: #f1c40f; font-weight: bold; }
@@ -127,7 +127,7 @@
 
         <div id="screen-online-join" class="screen">
             <h2>Entrar em Sala</h2>
-            <input type="text" id="input-sala-codigo" class="input-sala" placeholder="DIGITE O CÓDIGO DA SALA" maxlength="6" style="text-transform: uppercase;">
+            <input type="text" id="input-sala-codigo" class="input-sala" placeholder="CÓDIGO DE 6 LETRAS" maxlength="6" style="text-transform: uppercase;">
             <button class="btn btn-avancar" onclick="conectarNaSala()">CONECTAR</button>
             <div id="status-conexao-client" style="margin-top: 15px; color: #e74c3c; font-weight: bold;"></div>
             <button class="btn btn-voltar" style="margin-top: 20px;" onclick="showScreen('screen-online-choice')">⏴ VOLTAR</button>
@@ -230,7 +230,7 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO SERVIDOR WEB RTC COM STUN (Garante a conexão de rede)
+        // CONFIGURAÇÃO DO SERVIDOR WEB RTC COM STUN DO GOOGLE (Garante a conexão)
         const peerConfig = {
             config: {
                 'iceServers': [
@@ -249,7 +249,7 @@
 
         function gerarCodigo() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let res = '';
-            for(let i=0; i<5; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+            for(let i=0; i<6; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
             return res;
         }
 
@@ -264,12 +264,14 @@
             showScreen('screen-online-host'); uiText('txt-codigo-sala', "GERANDO...");
 
             try {
-                peer = new Peer('iaesball-' + myRoomID, peerConfig);
-                peer.on('open', (id) => { uiText('txt-codigo-sala', myRoomID); });
+                // Ao criar a sala, usa o ID gerado e a configuração STUN para furar o Firewall
+                peer = new Peer(myRoomID, peerConfig);
+                
+                peer.on('open', (id) => { uiText('txt-codigo-sala', id); });
                 
                 peer.on('connection', (connection) => { 
                     conn = connection; 
-                    uiText('status-conexao', "Jogador conectado! Sincronizando sala...");
+                    uiText('status-conexao', "Jogador conectado! Entrando no Menu...");
                     
                     conn.on('data', (data) => { 
                         if (data.type === 'input') remoteKeys = data.keys; 
@@ -282,22 +284,16 @@
                         }
                     });
 
-                    // HOST AVANÇA ASSIM QUE CONECTA (Prevenção contra Timeouts)
-                    let avancou = false;
-                    const iniciarHostApp = () => {
-                        if(avancou) return; avancou = true;
-                        uiText('status-conexao', "Autenticado! Escolha as configurações...");
-                        setTimeout(() => { showScreen('screen-mode'); }, 500); 
-                    };
-
-                    if (conn.open) iniciarHostApp();
-                    else conn.on('open', iniciarHostApp);
-                    
-                    setTimeout(() => { if (!avancou && estadoJogo === 'MENU') iniciarHostApp(); }, 1500);
+                    // HOST AVANÇA ASSIM QUE CONECTA (Sem esperar confirmações)
+                    setTimeout(() => { showScreen('screen-mode'); }, 1000); 
                 });
-                peer.on('error', (err) => { uiText('status-conexao', "Erro na rede. Verifique a internet."); console.error(err); });
+                
+                peer.on('error', (err) => { 
+                    if (err.type === 'unavailable-id') { iniciarHost(); } // Tenta outro ID se colidir
+                    else { uiText('status-conexao', "Erro na rede. Clique Cancelar e tente novamente."); console.error(err); }
+                });
             } catch (e) {
-                uiText('status-conexao', "Falha ao criar sala.");
+                uiText('status-conexao', "Falha ao criar sala. Verifique a internet.");
             }
         }
 
@@ -312,7 +308,7 @@
                 peer = new Peer(peerConfig);
                 peer.on('open', (id) => {
                     uiText('status-conexao-client', "Buscando sala " + val + "...");
-                    conn = peer.connect('iaesball-' + val, { reliable: true });
+                    conn = peer.connect(val, { reliable: true });
                     
                     let conectou = false;
                     const appCliente = () => {
@@ -379,7 +375,7 @@
                 else if (estadoJogo === 'FIM') {
                     uiText('texto-gol', data.msg); uiColor('texto-gol', '#fff');
                     uiHide('texto-estado'); uiShow('mensagem-overlay', 'flex'); document.getElementById('mensagem-overlay').style.background = 'rgba(0,0,0,0.8)';
-                    uiHide('botoes-fim-jogo'); // O client não pode clicar em Jogar Novamente
+                    uiHide('botoes-fim-jogo'); // O client não clica em jogar novamente
                 }
                 else if (estadoJogo === 'JOGANDO') resetarUICompleta();
                 else if (estadoJogo === 'PAUSADO') {
@@ -443,34 +439,30 @@
             document.getElementById('bar-top').style.height = '0'; document.getElementById('bar-bottom').style.height = '0';
         }
 
-        // --- LIMPEZA DE MEMÓRIA BLINDADA CONTRA O BUG DA TELA PRETA ---
+        // --- LIMPEZA BLINDADA DE FÍSICA PARA EVITAR BUGS DE RENDERIZAÇÃO ---
         function limparMotorFisico() {
             try {
-                if (runner) { Runner.stop(runner); runner = null; }
+                if (runner) { Matter.Runner.stop(runner); runner = null; }
                 if (render) {
-                    Render.stop(render);
-                    if (render.canvas && render.canvas.parentNode) { render.canvas.parentNode.removeChild(render.canvas); }
+                    Matter.Render.stop(render);
+                    if (render.canvas) render.canvas.remove();
                     render = null;
                 }
                 if (engine) {
-                    Events.off(engine);
-                    Composite.clear(engine.world, false, true); // DELETA CORRETAMENTE A MEMÓRIA
+                    Matter.Events.off(engine);
+                    Matter.Composite.clear(engine.world, false); 
                     engine = null;
                 }
-                const mc = document.getElementById('matter-container');
-                if (mc) mc.innerHTML = ''; 
-                
-                const bgCanvas = document.getElementById('field-canvas');
-                if (bgCanvas) { const ctx = bgCanvas.getContext('2d'); ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height); }
-            } catch(e) {
-                console.error("Erro ignorado ao limpar motor:", e);
-            }
+            } catch(e) { console.error("Ignorando resquícios do motor:", e); }
+            
+            const mc = document.getElementById('matter-container');
+            if (mc) mc.innerHTML = ''; 
         }
 
-        // CONTROLES DE TECLADO (LIVRES NO MENU)
+        // --- CONTROLES DE TECLADO 100% LIBERADOS NO MENU ---
         const keys = {};
         window.addEventListener('keydown', (e) => { 
-            if (estadoJogo === 'MENU') return; // Se está no menu, teclado 100% liberado
+            if (estadoJogo === 'MENU') return; // Libera totalmente o teclado se estiver no menu!
             if (e.target.tagName === 'INPUT') return; 
 
             if (e.code === 'Enter' || e.code === 'Space') { if(document.activeElement && document.activeElement.tagName !== 'INPUT') document.activeElement.blur(); e.preventDefault(); }
@@ -483,8 +475,9 @@
             if(e.code) keys[e.code.toLowerCase()] = false; if(e.key) keys[e.key.toLowerCase()] = false;
         });
 
+        // Só rouba o foco do jogador se a partida tiver começado
         function forceFocus() {
-            if (estadoJogo === 'MENU') return; // Não rouba foco no menu
+            if (estadoJogo === 'MENU') return;
             if(document.activeElement && document.activeElement.blur && document.activeElement.tagName !== 'INPUT') { document.activeElement.blur(); }
             const wrapper = document.getElementById('game-wrapper'); if(wrapper) wrapper.focus();
         }
@@ -585,18 +578,21 @@
 
         function voltarMenu() {
             estadoJogo = 'MENU';
-            clearInterval(timerInterval);
             limparMotorFisico();
             
             uiHide('game-wrapper'); uiHide('top-bar'); uiHide('btn-voltar-partida'); uiHide('placar-penaltis'); 
             resetarUICompleta();
-            uiShow('menu-container'); // GARANTE O MENU DE VOLTA
+            
+            // GARANTE ZERAR OS TIMES AO VOLTAR
+            timeTemporario = "";
+            cfgP1 = { time: "", uni: 1, cores: {} };
+            cfgP2 = { time: "", uni: 1, cores: {} };
             
             if (isOnline) {
                 cancelarOnline(); 
             } else {
                 currPlayer = 1;
-                showScreen('screen-home'); 
+                uiShow('menu-container'); showScreen('screen-home'); 
             }
         }
 
@@ -608,20 +604,19 @@
             historicoPosicoes = []; particulas = []; resetarUICompleta();
             frameReplay = 0; rewindIndex = 0; dashP1 = 0; dashP2 = 0; delayTimer = 0; onMessageEnd = null;
 
-            // Se for bug e a configuração for perdida, aplica padrões seguros:
-            if (!cfgP1 || !cfgP1.cores) cfgP1 = { time: "P1", uni: 1, cores: {bg: "#3498db", line: "#fff", num: "#fff"} };
-            if (!cfgP2 || !cfgP2.cores) cfgP2 = { time: "P2", uni: 1, cores: {bg: "#e74c3c", line: "#fff", num: "#fff"} };
-
             uiText('score1', "0"); uiText('score2', "0");
-            uiShow('btn-voltar-partida'); uiShow('top-bar', 'flex'); document.getElementById('top-bar').style.maxWidth = selCampoW + 'px';
+            uiShow('btn-voltar-partida'); uiShow('top-bar', 'flex'); 
+            document.getElementById('top-bar').style.maxWidth = selCampoW + 'px';
             uiHide('botoes-fim-jogo');
             
             uiText('nome-p1', cfgP1.time ? cfgP1.time.substring(0, 3).toUpperCase() : 'P1');
-            uiColor('sb-p1', obterCorTextoVisivel(cfgP1.cores.bg));
+            uiColor('sb-p1', obterCorTextoVisivel(cfgP1.cores?.bg));
             uiText('nome-p2', cfgP2.time ? cfgP2.time.substring(0, 3).toUpperCase() : 'P2');
-            uiColor('sb-p2', obterCorTextoVisivel(cfgP2.cores.bg));
+            uiColor('sb-p2', obterCorTextoVisivel(cfgP2.cores?.bg));
 
-            uiShow('game-wrapper'); const wrapper = document.getElementById('game-wrapper');
+            uiShow('game-wrapper'); 
+            const wrapper = document.getElementById('game-wrapper');
+            wrapper.style.display = 'block';
             wrapper.style.width = selCampoW + 'px'; wrapper.style.height = selCampoH + 'px';
 
             try {
@@ -635,7 +630,7 @@
                 forceFocus();
             } catch(e) {
                 console.error("ERRO GRAVE NA ENGINE:", e);
-                alert("Houve um erro no carregamento da partida.");
+                alert("Houve um erro no carregamento da partida. Tente atualizar a página.");
                 voltarMenu();
             }
         }
@@ -724,8 +719,8 @@
             const golDir = Bodies.rectangle(selCampoW - 40, selCampoH/2, 30, golSize, { isSensor: true, isStatic: true, label: 'golDir', render: { visible: false } });
 
             bola = Bodies.circle(selCampoW/2, selCampoH/2, 12, { label: 'bola', restitution: 0.8, frictionAir: 0.012, density: 0.002, render: { fillStyle: '#ff9800', strokeStyle: '#fff', lineWidth: 2 } });
-            player1 = Bodies.circle(selCampoW * 0.25, selCampoH/2, 22, { label: 'p1', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP1.cores?.bg||'#fff', strokeStyle: cfgP1.cores?.line||'#000', lineWidth: 3 } });
-            player2 = Bodies.circle(selCampoW * 0.75, selCampoH/2, 22, { label: 'p2', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP2.cores?.bg||'#000', strokeStyle: cfgP2.cores?.line||'#fff', lineWidth: 3 } });
+            player1 = Bodies.circle(selCampoW * 0.25, selCampoH/2, 22, { label: 'p1', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP1.cores?.bg||'#3498db', strokeStyle: cfgP1.cores?.line||'#fff', lineWidth: 3 } });
+            player2 = Bodies.circle(selCampoW * 0.75, selCampoH/2, 22, { label: 'p2', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP2.cores?.bg||'#e74c3c', strokeStyle: cfgP2.cores?.line||'#fff', lineWidth: 3 } });
 
             Composite.add(engine.world, [...walls, golEsq, golDir, bola, player1, player2]);
 
