@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>IAES BALL - Versão Definitiva Pro 3.0</title>
+    <title>IAES BALL - Versão Pro Definitiva</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
@@ -11,7 +11,7 @@
             margin: 0; padding: 0; background: radial-gradient(circle, #1a2a3a, #000000);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             height: 100vh; font-family: 'Montserrat', sans-serif; overflow: hidden; color: white;
-            user-select: none;
+            user-select: none; /* Previne seleção acidental */
         }
         
         .glass-panel {
@@ -58,7 +58,7 @@
         .camisa-manga-esq, .camisa-manga-dir { position: absolute; width: 35px; height: 45px; background: #fff; top: 15px; border: 5px solid #000; border-radius: 8px; box-sizing: border-box; }
         .camisa-manga-esq { left: 0; transform: rotate(20deg); } .camisa-manga-dir { right: 0; transform: rotate(-20deg); }
 
-        /* NOVO DESIGN DO PLACAR PROFISSIONAL */
+        /* NOVO PLACAR COM DESIGN DE TRANSMISSÃO OFICIAL */
         #top-bar { 
             display: none; 
             align-items: center; 
@@ -93,7 +93,6 @@
         .bolinha.erro { background: #e74c3c; border-color: #c0392b; box-shadow: 0 0 10px #e74c3c; }
         .divisoria { display: inline-block; width: 2px; height: 20px; background: #777; margin: 0 15px; vertical-align: bottom; }
 
-        /* FÍSICA E CAMPOS BLINDADOS */
         #game-wrapper { position: relative; display: none; border-radius: 8px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); outline: none; cursor: default; }
         #field-canvas, #matter-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
         #field-canvas { z-index: 1; } #matter-container { z-index: 2; pointer-events: none; }
@@ -114,8 +113,8 @@
         #btn-skip-replay { bottom: 25px; right: 25px; display: none; background: rgba(231, 76, 60, 0.9); }
         #btn-proximo-penalti { top: 25px; right: 25px; background: rgba(231, 76, 60, 0.9); border-color: #f1c40f; display: none; }
 
-        /* Estilos Online Otimizados */
-        .input-sala { padding: 15px; font-size: 24px; border-radius: 8px; border: 2px solid #3498db; background: #222; color: #fff; text-align: center; margin-bottom: 15px; width: 80%; font-family: 'Montserrat'; font-weight: bold; outline: none; letter-spacing: 3px; }
+        /* Estilos do Input liberados para digitação */
+        .input-sala { padding: 15px; font-size: 24px; border-radius: 8px; border: 2px solid #3498db; background: #222; color: #fff; text-align: center; margin-bottom: 15px; width: 80%; font-family: 'Montserrat'; font-weight: bold; outline: none; letter-spacing: 3px; user-select: auto; -webkit-user-select: auto; }
         .input-sala:focus { border-color: #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); }
         .codigo-sala { font-size: 40px; color: #2ecc71; letter-spacing: 5px; margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.5); border-radius: 10px; border: 2px dashed #2ecc71; }
         #status-conexao { margin-top: 15px; font-size: 14px; color: #f1c40f; font-weight: bold; }
@@ -154,7 +153,7 @@
 
         <div id="screen-online-join" class="screen">
             <h2>Entrar em Sala</h2>
-            <input type="text" id="input-sala-codigo" class="input-sala" placeholder="CÓDIGO DE 5 LETRAS" maxlength="5" style="text-transform: uppercase;">
+            <input type="text" id="input-sala-codigo" class="input-sala" placeholder="CÓDIGO DE 6 LETRAS" maxlength="6" style="text-transform: uppercase;">
             <button class="btn btn-avancar" onclick="conectarNaSala()">CONECTAR</button>
             <div id="status-conexao-client" style="margin-top: 15px; color: #e74c3c; font-weight: bold;"></div>
             <button class="btn btn-voltar" style="margin-top: 20px;" onclick="showScreen('screen-online-choice')">⏴ VOLTAR</button>
@@ -220,7 +219,7 @@
         </div>
     </div>
 
-    <!-- HUD DA PARTIDA PROFISSIONAL -->
+    <!-- HUD DA PARTIDA COM NOVO LAYOUT -->
     <button id="btn-voltar-partida" class="btn-ingame" onclick="voltarMenu()">⏴ VOLTAR AO MENU</button>
 
     <div id="top-bar" class="glass-panel">
@@ -237,8 +236,7 @@
         <div id="dots-p2" style="display: inline-block;"></div>
     </div>
 
-    <!-- ÁREA DO JOGO -->
-    <div id="game-wrapper" tabindex="0">
+    <div id="game-wrapper">
         <canvas id="field-canvas"></canvas>
         <div id="matter-container"></div>
         <div id="bar-top" class="cine-bar"></div>
@@ -260,25 +258,13 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO DOS SERVIDORES PÚBLICOS DO GOOGLE PARA GARANTIR CONEXÃO
-        const peerConfig = {
-            config: {
-                'iceServers': [
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:stun1.l.google.com:19302' },
-                    { urls: 'stun:stun2.l.google.com:19302' },
-                    { urls: 'stun:stun3.l.google.com:19302' },
-                    { urls: 'stun:stun4.l.google.com:19302' }
-                ]
-            }
-        };
-
+        // --- MULTIPLAYER P2P (PeerJS) ---
         let peer = null; let conn = null; let isOnline = false; let isHost = true;
         let remoteKeys = {}; let myRoomID = "";
 
         function gerarCodigo() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let res = '';
-            for(let i=0; i<5; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+            for(let i=0; i<6; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
             return res;
         }
 
@@ -293,13 +279,14 @@
             showScreen('screen-online-host'); uiText('txt-codigo-sala', "GERANDO...");
 
             try {
-                peer = new Peer('iaesball-' + myRoomID, peerConfig);
+                // Instancia simples e resiliente
+                peer = new Peer('iaesball-' + myRoomID);
                 
                 peer.on('open', (id) => { uiText('txt-codigo-sala', myRoomID); });
                 
                 peer.on('connection', (connection) => { 
                     conn = connection; 
-                    uiText('status-conexao', "Jogador conectado! Entrando no Menu...");
+                    uiText('status-conexao', "Jogador conectado! Sincronizando...");
                     
                     conn.on('data', (data) => { 
                         if (data.type === 'input') remoteKeys = data.keys; 
@@ -312,18 +299,18 @@
                         }
                     });
 
-                    // HOST AVANÇA ASSIM QUE CONECTA (Prevenção contra atrasos na rede)
-                    const avancarRapido = () => { setTimeout(() => { showScreen('screen-mode'); }, 800); };
+                    // HOST AVANÇA IMEDIATAMENTE (Sem travar no Loading)
+                    const avancarRapido = () => { setTimeout(() => { showScreen('screen-mode'); }, 500); };
                     if (conn.open) avancarRapido();
                     else conn.on('open', avancarRapido);
                 });
                 
                 peer.on('error', (err) => { 
                     if (err.type === 'unavailable-id') { iniciarHost(); } 
-                    else { uiText('status-conexao', "Erro na rede. Clique Cancelar e tente novamente."); console.error(err); }
+                    else { uiText('status-conexao', "Erro de Rede. Atualize a página."); }
                 });
             } catch (e) {
-                uiText('status-conexao', "Falha ao criar sala. Verifique a internet.");
+                uiText('status-conexao', "Erro ao iniciar o Host.");
             }
         }
 
@@ -335,7 +322,7 @@
             uiText('status-conexao-client', "Conectando ao servidor...");
             
             try {
-                peer = new Peer(peerConfig);
+                peer = new Peer();
                 peer.on('open', (id) => {
                     uiText('status-conexao-client', "Buscando sala " + val + "...");
                     conn = peer.connect('iaesball-' + val, { reliable: true });
@@ -350,7 +337,7 @@
                     if(conn.open) appCliente();
                     else conn.on('open', appCliente);
 
-                    setTimeout(() => { if(!conectou && estadoJogo === 'MENU') uiText('status-conexao-client', "Erro: Tempo esgotado ou Sala Inexistente."); }, 4000);
+                    setTimeout(() => { if(!conectou && estadoJogo === 'MENU') uiText('status-conexao-client', "Código Inválido ou Partida Fechada."); }, 4000);
                     
                     conn.on('data', (data) => {
                         if (data.type === 'your_turn') {
@@ -383,9 +370,9 @@
                         }
                     });
                 });
-                peer.on('error', (err) => { uiText('status-conexao-client', "Erro: Código inválido ou problema de rede."); });
+                peer.on('error', (err) => { uiText('status-conexao-client', "Erro de rede."); });
             } catch (e) {
-                uiText('status-conexao-client', "Erro ao conectar. Tente novamente.");
+                uiText('status-conexao-client', "Erro fatal no PeerJS.");
             }
         }
 
@@ -405,7 +392,7 @@
                 else if (estadoJogo === 'FIM') {
                     uiText('texto-gol', data.msg); uiColor('texto-gol', '#fff');
                     uiHide('texto-estado'); uiShow('mensagem-overlay', 'flex'); document.getElementById('mensagem-overlay').style.background = 'rgba(0,0,0,0.8)';
-                    uiHide('botoes-fim-jogo'); // Client espera ordem do Host
+                    uiHide('botoes-fim-jogo'); // O client sai voltando pro menu pela HUD
                 }
                 else if (estadoJogo === 'JOGANDO') resetarUICompleta();
                 else if (estadoJogo === 'PAUSADO') {
@@ -423,7 +410,7 @@
             showScreen('screen-home');
         }
 
-        // --- SISTEMA FÍSICO E BD ---
+        // --- SISTEMA FÍSICO E BD DE TIMES ---
         const Engine = Matter.Engine, Render = Matter.Render, Runner = Matter.Runner, Bodies = Matter.Bodies, Body = Matter.Body, Composite = Matter.Composite, Events = Matter.Events;
 
         const TIMES = {
@@ -463,42 +450,42 @@
         function uiText(id, txt) { const el = document.getElementById(id); if(el) el.innerText = txt; }
         function uiColor(id, color) { const el = document.getElementById(id); if(el) el.style.color = color; }
 
+        function obterCorTextoVisivel(corBg) {
+            const bg = String(corBg || '#ffffff').toLowerCase();
+            const coresEscuras = ['#000000', '#111111', '#1a1a1a', '#006437', '#8b0000'];
+            return coresEscuras.includes(bg) ? '#ffffff' : bg;
+        }
+
         function resetarUICompleta() {
             uiHide('mensagem-overlay'); uiHide('botoes-fim-jogo'); uiHide('indicador-replay');
             uiHide('btn-skip-replay'); uiHide('btn-proximo-penalti'); uiHide('texto-estado');
             document.getElementById('bar-top').style.height = '0'; document.getElementById('bar-bottom').style.height = '0';
         }
 
-        // LIMPEZA SEGURA 100% BLINDADA (DESTRÓI O CANVAS PARA NÃO DAR TELA PRETA)
+        // LIMPEZA 100% BLINDADA DA MEMÓRIA PARA EVITAR A TELA PRETA
         function limparMotorFisico() {
-            if (runner) { Matter.Runner.stop(runner); runner = null; }
-            if (render) { Matter.Render.stop(render); render = null; }
-            if (engine) { Matter.Events.off(engine); Matter.Composite.clear(engine.world, false, true); engine = null; }
+            try {
+                if (runner) { Matter.Runner.stop(runner); runner = null; }
+                if (render) { Matter.Render.stop(render); render = null; }
+                if (engine) { Matter.Events.off(engine); engine = null; }
 
-            const wrapper = document.getElementById('game-wrapper');
-            const oldCanvas = document.getElementById('field-canvas');
-            if (oldCanvas) oldCanvas.remove();
-            const oldMatter = document.getElementById('matter-container');
-            if (oldMatter) oldMatter.remove();
-
-            // Recria as divs na ordem exata para garantir funcionamento limpo
-            const newCanvas = document.createElement('canvas');
-            newCanvas.id = 'field-canvas';
-            wrapper.insertBefore(newCanvas, wrapper.firstChild);
-
-            const newMatter = document.createElement('div');
-            newMatter.id = 'matter-container';
-            wrapper.insertBefore(newMatter, newCanvas.nextSibling);
+                const mc = document.getElementById('matter-container');
+                if (mc) mc.innerHTML = ''; 
+                
+                const bgCanvas = document.getElementById('field-canvas');
+                if (bgCanvas) { const ctx = bgCanvas.getContext('2d'); ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height); }
+            } catch(e) {}
         }
 
-        // CONTROLES DE TECLADO (LIVRES ENQUANTO ESTIVER NO MENU)
+        // CONTROLES DE TECLADO 100% LIVRES NO MENU (Para digitar à vontade)
         const keys = {};
         window.addEventListener('keydown', (e) => { 
-            if (estadoJogo === 'MENU') return; // Libera toda e qualquer digitação nos menus
-            if (e.target.tagName === 'INPUT') return; 
-
-            if (e.code === 'Enter' || e.code === 'Space') { if(document.activeElement && document.activeElement.tagName !== 'INPUT') document.activeElement.blur(); e.preventDefault(); }
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
+            if (estadoJogo === 'MENU') return; 
+            
+            // Só previne o comportamento original de rolar a tela se estiver jogando
+            if (estadoJogo === 'JOGANDO') {
+                if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) e.preventDefault();
+            }
             
             if(e.code) keys[e.code.toLowerCase()] = true; if(e.key) keys[e.key.toLowerCase()] = true;
         }, { passive: false });
@@ -506,28 +493,6 @@
         window.addEventListener('keyup', (e) => { 
             if(e.code) keys[e.code.toLowerCase()] = false; if(e.key) keys[e.key.toLowerCase()] = false;
         });
-
-        function forceFocus() {
-            if (estadoJogo !== 'JOGANDO') return; // Não rouba o foco do jogador nos menus!
-            if(document.activeElement && document.activeElement.blur && document.activeElement.tagName !== 'INPUT') { document.activeElement.blur(); }
-            const wrapper = document.getElementById('game-wrapper'); if(wrapper) wrapper.focus();
-        }
-
-        window.addEventListener('click', (e) => {
-            if (estadoJogo === 'MENU' || e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
-            forceFocus();
-        });
-
-        function getLocalInputs() {
-            return {
-                w: keys['keyw'] || keys['w'] || keys['arrowup'],
-                s: keys['keys'] || keys['s'] || keys['arrowdown'],
-                a: keys['keya'] || keys['a'] || keys['arrowleft'],
-                d: keys['keyd'] || keys['d'] || keys['arrowright'],
-                shoot: keys['space'] || keys[' '] || keys['enter'],
-                dash: keys['shiftleft'] || keys['shiftright'] || keys['shift'] || keys['controlleft'] || keys['controlright'] || keys['control'] || keys['numpad0'] || keys['0']
-            };
-        }
 
         // --- MENUS DE ESCOLHA LOCAL ---
         function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen')); document.getElementById(id).classList.add('active-screen'); }
@@ -565,7 +530,7 @@
         function voltarParaTimes() { showScreen('screen-team'); }
 
         function confirmarUniforme() {
-            if(!timeTemporario) { alert("Escolha um time clicando no escudo!"); return; }
+            if(!timeTemporario) { alert("Você precisa escolher o time clicando no escudo dele na tela anterior."); return; }
 
             const uniValue = document.querySelector('input[name="uni-select"]:checked').value;
             const coresFinal = uniValue === "1" ? TIMES[timeTemporario].cor1 : TIMES[timeTemporario].cor2;
@@ -579,7 +544,7 @@
                         conn.send({ type: 'your_turn', modo: modoDeJogo, w: selCampoW, h: selCampoH, cfgP1: cfgP1 });
                         showScreen('screen-host-waiting-p2');
                     } else {
-                        alert("A conexão com o outro jogador caiu!"); voltarMenu();
+                        alert("O seu amigo se desconectou."); voltarMenu();
                     }
                 } else {
                     currPlayer = 2; prepararTelaTime(); showScreen('screen-team');
@@ -593,7 +558,7 @@
                         conn.send({ type: 'p2_ready', cfgP2: cfgP2 });
                         showScreen('screen-client-waiting');
                     } else {
-                        alert("O Host desconectou da sala!"); voltarMenu();
+                        alert("Conexão perdida com o Host."); voltarMenu();
                     }
                 } else {
                     uiHide('menu-container'); iniciarEngineJogo();
@@ -613,13 +578,12 @@
             uiHide('game-wrapper'); uiHide('top-bar'); uiHide('btn-voltar-partida'); uiHide('placar-penaltis'); 
             resetarUICompleta();
             
-            // Lógica de reset absoluta
-            timeTemporario = ""; cfgP1 = null; cfgP2 = null;
+            // Garantir que as variáveis voltem para o zero absoluto
+            timeTemporario = ""; cfgP1 = null; cfgP2 = null; currPlayer = 1;
             
-            if (isOnline) {
+            if (isOnline && !isHost) {
                 cancelarOnline(); 
             } else {
-                currPlayer = 1;
                 uiShow('menu-container'); showScreen('screen-home'); 
             }
         }
@@ -632,12 +596,12 @@
             historicoPosicoes = []; particulas = []; resetarUICompleta();
             frameReplay = 0; rewindIndex = 0; dashP1 = 0; dashP2 = 0; delayTimer = 0; onMessageEnd = null;
 
-            // Se algo falhar na transição, defina fallbacks de segurança:
-            if (!cfgP1 || !cfgP1.cores) cfgP1 = { time: "P1", uni: 1, cores: {bg: "#3498db", line: "#fff", num: "#fff"} };
-            if (!cfgP2 || !cfgP2.cores) cfgP2 = { time: "P2", uni: 1, cores: {bg: "#e74c3c", line: "#fff", num: "#fff"} };
+            if (!cfgP1) cfgP1 = { time: "P1", uni: 1, cores: {bg: "#3498db", line: "#fff", num: "#fff"} };
+            if (!cfgP2) cfgP2 = { time: "P2", uni: 1, cores: {bg: "#e74c3c", line: "#fff", num: "#fff"} };
 
             uiText('score1', "0"); uiText('score2', "0");
-            uiShow('btn-voltar-partida'); uiShow('top-bar', 'flex'); document.getElementById('top-bar').style.maxWidth = selCampoW + 'px';
+            uiShow('btn-voltar-partida'); uiShow('top-bar', 'flex'); 
+            document.getElementById('top-bar').style.maxWidth = selCampoW + 'px';
             uiHide('botoes-fim-jogo');
             
             uiText('nome-p1', cfgP1.time ? cfgP1.time.substring(0, 3).toUpperCase() : 'P1');
@@ -645,7 +609,9 @@
             uiText('nome-p2', cfgP2.time ? cfgP2.time.substring(0, 3).toUpperCase() : 'P2');
             uiColor('nome-p2', obterCorTextoVisivel(cfgP2.cores.bg));
 
-            uiShow('game-wrapper'); const wrapper = document.getElementById('game-wrapper');
+            uiShow('game-wrapper'); 
+            const wrapper = document.getElementById('game-wrapper');
+            wrapper.style.display = 'block';
             wrapper.style.width = selCampoW + 'px'; wrapper.style.height = selCampoH + 'px';
 
             try {
@@ -656,10 +622,9 @@
                 } else {
                     uiShow('timer'); uiHide('placar-penaltis'); reposicionarJogadores();
                 }
-                forceFocus();
             } catch(e) {
                 console.error("ERRO GRAVE NA ENGINE:", e);
-                alert("Houve um erro no carregamento da partida. Voltando ao Menu.");
+                alert("Falha ao desenhar o campo.");
                 voltarMenu();
             }
         }
@@ -867,10 +832,10 @@
                                     } else {
                                         if (!isProrrogacao) {
                                             isProrrogacao = true; tempoRestante = 30;
-                                            mostrarMensagemEspecial("PRORROGAÇÃO!", 150, () => { estadoJogo = 'JOGANDO'; forceFocus(); });
+                                            mostrarMensagemEspecial("PRORROGAÇÃO!", 150, () => { estadoJogo = 'JOGANDO'; });
                                         } else {
                                             mostrarMensagemEspecial("PÊNALTIS!", 180, () => {
-                                                modoDeJogo = 'PENALTI'; prepararModoPenaltiUI(); reposicionarJogadores(); estadoJogo = 'JOGANDO'; forceFocus();
+                                                modoDeJogo = 'PENALTI'; prepararModoPenaltiUI(); reposicionarJogadores(); estadoJogo = 'JOGANDO'; 
                                             });
                                         }
                                     }
@@ -919,7 +884,7 @@
             }
         }
 
-        // --- SISTEMA DE CONTROLES: FORÇAS E REGRAS ---
+        // --- SISTEMA DE CONTROLES ---
         function tentarChutar(jogador) {
             if (modoDeJogo === 'PENALTI' && toquesNaBolaPenalti >= 2) return; 
             
@@ -959,13 +924,9 @@
                 w = local.w; s = local.s; a = local.a; d = local.d; space = local.shoot; shift = local.dash;
                 up = remoteKeys.w; down = remoteKeys.s; left = remoteKeys.a; right = remoteKeys.d; enter = remoteKeys.shoot; ctrl = remoteKeys.dash;
             } else {
-                w = keys['keyw'] || keys['w']; s = keys['keys'] || keys['s'];
-                a = keys['keya'] || keys['a']; d = keys['keyd'] || keys['d'];
-                space = keys['space'] || keys[' ']; shift = keys['shiftleft'] || keys['shiftright'] || keys['shift'];
-                
-                up = keys['arrowup']; down = keys['arrowdown'];
-                left = keys['arrowleft']; right = keys['arrowright'];
-                enter = keys['enter']; ctrl = keys['controlleft'] || keys['controlright'] || keys['control'] || keys['numpad0'] || keys['0'];
+                const local = getLocalInputs();
+                w = local.w; s = local.s; a = local.a; d = local.d; space = local.shoot; shift = local.dash;
+                up = keys['arrowup']; down = keys['arrowdown']; left = keys['arrowleft']; right = keys['arrowright']; enter = keys['enter']; ctrl = keys['controlleft'] || keys['controlright'] || keys['control'] || keys['numpad0'] || keys['0'];
             }
             
             if(modoDeJogo === 'PENALTI') {
@@ -1038,7 +999,7 @@
             turnoPenalti = turnoPenalti === 1 ? 2 : 1;
             
             mostrarMensagemEspecial(foiGol ? "GOL VALIDADO!" : "PERDEU!", 120, () => {
-                reposicionarJogadores(); toquesNaBolaPenalti = 0; framesDesdeUltimoToque = 999; timerPosToque = 0; estadoJogo = 'JOGANDO'; forceFocus();
+                reposicionarJogadores(); toquesNaBolaPenalti = 0; framesDesdeUltimoToque = 999; timerPosToque = 0; estadoJogo = 'JOGANDO';
             });
         }
 
@@ -1145,7 +1106,7 @@
 
         function encerrarReplay() {
             resetarUICompleta();
-            reposicionarJogadores(); historicoPosicoes = []; estadoJogo = 'JOGANDO'; forceFocus(); 
+            reposicionarJogadores(); historicoPosicoes = []; estadoJogo = 'JOGANDO'; 
         }
 
         function tocarReplay() {
