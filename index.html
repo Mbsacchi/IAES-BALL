@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>IAES BALL - Multiplayer 100% Sincronizado</title>
+    <title>IAES BALL - Versão Definitiva Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
@@ -88,11 +88,10 @@
         #btn-skip-replay { bottom: 25px; right: 25px; display: none; background: rgba(231, 76, 60, 0.9); }
         #btn-proximo-penalti { top: 25px; right: 25px; background: rgba(231, 76, 60, 0.9); border-color: #f1c40f; display: none; }
 
-        /* Estilos Online Otimizados */
         .input-sala { padding: 15px; font-size: 18px; border-radius: 8px; border: 2px solid #3498db; background: #222; color: #fff; text-align: center; margin-bottom: 15px; width: 80%; font-family: 'Montserrat'; font-weight: bold; outline: none; user-select: auto; }
         .input-sala:focus { border-color: #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); }
         .codigo-sala { font-size: 40px; color: #2ecc71; letter-spacing: 5px; margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.5); border-radius: 10px; border: 2px dashed #2ecc71; }
-        #status-conexao { margin-top: 15px; font-size: 14px; color: #f1c40f; }
+        #status-conexao { margin-top: 15px; font-size: 14px; color: #f1c40f; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -132,10 +131,9 @@
         <!-- FASE ONLINE: CLIENT JOIN -->
         <div id="screen-online-join" class="screen">
             <h2>Entrar em Sala</h2>
-            <!-- O INPUT AGORA TEM FOCO TOTALMENTE LIVRE -->
             <input type="text" id="input-sala-codigo" class="input-sala" placeholder="DIGITE O CÓDIGO DA SALA" maxlength="6" style="text-transform: uppercase;">
             <button class="btn btn-avancar" onclick="conectarNaSala()">CONECTAR</button>
-            <div id="status-conexao-client" style="margin-top: 15px; color: #e74c3c;"></div>
+            <div id="status-conexao-client" style="margin-top: 15px; color: #e74c3c; font-weight: bold;"></div>
             <button class="btn btn-voltar" style="margin-top: 20px;" onclick="showScreen('screen-online-choice')">⏴ VOLTAR</button>
         </div>
 
@@ -240,6 +238,17 @@
     </div>
 
     <script>
+        // CONFIGURAÇÃO DO SERVIDOR WEB RTC COM STUN (Garante a conexão)
+        const peerConfig = {
+            config: {
+                'iceServers': [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun2.l.google.com:19302' }
+                ]
+            }
+        };
+
         // --- MULTIPLAYER P2P (PeerJS) ---
         let peer = null; let conn = null; let isOnline = false; let isHost = true;
         let remoteKeys = {}; let myRoomID = "";
@@ -260,12 +269,12 @@
             isHost = true; currPlayer = 1; myRoomID = gerarCodigo();
             showScreen('screen-online-host'); uiText('txt-codigo-sala', "GERANDO...");
 
-            peer = new Peer('iaesball-' + myRoomID);
+            peer = new Peer('iaesball-' + myRoomID, peerConfig);
             peer.on('open', (id) => { uiText('txt-codigo-sala', myRoomID); });
             
             peer.on('connection', (connection) => { 
                 conn = connection; 
-                uiText('status-conexao', "Jogador conectado! Configurando a sala...");
+                uiText('status-conexao', "Jogador conectado! Sincronizando sala...");
                 
                 conn.on('data', (data) => { 
                     if (data.type === 'input') remoteKeys = data.keys; 
@@ -278,10 +287,13 @@
                     }
                 });
 
-                // Host avança imediatamente sem esperar burocracia do servidor
-                setTimeout(() => { showScreen('screen-mode'); }, 1000);
+                // Assim que a conexão for autenticada bilateralmente, o Host avança
+                conn.on('open', () => { 
+                    uiText('status-conexao', "Autenticado! Carregando...");
+                    setTimeout(() => { showScreen('screen-mode'); }, 500); 
+                });
             });
-            peer.on('error', (err) => { uiText('status-conexao', "Erro na sala. Tente novamente."); console.error(err); });
+            peer.on('error', (err) => { uiText('status-conexao', "Erro na rede. Clique Cancelar e tente novamente."); console.error(err); });
         }
 
         function conectarNaSala() {
@@ -291,9 +303,9 @@
             isHost = false; currPlayer = 2; 
             uiText('status-conexao-client', "Conectando ao servidor...");
             
-            peer = new Peer();
+            peer = new Peer(peerConfig);
             peer.on('open', (id) => {
-                uiText('status-conexao-client', "Buscando sala...");
+                uiText('status-conexao-client', "Buscando sala " + val + "...");
                 conn = peer.connect('iaesball-' + val, { reliable: true });
                 
                 conn.on('open', () => { 
@@ -332,7 +344,7 @@
                     }
                 });
             });
-            peer.on('error', (err) => { uiText('status-conexao-client', "Sala não encontrada!"); });
+            peer.on('error', (err) => { uiText('status-conexao-client', "Erro: Sala não encontrada ou falha de rede."); });
         }
 
         function sincronizarUIRemota(data) {
@@ -351,7 +363,7 @@
                 else if (estadoJogo === 'FIM') {
                     uiText('texto-gol', data.msg); uiColor('texto-gol', '#fff');
                     uiHide('texto-estado'); uiShow('mensagem-overlay', 'flex'); document.getElementById('mensagem-overlay').style.background = 'rgba(0,0,0,0.8)';
-                    uiHide('botoes-fim-jogo'); 
+                    uiHide('botoes-fim-jogo'); // O client não clica em jogar novamente
                 }
                 else if (estadoJogo === 'JOGANDO') resetarUICompleta();
                 else if (estadoJogo === 'PAUSADO') {
@@ -413,6 +425,7 @@
             document.getElementById('bar-top').style.height = '0'; document.getElementById('bar-bottom').style.height = '0';
         }
 
+        // LIMPEZA SEGURA E ABSOLUTA DO MATTER JS
         function limparMotorFisico() {
             if (runner) { Runner.stop(runner); runner = null; }
             if (render) {
@@ -421,20 +434,22 @@
                 render = null;
             }
             if (engine) {
-                Matter.Events.off(engine); Matter.World.clear(engine.world); Engine.clear(engine); engine = null;
+                Matter.Events.off(engine);
+                Composite.clear(engine.world); // USANDO O COMPOSITE CORRETO PARA EVITAR BUG DE TELA PRETA
+                Engine.clear(engine);
+                engine = null;
             }
             const mc = document.getElementById('matter-container');
             if (mc) mc.innerHTML = ''; 
         }
 
-        // --- CONTROLES DE TECLADO 100% BLINDADOS ---
+        // CONTROLES DE TECLADO DESBLOQUEADOS NO MENU
         const keys = {};
         window.addEventListener('keydown', (e) => { 
-            // Não interfere se o jogador estiver no Menu ou digitando códigos
-            if (estadoJogo === 'MENU') return;
+            if (estadoJogo === 'MENU') return; // Permite digitação livre no menu
             if (e.target.tagName === 'INPUT') return; 
 
-            if (e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); }
+            if (e.code === 'Enter' || e.code === 'Space') { if(document.activeElement && document.activeElement.tagName !== 'INPUT') document.activeElement.blur(); e.preventDefault(); }
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
             
             if(e.code) keys[e.code.toLowerCase()] = true; if(e.key) keys[e.key.toLowerCase()] = true;
@@ -444,7 +459,6 @@
             if(e.code) keys[e.code.toLowerCase()] = false; if(e.key) keys[e.key.toLowerCase()] = false;
         });
 
-        // Impede que clicar na tela de Menu atrapalhe a digitação
         window.addEventListener('click', (e) => {
             if (estadoJogo === 'MENU') return; 
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
@@ -512,18 +526,26 @@
             if (currPlayer === 1) {
                 cfgP1 = { time: timeTemporario, uni: uniValue, cores: coresFinal };
                 
-                if (isOnline && isHost && conn) {
-                    conn.send({ type: 'your_turn', modo: modoDeJogo, w: selCampoW, h: selCampoH, cfgP1: cfgP1 });
-                    showScreen('screen-host-waiting-p2');
+                if (isOnline) {
+                    if (isHost && conn && conn.open) {
+                        conn.send({ type: 'your_turn', modo: modoDeJogo, w: selCampoW, h: selCampoH, cfgP1: cfgP1 });
+                        showScreen('screen-host-waiting-p2');
+                    } else {
+                        alert("A conexão com o outro jogador caiu!"); voltarMenu();
+                    }
                 } else {
                     currPlayer = 2; prepararTelaTime(); showScreen('screen-team');
                 }
             } else {
                 cfgP2 = { time: timeTemporario, uni: uniValue, cores: coresFinal };
                 
-                if (isOnline && !isHost && conn) {
-                    conn.send({ type: 'p2_ready', cfgP2: cfgP2 });
-                    showScreen('screen-client-waiting');
+                if (isOnline) {
+                    if (!isHost && conn && conn.open) {
+                        conn.send({ type: 'p2_ready', cfgP2: cfgP2 });
+                        showScreen('screen-client-waiting');
+                    } else {
+                        alert("O Host desconectou da sala!"); voltarMenu();
+                    }
                 } else {
                     uiHide('menu-container'); iniciarEngineJogo();
                 }
@@ -570,14 +592,20 @@
             uiShow('game-wrapper'); const wrapper = document.getElementById('game-wrapper');
             wrapper.style.width = selCampoW + 'px'; wrapper.style.height = selCampoH + 'px';
 
-            desenharCampoRealista(); configurarFisica();
-            
-            if(modoDeJogo === 'PENALTI') {
-                prepararModoPenaltiUI(); reposicionarJogadores();
-            } else {
-                uiShow('timer'); uiHide('placar-penaltis'); reposicionarJogadores();
+            try {
+                desenharCampoRealista(); configurarFisica();
+                
+                if(modoDeJogo === 'PENALTI') {
+                    prepararModoPenaltiUI(); reposicionarJogadores();
+                } else {
+                    uiShow('timer'); uiHide('placar-penaltis'); reposicionarJogadores();
+                }
+                forceFocus();
+            } catch(e) {
+                console.error("ERRO GRAVE NA ENGINE:", e);
+                alert("Houve um erro ao renderizar o campo. Retornando ao menu.");
+                voltarMenu();
             }
-            forceFocus();
         }
 
         function prepararModoPenaltiUI() {
