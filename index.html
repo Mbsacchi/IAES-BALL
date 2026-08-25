@@ -89,7 +89,8 @@
         #btn-proximo-penalti { top: 25px; right: 25px; background: rgba(231, 76, 60, 0.9); border-color: #f1c40f; display: none; }
 
         /* Estilos Online */
-        .input-sala { padding: 15px; font-size: 18px; border-radius: 8px; border: 2px solid #3498db; background: #222; color: #fff; text-align: center; margin-bottom: 15px; width: 80%; font-family: 'Montserrat'; font-weight: bold; }
+        .input-sala { padding: 15px; font-size: 18px; border-radius: 8px; border: 2px solid #3498db; background: #222; color: #fff; text-align: center; margin-bottom: 15px; width: 80%; font-family: 'Montserrat'; font-weight: bold; outline: none; }
+        .input-sala:focus { border-color: #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); }
         .codigo-sala { font-size: 40px; color: #2ecc71; letter-spacing: 5px; margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.5); border-radius: 10px; border: 2px dashed #2ecc71; }
         #status-conexao { margin-top: 15px; font-size: 14px; color: #f1c40f; }
     </style>
@@ -99,6 +100,7 @@
     <!-- MENUS PRINCIPAIS -->
     <div id="menu-container" class="glass-panel">
         
+        <!-- FASE 0: ESCOLHA DE REDE -->
         <div id="screen-home" class="screen active-screen">
             <h1 style="font-size: 54px; margin-bottom: 5px;">IAES BALL</h1>
             <div style="font-size: 16px; color: #aaa; margin-bottom: 30px;">O Futebol 2D Definitivo</div>
@@ -108,6 +110,7 @@
             </div>
         </div>
 
+        <!-- FASE ONLINE: LOBBY -->
         <div id="screen-online-choice" class="screen">
             <h1>IAES BALL ONLINE</h1>
             <div class="botoes-modo">
@@ -117,6 +120,7 @@
             <button class="btn btn-voltar" style="margin-top: 30px;" onclick="cancelarOnline()">⏴ VOLTAR</button>
         </div>
 
+        <!-- FASE ONLINE: HOST WAITING -->
         <div id="screen-online-host" class="screen">
             <h2>Sua Sala foi Criada!</h2>
             <p>Envie o código abaixo para seu amigo:</p>
@@ -125,27 +129,29 @@
             <button class="btn btn-voltar" style="margin-top: 30px;" onclick="cancelarOnline()">CANCELAR</button>
         </div>
 
+        <!-- FASE ONLINE: CLIENT JOIN -->
         <div id="screen-online-join" class="screen">
             <h2>Entrar em Sala</h2>
-            <input type="text" id="input-sala-codigo" class="input-sala" placeholder="CÓDIGO DA SALA" maxlength="6" style="text-transform: uppercase;">
+            <!-- O INPUT AGORA TEM FOCO LIVRE -->
+            <input type="text" id="input-sala-codigo" class="input-sala" placeholder="DIGITE O CÓDIGO DA SALA" maxlength="6" style="text-transform: uppercase;">
             <button class="btn btn-avancar" onclick="conectarNaSala()">CONECTAR</button>
             <div id="status-conexao-client" style="margin-top: 15px; color: #e74c3c;"></div>
             <button class="btn btn-voltar" style="margin-top: 20px;" onclick="showScreen('screen-online-choice')">⏴ VOLTAR</button>
         </div>
 
-        <!-- NOVAS TELAS DE ESPERA MULTIPLAYER -->
+        <!-- FASE ONLINE: CLIENT WAITING -->
         <div id="screen-client-waiting" class="screen">
             <h2>Conectado com Sucesso!</h2>
             <div class="codigo-sala" style="border-color:#f1c40f; color:#f1c40f; font-size: 20px;">Aguardando Host Configurar a Partida...</div>
-            <button class="btn btn-voltar" style="margin-top: 30px;" onclick="cancelarOnline()">DESCONECTAR</button>
         </div>
         
+        <!-- FASE ONLINE: HOST ESPERANDO P2 ESCOLHER O TIME -->
         <div id="screen-host-waiting-p2" class="screen">
             <h2>Quase lá!</h2>
-            <div class="codigo-sala" style="border-color:#3498db; color:#3498db; font-size: 20px;">O Jogador 2 está escolhendo o Time dele...</div>
+            <div class="codigo-sala" style="border-color:#3498db; color:#3498db; font-size: 20px;">O Jogador 2 está escolhendo o Time...</div>
         </div>
 
-        <!-- TELAS DE JOGO NORMAL -->
+        <!-- FASE 1: MODO DE JOGO -->
         <div id="screen-mode" class="screen">
             <h1>IAES BALL</h1>
             <h2>Modo de Jogo</h2>
@@ -156,6 +162,7 @@
             <button class="btn btn-voltar" style="margin-top: 30px;" onclick="cancelarOnline()">⏴ SAIR</button>
         </div>
 
+        <!-- FASE 2: TAMANHO DO CAMPO -->
         <div id="screen-field" class="screen">
             <h1>IAES BALL</h1>
             <h2>Tamanho do Estádio</h2>
@@ -166,11 +173,13 @@
             </div>
         </div>
 
+        <!-- FASE 3: TIME -->
         <div id="screen-team" class="screen">
             <h2 id="title-jogador-team">JOGADOR 1: Escolha seu Time</h2>
             <div class="grid-times" id="grid-times"></div>
         </div>
 
+        <!-- FASE 4: UNIFORME -->
         <div id="screen-uniform" class="screen">
             <div style="display: flex; align-items: center; width: 100%; margin-bottom: 20px; position: relative; justify-content: center;">
                 <button class="btn" style="position: absolute; left: 0; padding: 10px 15px; font-size: 12px; background: #555;" onclick="voltarParaTimes()">⏴ VOLTAR</button>
@@ -208,6 +217,7 @@
         <div id="dots-p2" style="display: inline-block;"></div>
     </div>
 
+    <!-- ÁREA DO JOGO -->
     <div id="game-wrapper" tabindex="0">
         <canvas id="field-canvas"></canvas>
         <div id="matter-container"></div>
@@ -255,13 +265,12 @@
             
             peer.on('connection', (connection) => { 
                 conn = connection; 
-                uiText('status-conexao', "Jogador conectado! Entrando na partida...");
+                uiText('status-conexao', "Jogador conectado! Iniciando a partida...");
                 
                 conn.on('data', (data) => { 
                     if (data.type === 'input') remoteKeys = data.keys; 
-                    
                     if (data.type === 'p2_ready') {
-                        // O CLiente finalmente escolheu o time dele. Inicia o jogo para o Host!
+                        // O CLiente escolheu o time. Host pode iniciar!
                         cfgP2 = data.cfgP2;
                         uiHide('menu-container'); 
                         conn.send({ type: 'start', cfgP1: cfgP1, cfgP2: cfgP2, w: selCampoW, h: selCampoH, modo: modoDeJogo });
@@ -269,7 +278,10 @@
                     }
                 });
 
-                conn.on('open', () => { setTimeout(() => { showScreen('screen-mode'); }, 1000); });
+                // ATENÇÃO AQUI: Garante que a tela de modo abra sem travar
+                const carregarModos = () => { setTimeout(() => { showScreen('screen-mode'); }, 1000); };
+                if (conn.open) carregarModos();
+                else conn.on('open', carregarModos);
             });
             peer.on('error', (err) => { uiText('status-conexao', "Erro na sala. Tente novamente."); console.error(err); });
         }
@@ -278,7 +290,7 @@
             const val = document.getElementById('input-sala-codigo').value.trim().toUpperCase();
             if(val.length < 5) return;
             
-            isHost = false; currPlayer = 2; // Cliente é sempre Player 2
+            isHost = false; currPlayer = 2; 
             uiText('status-conexao-client', "Conectando ao servidor...");
             
             peer = new Peer();
@@ -286,14 +298,17 @@
                 uiText('status-conexao-client', "Buscando sala...");
                 conn = peer.connect('iaesball-' + val, { reliable: true });
                 
-                conn.on('open', () => { showScreen('screen-client-waiting'); });
+                // ATENÇÃO AQUI: Garante que o cliente veja a tela de espera sem travar
+                const sucessoConexao = () => { showScreen('screen-client-waiting'); };
+                if(conn.open) sucessoConexao();
+                else conn.on('open', sucessoConexao);
                 
                 conn.on('data', (data) => {
-                    // Quando o Host escolhe o modo e o time 1, ele manda isso para o Cliente
+                    // Host escolheu as configs e passou a bola pro Cliente escolher o Time
                     if (data.type === 'your_turn') {
                         cfgP1 = data.cfgP1; modoDeJogo = data.modo; selCampoW = data.w; selCampoH = data.h;
                         currPlayer = 2; 
-                        prepararTelaTime(); showScreen('screen-team'); // Libera pro Cliente escolher o Time 2
+                        prepararTelaTime(); showScreen('screen-team');
                     }
 
                     if (data.type === 'start') {
@@ -339,7 +354,7 @@
                 else if (estadoJogo === 'FIM') {
                     uiText('texto-gol', data.msg); uiColor('texto-gol', '#fff');
                     uiHide('texto-estado'); uiShow('mensagem-overlay', 'flex'); document.getElementById('mensagem-overlay').style.background = 'rgba(0,0,0,0.8)';
-                    uiHide('botoes-fim-jogo'); // O client sai apenas via botão voltar pro menu
+                    uiHide('botoes-fim-jogo'); // O client sai apenas voltando pro menu pelo botão superior
                 }
                 else if (estadoJogo === 'JOGANDO') resetarUICompleta();
                 else if (estadoJogo === 'PAUSADO') {
@@ -400,30 +415,27 @@
             document.getElementById('bar-top').style.height = '0'; document.getElementById('bar-bottom').style.height = '0';
         }
 
-        // LIMPEZA SEGURA DO MOTOR DE FÍSICA PARA EVITAR BUG DE FUNDO DUPLICADO
+        // LIMPEZA SEGURA DA FÍSICA PARA EVITAR BUGS ENTRE PARTIDAS
         function limparMotorFisico() {
             if (runner) { Runner.stop(runner); runner = null; }
             if (render) {
                 Render.stop(render);
-                if (render.canvas && render.canvas.parentNode) {
-                    render.canvas.parentNode.removeChild(render.canvas);
-                }
+                if (render.canvas && render.canvas.parentNode) { render.canvas.parentNode.removeChild(render.canvas); }
                 render = null;
             }
             if (engine) {
-                Matter.Events.off(engine);
-                Matter.World.clear(engine.world);
-                Engine.clear(engine);
-                engine = null;
+                Matter.Events.off(engine); Matter.World.clear(engine.world); Engine.clear(engine); engine = null;
             }
             const mc = document.getElementById('matter-container');
             if (mc) mc.innerHTML = ''; 
         }
 
-        // CONTROLES DE TECLADO
+        // CONTROLES DE TECLADO BLINDADO
         const keys = {};
         window.addEventListener('keydown', (e) => { 
-            if (e.code === 'Enter' || e.code === 'Space') { if(document.activeElement) document.activeElement.blur(); e.preventDefault(); }
+            // PERMITE DIGITAÇÃO NO INPUT SEM ROUBAR O FOCO
+            if (e.target.tagName === 'INPUT') return; 
+            if (e.code === 'Enter' || e.code === 'Space') { if(document.activeElement && document.activeElement.tagName !== 'INPUT') document.activeElement.blur(); e.preventDefault(); }
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
             if(e.code) keys[e.code.toLowerCase()] = true; if(e.key) keys[e.key.toLowerCase()] = true;
         }, { passive: false });
@@ -433,10 +445,14 @@
         });
 
         function forceFocus() {
-            if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+            if (estadoJogo === 'MENU') return; // Não interfere nos menus e digitações
+            if(document.activeElement && document.activeElement.blur && document.activeElement.tagName !== 'INPUT') document.activeElement.blur();
             const wrapper = document.getElementById('game-wrapper'); if(wrapper) wrapper.focus();
         }
-        window.addEventListener('click', forceFocus);
+        window.addEventListener('click', (e) => {
+            if (e.target.tagName === 'INPUT') return; // Deixa o jogador clicar e digitar
+            forceFocus();
+        });
 
         function getLocalInputs() {
             return {
@@ -449,10 +465,10 @@
             };
         }
 
-        // --- MENUS DE ESCOLHA ---
+        // --- MENUS DE ESCOLHA LOCAL ---
         function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen')); document.getElementById(id).classList.add('active-screen'); }
         function escolherModo(modo) { modoDeJogo = modo; showScreen('screen-field'); }
-        function escolherCampo(w, h) { selCampoW = w; selCampoH = h; prepararTelaTime(); showScreen('screen-team'); }
+        function escolherCampo(w, h) { selCampoW = w; selCampoH = h; currPlayer = 1; prepararTelaTime(); showScreen('screen-team'); }
 
         function prepararTelaTime() {
             uiText('title-jogador-team', `JOGADOR ${currPlayer}: Escolha seu Time`);
@@ -492,23 +508,18 @@
                 cfgP1 = { time: timeTemporario, uni: uniValue, cores: coresFinal };
                 
                 if (isOnline && isHost && conn) {
-                    // Host escolheu o time dele (P1). Agora manda pro Cliente escolher o dele (P2).
                     conn.send({ type: 'your_turn', modo: modoDeJogo, w: selCampoW, h: selCampoH, cfgP1: cfgP1 });
                     showScreen('screen-host-waiting-p2');
                 } else {
-                    // Partida Local. Passa pro P2 escolher na mesma máquina.
                     currPlayer = 2; prepararTelaTime(); showScreen('screen-team');
                 }
             } else {
-                // Jogador 2 confirmou.
                 cfgP2 = { time: timeTemporario, uni: uniValue, cores: coresFinal };
                 
                 if (isOnline && !isHost && conn) {
-                    // Cliente escolheu P2, avisa o Host.
                     conn.send({ type: 'p2_ready', cfgP2: cfgP2 });
                     showScreen('screen-client-waiting');
                 } else {
-                    // Local: inicia o jogo na hora.
                     uiHide('menu-container'); iniciarEngineJogo();
                 }
             }
@@ -523,7 +534,6 @@
         function voltarMenu() {
             estadoJogo = 'MENU';
             limparMotorFisico();
-            
             uiHide('game-wrapper'); uiHide('top-bar'); uiHide('btn-voltar-partida'); uiHide('placar-penaltis'); 
             resetarUICompleta();
             
@@ -531,7 +541,7 @@
                 cancelarOnline(); 
             } else {
                 currPlayer = 1;
-                uiShow('menu-container'); showScreen('screen-home'); // Volta pra Home local
+                uiShow('menu-container'); showScreen('screen-home'); 
             }
         }
 
