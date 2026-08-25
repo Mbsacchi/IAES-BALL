@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>IAES BALL - Versão Definitiva Pro</title>
+    <title>IAES BALL - Definitivo Pro 2.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
@@ -99,7 +99,6 @@
     <!-- MENUS PRINCIPAIS -->
     <div id="menu-container" class="glass-panel">
         
-        <!-- FASE 0: ESCOLHA DE REDE -->
         <div id="screen-home" class="screen active-screen">
             <h1 style="font-size: 54px; margin-bottom: 5px;">IAES BALL</h1>
             <div style="font-size: 16px; color: #aaa; margin-bottom: 30px;">O Futebol 2D Definitivo</div>
@@ -109,7 +108,6 @@
             </div>
         </div>
 
-        <!-- FASE ONLINE: LOBBY -->
         <div id="screen-online-choice" class="screen">
             <h1>IAES BALL ONLINE</h1>
             <div class="botoes-modo">
@@ -119,7 +117,6 @@
             <button class="btn btn-voltar" style="margin-top: 30px;" onclick="cancelarOnline()">⏴ VOLTAR</button>
         </div>
 
-        <!-- FASE ONLINE: HOST WAITING -->
         <div id="screen-online-host" class="screen">
             <h2>Sua Sala foi Criada!</h2>
             <p>Envie o código abaixo para seu amigo:</p>
@@ -128,7 +125,6 @@
             <button class="btn btn-voltar" style="margin-top: 30px;" onclick="cancelarOnline()">CANCELAR</button>
         </div>
 
-        <!-- FASE ONLINE: CLIENT JOIN -->
         <div id="screen-online-join" class="screen">
             <h2>Entrar em Sala</h2>
             <input type="text" id="input-sala-codigo" class="input-sala" placeholder="DIGITE O CÓDIGO DA SALA" maxlength="6" style="text-transform: uppercase;">
@@ -137,19 +133,16 @@
             <button class="btn btn-voltar" style="margin-top: 20px;" onclick="showScreen('screen-online-choice')">⏴ VOLTAR</button>
         </div>
 
-        <!-- FASE ONLINE: CLIENT WAITING -->
         <div id="screen-client-waiting" class="screen">
             <h2>Conectado com Sucesso!</h2>
             <div class="codigo-sala" style="border-color:#f1c40f; color:#f1c40f; font-size: 20px;">Aguardando Host Configurar a Partida...</div>
         </div>
         
-        <!-- FASE ONLINE: HOST ESPERANDO P2 ESCOLHER O TIME -->
         <div id="screen-host-waiting-p2" class="screen">
             <h2>Quase lá!</h2>
             <div class="codigo-sala" style="border-color:#3498db; color:#3498db; font-size: 20px;">O Jogador 2 está escolhendo o Time...</div>
         </div>
 
-        <!-- FASE 1: MODO DE JOGO -->
         <div id="screen-mode" class="screen">
             <h1>IAES BALL</h1>
             <h2>Modo de Jogo</h2>
@@ -160,7 +153,6 @@
             <button class="btn btn-voltar" style="margin-top: 30px;" onclick="cancelarOnline()">⏴ SAIR</button>
         </div>
 
-        <!-- FASE 2: TAMANHO DO CAMPO -->
         <div id="screen-field" class="screen">
             <h1>IAES BALL</h1>
             <h2>Tamanho do Estádio</h2>
@@ -171,13 +163,11 @@
             </div>
         </div>
 
-        <!-- FASE 3: TIME -->
         <div id="screen-team" class="screen">
             <h2 id="title-jogador-team">JOGADOR 1: Escolha seu Time</h2>
             <div class="grid-times" id="grid-times"></div>
         </div>
 
-        <!-- FASE 4: UNIFORME -->
         <div id="screen-uniform" class="screen">
             <div style="display: flex; align-items: center; width: 100%; margin-bottom: 20px; position: relative; justify-content: center;">
                 <button class="btn" style="position: absolute; left: 0; padding: 10px 15px; font-size: 12px; background: #555;" onclick="voltarParaTimes()">⏴ VOLTAR</button>
@@ -215,7 +205,6 @@
         <div id="dots-p2" style="display: inline-block;"></div>
     </div>
 
-    <!-- ÁREA DO JOGO -->
     <div id="game-wrapper" tabindex="0">
         <canvas id="field-canvas"></canvas>
         <div id="matter-container"></div>
@@ -238,13 +227,15 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO SERVIDOR WEB RTC COM STUN (Garante a conexão)
+        // CONFIGURAÇÃO DO SERVIDOR WEB RTC COM STUN
         const peerConfig = {
             config: {
                 'iceServers': [
                     { urls: 'stun:stun.l.google.com:19302' },
                     { urls: 'stun:stun1.l.google.com:19302' },
-                    { urls: 'stun:stun2.l.google.com:19302' }
+                    { urls: 'stun:stun2.l.google.com:19302' },
+                    { urls: 'stun:stun3.l.google.com:19302' },
+                    { urls: 'stun:stun4.l.google.com:19302' }
                 ]
             }
         };
@@ -287,11 +278,13 @@
                     }
                 });
 
-                // Assim que a conexão for autenticada bilateralmente, o Host avança
-                conn.on('open', () => { 
+                const iniciarHostApp = () => {
                     uiText('status-conexao', "Autenticado! Carregando...");
                     setTimeout(() => { showScreen('screen-mode'); }, 500); 
-                });
+                };
+
+                if (conn.open) iniciarHostApp();
+                else conn.on('open', iniciarHostApp);
             });
             peer.on('error', (err) => { uiText('status-conexao', "Erro na rede. Clique Cancelar e tente novamente."); console.error(err); });
         }
@@ -308,10 +301,13 @@
                 uiText('status-conexao-client', "Buscando sala " + val + "...");
                 conn = peer.connect('iaesball-' + val, { reliable: true });
                 
-                conn.on('open', () => { 
+                const iniciarClientApp = () => {
                     uiText('status-conexao-client', "Conectado!");
                     showScreen('screen-client-waiting'); 
-                });
+                };
+
+                if(conn.open) iniciarClientApp();
+                else conn.on('open', iniciarClientApp);
                 
                 conn.on('data', (data) => {
                     if (data.type === 'your_turn') {
@@ -363,7 +359,7 @@
                 else if (estadoJogo === 'FIM') {
                     uiText('texto-gol', data.msg); uiColor('texto-gol', '#fff');
                     uiHide('texto-estado'); uiShow('mensagem-overlay', 'flex'); document.getElementById('mensagem-overlay').style.background = 'rgba(0,0,0,0.8)';
-                    uiHide('botoes-fim-jogo'); // O client não clica em jogar novamente
+                    uiHide('botoes-fim-jogo'); // O client sai apenas via botão voltar pro menu manual
                 }
                 else if (estadoJogo === 'JOGANDO') resetarUICompleta();
                 else if (estadoJogo === 'PAUSADO') {
@@ -425,7 +421,7 @@
             document.getElementById('bar-top').style.height = '0'; document.getElementById('bar-bottom').style.height = '0';
         }
 
-        // LIMPEZA SEGURA E ABSOLUTA DO MATTER JS
+        // LIMPEZA DE MEMÓRIA BLINDADA
         function limparMotorFisico() {
             if (runner) { Runner.stop(runner); runner = null; }
             if (render) {
@@ -435,7 +431,8 @@
             }
             if (engine) {
                 Matter.Events.off(engine);
-                Composite.clear(engine.world); // USANDO O COMPOSITE CORRETO PARA EVITAR BUG DE TELA PRETA
+                // Comando atualizado para limpar o mundo de forma segura:
+                Matter.Composite.clear(engine.world, false, true); 
                 Engine.clear(engine);
                 engine = null;
             }
@@ -443,14 +440,19 @@
             if (mc) mc.innerHTML = ''; 
         }
 
-        // CONTROLES DE TECLADO DESBLOQUEADOS NO MENU
+        // CONTROLES DE TECLADO DESBLOQUEADOS NO MENU E NOS INPUTS
         const keys = {};
         window.addEventListener('keydown', (e) => { 
-            if (estadoJogo === 'MENU') return; // Permite digitação livre no menu
+            // Libera digitação na caixa do código
             if (e.target.tagName === 'INPUT') return; 
 
-            if (e.code === 'Enter' || e.code === 'Space') { if(document.activeElement && document.activeElement.tagName !== 'INPUT') document.activeElement.blur(); e.preventDefault(); }
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
+            // Barra e Enter funcionam normal, exceto no campo do jogo
+            if (e.code === 'Enter' || e.code === 'Space') { 
+                if (estadoJogo === 'JOGANDO') { e.preventDefault(); }
+            }
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code) && estadoJogo === 'JOGANDO') {
+                e.preventDefault();
+            }
             
             if(e.code) keys[e.code.toLowerCase()] = true; if(e.key) keys[e.key.toLowerCase()] = true;
         }, { passive: false });
@@ -459,12 +461,7 @@
             if(e.code) keys[e.code.toLowerCase()] = false; if(e.key) keys[e.key.toLowerCase()] = false;
         });
 
-        window.addEventListener('click', (e) => {
-            if (estadoJogo === 'MENU') return; 
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
-            forceFocus();
-        });
-
+        // Impede que o jogo roube o foco se você estiver nos Menus
         function forceFocus() {
             if (estadoJogo === 'MENU') return;
             if(document.activeElement && document.activeElement.blur && document.activeElement.tagName !== 'INPUT') {
@@ -472,6 +469,11 @@
             }
             const wrapper = document.getElementById('game-wrapper'); if(wrapper) wrapper.focus();
         }
+
+        window.addEventListener('click', (e) => {
+            if (estadoJogo === 'MENU' || e.target.tagName === 'INPUT') return; 
+            forceFocus();
+        });
 
         function getLocalInputs() {
             return {
@@ -697,6 +699,7 @@
 
             Composite.add(engine.world, [...walls, golEsq, golDir, bola, player1, player2]);
 
+            // SOMENTE O HOST (ou local) calcula os gols
             if (isHost || !isOnline) {
                 Events.on(engine, 'collisionStart', function(event) {
                     try {
