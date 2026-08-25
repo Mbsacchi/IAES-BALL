@@ -230,7 +230,7 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO SERVIDOR WEB RTC COM STUN DO GOOGLE (Garante a conexão)
+        // CONFIGURAÇÃO DO SERVIDOR WEB RTC COM STUN (Garante a conexão de rede)
         const peerConfig = {
             config: {
                 'iceServers': [
@@ -263,39 +263,42 @@
             isHost = true; currPlayer = 1; myRoomID = gerarCodigo();
             showScreen('screen-online-host'); uiText('txt-codigo-sala', "GERANDO...");
 
-            peer = new Peer('iaesball-' + myRoomID, peerConfig);
-            peer.on('open', (id) => { uiText('txt-codigo-sala', myRoomID); });
-            
-            peer.on('connection', (connection) => { 
-                conn = connection; 
-                uiText('status-conexao', "Jogador conectado! Sincronizando sala...");
+            try {
+                peer = new Peer('iaesball-' + myRoomID, peerConfig);
+                peer.on('open', (id) => { uiText('txt-codigo-sala', myRoomID); });
                 
-                conn.on('data', (data) => { 
-                    if (data.type === 'input') remoteKeys = data.keys; 
+                peer.on('connection', (connection) => { 
+                    conn = connection; 
+                    uiText('status-conexao', "Jogador conectado! Sincronizando sala...");
                     
-                    if (data.type === 'p2_ready') {
-                        cfgP2 = data.cfgP2;
-                        uiHide('menu-container'); 
-                        conn.send({ type: 'start', cfgP1: cfgP1, cfgP2: cfgP2, w: selCampoW, h: selCampoH, modo: modoDeJogo });
-                        iniciarEngineJogo();
-                    }
+                    conn.on('data', (data) => { 
+                        if (data.type === 'input') remoteKeys = data.keys; 
+                        
+                        if (data.type === 'p2_ready') {
+                            cfgP2 = data.cfgP2;
+                            uiHide('menu-container'); 
+                            conn.send({ type: 'start', cfgP1: cfgP1, cfgP2: cfgP2, w: selCampoW, h: selCampoH, modo: modoDeJogo });
+                            iniciarEngineJogo();
+                        }
+                    });
+
+                    // HOST AVANÇA ASSIM QUE CONECTA (Prevenção contra Timeouts)
+                    let avancou = false;
+                    const iniciarHostApp = () => {
+                        if(avancou) return; avancou = true;
+                        uiText('status-conexao', "Autenticado! Escolha as configurações...");
+                        setTimeout(() => { showScreen('screen-mode'); }, 500); 
+                    };
+
+                    if (conn.open) iniciarHostApp();
+                    else conn.on('open', iniciarHostApp);
+                    
+                    setTimeout(() => { if (!avancou && estadoJogo === 'MENU') iniciarHostApp(); }, 1500);
                 });
-
-                // Tenta avançar o mais rápido possível assim que a conexão existir
-                let avencou = false;
-                const iniciarHostApp = () => {
-                    if(avencou) return; avencou = true;
-                    uiText('status-conexao', "Autenticado! Escolha as configurações...");
-                    setTimeout(() => { showScreen('screen-mode'); }, 500); 
-                };
-
-                if (conn.open) iniciarHostApp();
-                else conn.on('open', iniciarHostApp);
-                
-                // Fallback caso a confirmação demore
-                setTimeout(() => { if (!avencou && estadoJogo === 'MENU') iniciarHostApp(); }, 1500);
-            });
-            peer.on('error', (err) => { uiText('status-conexao', "Erro na rede. Clique Cancelar e tente novamente."); });
+                peer.on('error', (err) => { uiText('status-conexao', "Erro na rede. Verifique a internet."); console.error(err); });
+            } catch (e) {
+                uiText('status-conexao', "Falha ao criar sala.");
+            }
         }
 
         function conectarNaSala() {
@@ -305,55 +308,59 @@
             isHost = false; currPlayer = 2; 
             uiText('status-conexao-client', "Conectando ao servidor...");
             
-            peer = new Peer(peerConfig);
-            peer.on('open', (id) => {
-                uiText('status-conexao-client', "Buscando sala " + val + "...");
-                conn = peer.connect('iaesball-' + val, { reliable: true });
-                
-                let conectou = false;
-                const appCliente = () => {
-                    if(conectou) return; conectou = true;
-                    uiText('status-conexao-client', "Conectado!");
-                    showScreen('screen-client-waiting'); 
-                };
+            try {
+                peer = new Peer(peerConfig);
+                peer.on('open', (id) => {
+                    uiText('status-conexao-client', "Buscando sala " + val + "...");
+                    conn = peer.connect('iaesball-' + val, { reliable: true });
+                    
+                    let conectou = false;
+                    const appCliente = () => {
+                        if(conectou) return; conectou = true;
+                        uiText('status-conexao-client', "Conectado!");
+                        showScreen('screen-client-waiting'); 
+                    };
 
-                if(conn.open) appCliente();
-                else conn.on('open', appCliente);
+                    if(conn.open) appCliente();
+                    else conn.on('open', appCliente);
 
-                setTimeout(() => { if(!conectou && estadoJogo === 'MENU') uiText('status-conexao-client', "Erro: Tempo esgotado ou Sala Inexistente."); }, 4000);
-                
-                conn.on('data', (data) => {
-                    if (data.type === 'your_turn') {
-                        cfgP1 = data.cfgP1; modoDeJogo = data.modo; selCampoW = data.w; selCampoH = data.h;
-                        currPlayer = 2; timeTemporario = ""; 
-                        prepararTelaTime(); showScreen('screen-team'); 
-                    }
-
-                    if (data.type === 'start') {
-                        limparMotorFisico(); 
-                        cfgP1 = data.cfgP1; cfgP2 = data.cfgP2; selCampoW = data.w; selCampoH = data.h; modoDeJogo = data.modo;
-                        uiHide('menu-container'); iniciarEngineJogo();
-                    }
-
-                    if (data.type === 'sync' && estadoJogo !== 'MENU') {
-                        Body.setPosition(bola, data.b); Body.setPosition(player1, data.p1); Body.setPosition(player2, data.p2);
-                        Body.setVelocity(bola, {x:0, y:0}); Body.setVelocity(player1, {x:0, y:0}); Body.setVelocity(player2, {x:0, y:0});
-                        
-                        dashP1 = data.d1; dashP2 = data.d2;
-                        if (data.exp) criarExplosaoGol(data.exp.x, data.exp.y, data.exp.c);
-
-                        if(modoDeJogo === 'CLASSICO') {
-                            if(placar1 !== data.s1) { placar1 = data.s1; uiText('score1', placar1); }
-                            if(placar2 !== data.s2) { placar2 = data.s2; uiText('score2', placar2); }
-                            uiText('timer', data.timeStr);
-                        } else {
-                            if(data.hp1) { historicoPenaltisP1 = data.hp1; historicoPenaltisP2 = data.hp2; atualizarPlacarPenaltis(); }
+                    setTimeout(() => { if(!conectou && estadoJogo === 'MENU') uiText('status-conexao-client', "Erro: Tempo esgotado ou Sala Inexistente."); }, 4000);
+                    
+                    conn.on('data', (data) => {
+                        if (data.type === 'your_turn') {
+                            cfgP1 = data.cfgP1; modoDeJogo = data.modo; selCampoW = data.w; selCampoH = data.h;
+                            currPlayer = 2; timeTemporario = ""; 
+                            prepararTelaTime(); showScreen('screen-team'); 
                         }
-                        sincronizarUIRemota(data);
-                    }
+
+                        if (data.type === 'start') {
+                            limparMotorFisico(); 
+                            cfgP1 = data.cfgP1; cfgP2 = data.cfgP2; selCampoW = data.w; selCampoH = data.h; modoDeJogo = data.modo;
+                            uiHide('menu-container'); iniciarEngineJogo();
+                        }
+
+                        if (data.type === 'sync' && estadoJogo !== 'MENU') {
+                            Body.setPosition(bola, data.b); Body.setPosition(player1, data.p1); Body.setPosition(player2, data.p2);
+                            Body.setVelocity(bola, {x:0, y:0}); Body.setVelocity(player1, {x:0, y:0}); Body.setVelocity(player2, {x:0, y:0});
+                            
+                            dashP1 = data.d1; dashP2 = data.d2;
+                            if (data.exp) criarExplosaoGol(data.exp.x, data.exp.y, data.exp.c);
+
+                            if(modoDeJogo === 'CLASSICO') {
+                                if(placar1 !== data.s1) { placar1 = data.s1; uiText('score1', placar1); }
+                                if(placar2 !== data.s2) { placar2 = data.s2; uiText('score2', placar2); }
+                                uiText('timer', data.timeStr);
+                            } else {
+                                if(data.hp1) { historicoPenaltisP1 = data.hp1; historicoPenaltisP2 = data.hp2; atualizarPlacarPenaltis(); }
+                            }
+                            sincronizarUIRemota(data);
+                        }
+                    });
                 });
-            });
-            peer.on('error', (err) => { uiText('status-conexao-client', "Erro de rede. Tente de novo."); });
+                peer.on('error', (err) => { uiText('status-conexao-client', "Erro: Código inválido ou problema de rede."); });
+            } catch (e) {
+                uiText('status-conexao-client', "Erro ao conectar. Tente novamente.");
+            }
         }
 
         function sincronizarUIRemota(data) {
@@ -372,7 +379,7 @@
                 else if (estadoJogo === 'FIM') {
                     uiText('texto-gol', data.msg); uiColor('texto-gol', '#fff');
                     uiHide('texto-estado'); uiShow('mensagem-overlay', 'flex'); document.getElementById('mensagem-overlay').style.background = 'rgba(0,0,0,0.8)';
-                    uiHide('botoes-fim-jogo'); // Client apenas assiste e pode voltar pelo menu superior
+                    uiHide('botoes-fim-jogo'); // O client não pode clicar em Jogar Novamente
                 }
                 else if (estadoJogo === 'JOGANDO') resetarUICompleta();
                 else if (estadoJogo === 'PAUSADO') {
@@ -384,12 +391,13 @@
         }
 
         function cancelarOnline() {
-            if(conn) conn.close(); if(peer) peer.destroy();
-            peer = null; conn = null; isOnline = false; isHost = true; timeTemporario = "";
+            if(conn) { conn.close(); conn = null; }
+            if(peer) { peer.destroy(); peer = null; }
+            isOnline = false; isHost = true; timeTemporario = "";
             showScreen('screen-home');
         }
 
-        // --- SISTEMA FÍSICO E BD DE TIMES ---
+        // --- SISTEMA FÍSICO E BD ---
         const Engine = Matter.Engine, Render = Matter.Render, Runner = Matter.Runner, Bodies = Matter.Bodies, Body = Matter.Body, Composite = Matter.Composite, Events = Matter.Events;
 
         const TIMES = {
@@ -429,35 +437,40 @@
         function uiText(id, txt) { const el = document.getElementById(id); if(el) el.innerText = txt; }
         function uiColor(id, color) { const el = document.getElementById(id); if(el) el.style.color = color; }
 
-        function obterCorTextoVisivel(corBg) {
-            const bg = String(corBg || '#ffffff').toLowerCase();
-            const coresEscuras = ['#000000', '#111111', '#1a1a1a', '#006437', '#8b0000'];
-            return coresEscuras.includes(bg) ? '#ffffff' : bg;
-        }
-
         function resetarUICompleta() {
             uiHide('mensagem-overlay'); uiHide('botoes-fim-jogo'); uiHide('indicador-replay');
             uiHide('btn-skip-replay'); uiHide('btn-proximo-penalti'); uiHide('texto-estado');
             document.getElementById('bar-top').style.height = '0'; document.getElementById('bar-bottom').style.height = '0';
         }
 
-        // LIMPEZA 100% SEGURA DA FÍSICA PARA EVITAR BUGS ENTRE PARTIDAS
+        // --- LIMPEZA DE MEMÓRIA BLINDADA CONTRA O BUG DA TELA PRETA ---
         function limparMotorFisico() {
             try {
-                if (runner) { Matter.Runner.stop(runner); runner = null; }
-                if (render) { Matter.Render.stop(render); if(render.canvas) render.canvas.remove(); render = null; }
-                if (engine) { Matter.Events.off(engine); Matter.World.clear(engine.world); Matter.Engine.clear(engine); engine = null; }
-                const mc = document.getElementById('matter-container'); if (mc) mc.innerHTML = ''; 
+                if (runner) { Runner.stop(runner); runner = null; }
+                if (render) {
+                    Render.stop(render);
+                    if (render.canvas && render.canvas.parentNode) { render.canvas.parentNode.removeChild(render.canvas); }
+                    render = null;
+                }
+                if (engine) {
+                    Events.off(engine);
+                    Composite.clear(engine.world, false, true); // DELETA CORRETAMENTE A MEMÓRIA
+                    engine = null;
+                }
+                const mc = document.getElementById('matter-container');
+                if (mc) mc.innerHTML = ''; 
                 
                 const bgCanvas = document.getElementById('field-canvas');
                 if (bgCanvas) { const ctx = bgCanvas.getContext('2d'); ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height); }
-            } catch(e) { console.error("Erro ao limpar motor:", e); }
+            } catch(e) {
+                console.error("Erro ignorado ao limpar motor:", e);
+            }
         }
 
         // CONTROLES DE TECLADO (LIVRES NO MENU)
         const keys = {};
         window.addEventListener('keydown', (e) => { 
-            if (estadoJogo === 'MENU') return; // Se está no menu, teclado 100% liberado para digitar
+            if (estadoJogo === 'MENU') return; // Se está no menu, teclado 100% liberado
             if (e.target.tagName === 'INPUT') return; 
 
             if (e.code === 'Enter' || e.code === 'Space') { if(document.activeElement && document.activeElement.tagName !== 'INPUT') document.activeElement.blur(); e.preventDefault(); }
@@ -535,27 +548,28 @@
             
             if (currPlayer === 1) {
                 cfgP1 = { time: timeTemporario, uni: uniValue, cores: coresFinal };
-                timeTemporario = ""; // Zera a escolha para o P2
+                timeTemporario = ""; 
                 
                 if (isOnline) {
                     if (isHost && conn && conn.open) {
                         conn.send({ type: 'your_turn', modo: modoDeJogo, w: selCampoW, h: selCampoH, cfgP1: cfgP1 });
                         showScreen('screen-host-waiting-p2');
                     } else {
-                        alert("A conexão com o outro jogador falhou."); voltarMenu();
+                        alert("A conexão com o outro jogador caiu!"); voltarMenu();
                     }
                 } else {
                     currPlayer = 2; prepararTelaTime(); showScreen('screen-team');
                 }
             } else {
                 cfgP2 = { time: timeTemporario, uni: uniValue, cores: coresFinal };
+                timeTemporario = "";
                 
                 if (isOnline) {
                     if (!isHost && conn && conn.open) {
                         conn.send({ type: 'p2_ready', cfgP2: cfgP2 });
                         showScreen('screen-client-waiting');
                     } else {
-                        alert("Sua conexão com o Host caiu."); voltarMenu();
+                        alert("O Host desconectou da sala!"); voltarMenu();
                     }
                 } else {
                     uiHide('menu-container'); iniciarEngineJogo();
@@ -571,15 +585,18 @@
 
         function voltarMenu() {
             estadoJogo = 'MENU';
+            clearInterval(timerInterval);
             limparMotorFisico();
+            
             uiHide('game-wrapper'); uiHide('top-bar'); uiHide('btn-voltar-partida'); uiHide('placar-penaltis'); 
-            resetarUICompleta(); timeTemporario = "";
+            resetarUICompleta();
+            uiShow('menu-container'); // GARANTE O MENU DE VOLTA
             
             if (isOnline) {
                 cancelarOnline(); 
             } else {
                 currPlayer = 1;
-                uiShow('menu-container'); showScreen('screen-home'); 
+                showScreen('screen-home'); 
             }
         }
 
@@ -879,7 +896,7 @@
             }
         }
 
-        // --- SISTEMA DE CONTROLES ---
+        // --- SISTEMA DE CONTROLES: FORÇAS E REGRAS ---
         function tentarChutar(jogador) {
             if (modoDeJogo === 'PENALTI' && toquesNaBolaPenalti >= 2) return; 
             
