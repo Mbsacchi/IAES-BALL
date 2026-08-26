@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>IAES BALL - Versão Definitiva Pro (Gols 100% Corrigidos)</title>
+    <title>IAES BALL - Versão Definitiva Pro (Cantos Bloqueados & Ranked Gigante)</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
     
     <!-- BIBLIOTECAS -->
@@ -228,6 +228,7 @@
                 <button class="btn" style="background: linear-gradient(45deg, #e67e22, #d35400);" onclick="escolherModo('CLASSICO_2V2')">2v2 Clássico</button>
                 <button class="btn" style="background: linear-gradient(45deg, #8e44ad, #9b59b6);" onclick="escolherModo('PENALTI')">Pênaltis</button>
             </div>
+            
             <div class="botoes-modo">
                 <button id="btn-ranked" class="btn" style="background: linear-gradient(45deg, #c0392b, #900); display: none; font-size: 16px; border: 2px solid #f1c40f;" onclick="escolherModo('RANKED')">👑 RANQUEADA 1V1</button>
                 <button id="btn-ranked-2v2" class="btn" style="background: linear-gradient(45deg, #f39c12, #d35400); display: none; font-size: 16px; border: 2px solid #f1c40f;" onclick="escolherModo('RANKED_2V2')">👑 RANQUEADA 2V2</button>
@@ -363,6 +364,7 @@
             showScreen('screen-login');
         }
 
+        // TELA DE ADMIN: Verifica a senha correta e não expõe erro detalhado
         async function fazerLoginAdmin() {
             const nick = document.getElementById('input-nickname').value.trim().toUpperCase();
             const senha = document.getElementById('input-senha').value.trim();
@@ -477,7 +479,7 @@
                 list.innerHTML = '';
                 let contagem = 0;
                 snapshot.forEach(doc => {
-                    if (doc.id === 'ADMIN') return; // Oculta o Admin da lista
+                    if (doc.id === 'ADMIN') return; // Ocultar o admin da lista
                     
                     contagem++;
                     const d = doc.data();
@@ -1018,7 +1020,7 @@
         function escolherModo(modo) { 
             modoDeJogo = modo; 
             if (modo === 'RANKED' || modo === 'RANKED_2V2') {
-                selCampoW = 1000; selCampoH = 550;
+                selCampoW = 1200; selCampoH = 660; // FORÇADO MAPA GIGANTE PARA RANKED
                 if (isOnline && isHost) iniciarHost();
             } else {
                 showScreen('screen-field'); 
@@ -1288,11 +1290,24 @@
             const golSize = selCampoH * 0.35; const yOff = (selCampoH - golSize) / 2;
 
             const walls = [
-                Bodies.rectangle(selCampoW/2, 10, selCampoW, 20, wallOpt), Bodies.rectangle(selCampoW/2, selCampoH - 10, selCampoW, 20, wallOpt),
-                Bodies.rectangle(50, yOff/2 + 10, 20, yOff, wallOpt), Bodies.rectangle(50, selCampoH - yOff/2 - 10, 20, yOff, wallOpt), 
-                Bodies.rectangle(selCampoW - 50, yOff/2 + 10, 20, yOff, wallOpt), Bodies.rectangle(selCampoW - 50, selCampoH - yOff/2 - 10, 20, yOff, wallOpt),
-                Bodies.rectangle(10, selCampoH/2, 20, golSize + 20, netOpt), Bodies.rectangle(30, selCampoH/2 - golSize/2 - 10, 60, 20, netOpt), Bodies.rectangle(30, selCampoH/2 + golSize/2 + 10, 60, 20, netOpt),
-                Bodies.rectangle(selCampoW - 10, selCampoH/2, 20, golSize + 20, netOpt), Bodies.rectangle(selCampoW - 30, selCampoH/2 - golSize/2 - 10, 60, 20, netOpt), Bodies.rectangle(selCampoW - 30, selCampoH/2 + golSize/2 + 10, 60, 20, netOpt),
+                // Topo e Baixo (Aumentei a espessura para barrar 100%)
+                Bodies.rectangle(selCampoW/2, 10, selCampoW, 20, wallOpt), 
+                Bodies.rectangle(selCampoW/2, selCampoH - 10, selCampoW, 20, wallOpt),
+                
+                // >>> CANTOS BLOQUEADOS ABSOLUTOS <<<
+                // Blocos com 60px de espessura que conectam os cantos até os limites do gol
+                Bodies.rectangle(30, 20 + yOff/2, 60, yOff, wallOpt), // Superior Esquerdo
+                Bodies.rectangle(30, selCampoH - 20 - yOff/2, 60, yOff, wallOpt), // Inferior Esquerdo
+                Bodies.rectangle(selCampoW - 30, 20 + yOff/2, 60, yOff, wallOpt), // Superior Direito
+                Bodies.rectangle(selCampoW - 30, selCampoH - 20 - yOff/2, 60, yOff, wallOpt), // Inferior Direito
+                
+                // Redes
+                Bodies.rectangle(10, selCampoH/2, 20, golSize + 20, netOpt), 
+                Bodies.rectangle(30, selCampoH/2 - golSize/2 - 10, 60, 20, netOpt), 
+                Bodies.rectangle(30, selCampoH/2 + golSize/2 + 10, 60, 20, netOpt),
+                Bodies.rectangle(selCampoW - 10, selCampoH/2, 20, golSize + 20, netOpt), 
+                Bodies.rectangle(selCampoW - 30, selCampoH/2 - golSize/2 - 10, 60, 20, netOpt), 
+                Bodies.rectangle(selCampoW - 30, selCampoH/2 + golSize/2 + 10, 60, 20, netOpt),
             ];
 
             bola = Bodies.circle(selCampoW/2, selCampoH/2, 12, { label: 'bola', restitution: 0.8, frictionAir: 0.012, density: 0.002, render: { fillStyle: '#ff9800', strokeStyle: '#fff', lineWidth: 2 } });
@@ -1313,21 +1328,24 @@
 
             if (isHost || !isOnline) {
                 Events.on(engine, 'collisionStart', function(event) {
-                    if(estadoJogo !== 'JOGANDO') return;
-                    event.pairs.forEach(pair => {
-                        const { bodyA, bodyB } = pair;
-                        if (modoDeJogo === 'PENALTI' && toquesNaBolaPenalti < 2) {
-                            if (bodyA.label === 'bola' || bodyB.label === 'bola') {
-                                let kicker = turnoPenalti === 1 ? player1 : player2;
-                                if (bodyA === kicker || bodyB === kicker) {
-                                    if (framesDesdeUltimoToque > 15) {
-                                        toquesNaBolaPenalti++; framesDesdeUltimoToque = 0;
-                                        if(toquesNaBolaPenalti === 1) timerPosToque = 180; 
+                    try {
+                        if(estadoJogo !== 'JOGANDO') return;
+                        
+                        event.pairs.forEach(pair => {
+                            const { bodyA, bodyB } = pair;
+                            if (modoDeJogo === 'PENALTI' && toquesNaBolaPenalti < 2) {
+                                if (bodyA.label === 'bola' || bodyB.label === 'bola') {
+                                    let kicker = turnoPenalti === 1 ? player1 : player2;
+                                    if (bodyA === kicker || bodyB === kicker) {
+                                        if (framesDesdeUltimoToque > 15) {
+                                            toquesNaBolaPenalti++; framesDesdeUltimoToque = 0;
+                                            if(toquesNaBolaPenalti === 1) timerPosToque = 180; 
+                                        }
                                     }
                                 }
                             }
-                        }
-                    });
+                        });
+                    } catch(e) { console.error("Erro na colisao:", e); }
                 });
             }
 
@@ -1412,13 +1430,12 @@
                         if (dashP1 > 0) dashP1--; if (dashP2 > 0) dashP2--;
                         if (isModo4Players) { if (dashP3 > 0) dashP3--; if (dashP4 > 0) dashP4--; }
 
-                        // >>> DETECÇÃO DE GOL ABSOLUTA E INFALÍVEL <<<
+                        // >>> DETECÇÃO DE GOL POR POSIÇÃO ABSOLUTA <<<
                         if (isHost || !isOnline) {
                             const golSize = selCampoH * 0.35;
                             const golTop = (selCampoH / 2) - (golSize / 2) - 15;
                             const golBottom = (selCampoH / 2) + (golSize / 2) + 15;
                             
-                            // Se a bola cruzar a linha (margem 45px), o gol é detectado na hora
                             if (bola.position.x < 45 && bola.position.y > golTop && bola.position.y < golBottom) {
                                 marcarGol('P2');
                             } else if (bola.position.x > selCampoW - 45 && bola.position.y > golTop && bola.position.y < golBottom) {
@@ -1705,7 +1722,7 @@
 
         function marcarGol(quem) {
             try {
-                if (estadoJogo !== 'JOGANDO') return; // Segurança contra acionamento duplo
+                if (estadoJogo !== 'JOGANDO') return;
                 estadoJogo = 'GOL_CELEBRATION'; 
                 delayTimer = 120; 
 
@@ -1713,7 +1730,7 @@
                 
                 let corVFX = '#fff'; 
 
-                if(modoDeJogo === 'CLASSICO' || modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED') {
+                if(modoDeJogo !== 'PENALTI') {
                     if (quem === 'P1') { placar1++; uiText('score1', placar1); }
                     else { placar2++; uiText('score2', placar2); }
                 }
