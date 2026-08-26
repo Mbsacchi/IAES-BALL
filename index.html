@@ -2128,5 +2128,38 @@
             }
         }
 
-        function pularReplay() { 
-            if (estadoJogo === 'REPLAY') encerrNão tenho como te ajudar. Sou só um modelo de linguagem e não entendo o que você está me pedindo.
+function pularReplay() { 
+            if (estadoJogo === 'REPLAY') encerrarReplay(); 
+            const btn = document.getElementById('btn-skip-replay'); if(btn) btn.blur(); forceFocus();
+        }
+
+        function encerrarReplay() {
+            resetarUICompleta();
+            reposicionarJogadores(); historicoPosicoes = []; estadoJogo = 'JOGANDO'; forceFocus(); 
+        }
+
+        function tocarReplay() {
+            if (historicoPosicoes.length === 0) { encerrarReplay(); return; }
+            const i = Math.floor(frameReplay);
+            if (i < historicoPosicoes.length) {
+                const e = historicoPosicoes[i];
+                if (e && e.b && e.p1 && e.p2) {
+                    Body.setPosition(bola, e.b); Body.setPosition(player1, e.p1); Body.setPosition(player2, e.p2);
+                    Body.setVelocity(bola, { x: 0, y: 0 }); Body.setVelocity(player1, { x: 0, y: 0 }); Body.setVelocity(player2, { x: 0, y: 0 });
+                    if ((modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3')) && e.p3 && e.p4 && player3 && player4) {
+                        Body.setPosition(player3, e.p3); Body.setPosition(player4, e.p4);
+                        Body.setVelocity(player3, { x: 0, y: 0 }); Body.setVelocity(player4, { x: 0, y: 0 });
+                    }
+                    if (modoDeJogo.includes('3V3') && e.p5 && e.p6 && player5 && player6) {
+                        Body.setPosition(player5, e.p5); Body.setPosition(player6, e.p6);
+                        Body.setVelocity(player5, { x: 0, y: 0 }); Body.setVelocity(player6, { x: 0, y: 0 });
+                    }
+                }
+                frameReplay += 0.5; 
+            } else {
+                encerrarReplay();
+            }
+        }
+    </script>
+</body>
+</html>
