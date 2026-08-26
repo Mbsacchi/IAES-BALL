@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>IAES BALL - Versão Definitiva Pro (3v3, PDL+100 & Votação)</title>
+    <title>IAES BALL - Versão Definitiva Pro (Lobby Interativo, 3v3 & Pênaltis Alternados)</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
     
     <!-- BIBLIOTECAS -->
@@ -74,10 +74,14 @@
         .camisa-manga-esq, .camisa-manga-dir { position: absolute; width: 35px; height: 45px; background: #fff; top: 15px; border: 5px solid #000; border-radius: 8px; box-sizing: border-box; }
         .camisa-manga-esq { left: 0; transform: rotate(20deg); } .camisa-manga-dir { right: 0; transform: rotate(-20deg); }
 
-        .lobby-slots { display: flex; flex-direction: column; gap: 10px; width: 100%; margin: 15px 0; }
-        .lobby-slot { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.05); padding: 12px 20px; border-radius: 8px; border: 2px solid #444; font-weight: bold; font-size: 16px; }
-        .lobby-slot.connected { border-color: #2ecc71; background: rgba(46, 204, 113, 0.15); color: #2ecc71; }
-        .lobby-slot.waiting { border-color: #f39c12; color: #f39c12; }
+        /* NOVO DESIGN DO LOBBY - DIVIDIDO POR TIMES */
+        .lobby-panel { display: flex; width: 100%; gap: 15px; margin: 15px 0; text-align: left; }
+        .lobby-team-box { flex: 1; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .box-azul { border: 2px solid #3498db; background: rgba(52, 152, 219, 0.1); }
+        .box-vermelho { border: 2px solid #e74c3c; background: rgba(231, 76, 60, 0.1); }
+        .lobby-slot { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.5); padding: 10px 15px; border-radius: 5px; font-weight: bold; font-size: 14px; border: 1px solid #444;}
+        .lobby-slot.connected { border-color: #2ecc71; color: #2ecc71; }
+        .lobby-slot.waiting { border-color: #f39c12; color: #f39c12; opacity: 0.5; }
 
         #top-bar { display: none; align-items: center; justify-content: center; width: 100%; max-width: 800px; margin-bottom: 10px; padding: 10px 30px; box-sizing: border-box; position: relative; z-index: 10; }
         .time-nome { flex: 1; font-size: 28px; font-weight: 900; white-space: nowrap; }
@@ -95,7 +99,7 @@
         #game-wrapper { position: relative; display: none; border-radius: 8px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); outline: none; cursor: default; }
         #field-canvas, #matter-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
         #field-canvas { z-index: 1; } #matter-container { z-index: 2; pointer-events: none; }
-
+        
         #mensagem-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: none; justify-content: center; align-items: center; flex-direction: column; background: rgba(0,0,0,0.4); }
         #texto-gol { font-size: 70px; font-style: italic; font-weight: 900; letter-spacing: 5px; animation: zoom 0.5s ease-out forwards; -webkit-text-stroke: 2px #000; text-align: center; }
         #texto-estado { font-size: 24px; color: #fff; margin-top: 10px; font-weight: 700; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 5px; text-transform: uppercase; }
@@ -121,7 +125,7 @@
         
         .controles-info { font-size: 12px; color: #aaa; margin-top: 20px; line-height: 1.6; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 8px; }
         
-        /* RANKING E ADMIN LISTS COM SCROLLBAR PERSONALIZADA */
+        /* RANKING E ADMIN LISTS */
         #ranking-list, #admin-lista-contas { width: 100%; max-width: 650px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 2px solid #f1c40f; margin-bottom: 20px; text-align: left; overflow-y: auto; max-height: 450px; }
         #admin-lista-contas { border-color: #e74c3c; }
         
@@ -201,7 +205,18 @@
             <h2>Sua Sala foi Criada!</h2>
             <p style="margin: 0; color: #aaa;">Envie o código para seus amigos conectarem:</p>
             <div class="codigo-sala" id="txt-codigo-sala">GERANDO...</div>
-            <div class="lobby-slots" id="lobby-slots-container"></div>
+            
+            <div class="lobby-panel">
+                <div class="lobby-team-box box-azul">
+                    <h3 style="color: #3498db; margin:0; text-align: center;">TIME AZUL</h3>
+                    <div id="lobby-t1-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+                </div>
+                <div class="lobby-team-box box-vermelho">
+                    <h3 style="color: #e74c3c; margin:0; text-align: center;">TIME VERMELHO</h3>
+                    <div id="lobby-t2-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+                </div>
+            </div>
+
             <button class="btn btn-avancar" id="btn-host-avancar" onclick="avancarAposLobby()" disabled>AGUARDANDO JOGADORES...</button>
             <button class="btn btn-voltar" style="margin-top: 15px;" onclick="cancelarOnline()">CANCELAR SALA</button>
         </div>
@@ -216,8 +231,21 @@
 
         <div id="screen-client-waiting" class="screen">
             <h2 id="txt-meu-slot-client">Conectado com Sucesso!</h2>
-            <div class="codigo-sala" style="border-color:#f1c40f; color:#f1c40f; font-size: 20px;" id="txt-status-client-lobby">Aguardando Host Configurar a Partida...</div>
-            <div class="lobby-slots" id="client-lobby-slots-container"></div>
+            <div class="codigo-sala" style="border-color:#f1c40f; color:#f1c40f; font-size: 20px;" id="txt-status-client-lobby">Aguardando Host...</div>
+            
+            <div class="lobby-panel">
+                <div class="lobby-team-box box-azul">
+                    <h3 style="color: #3498db; margin:0; text-align: center;">TIME AZUL</h3>
+                    <div id="client-t1-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    <button class="btn" style="background:#3498db; font-size:12px; padding:10px; margin-top:5px;" onclick="mudarTime(1)">ENTRAR NO AZUL</button>
+                </div>
+                <div class="lobby-team-box box-vermelho">
+                    <h3 style="color: #e74c3c; margin:0; text-align: center;">TIME VERMELHO</h3>
+                    <div id="client-t2-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    <button class="btn" style="background:#e74c3c; font-size:12px; padding:10px; margin-top:5px;" onclick="mudarTime(2)">ENTRAR NO VERMELHO</button>
+                </div>
+            </div>
+
             <button class="btn btn-voltar" style="margin-top: 20px;" onclick="cancelarOnline()">DESCONECTAR</button>
         </div>
 
@@ -598,9 +626,9 @@
         let isOnline = false, isHost = true;
         let mySlot = 1; 
         let remoteInputs = { 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {} };
-        let playerNumbers = { 1: 10, 2: 10, 3: 7, 4: 7, 5: 11, 6: 11 }; // Numeros das camisas
+        let playerNumbers = { 1: 10, 2: 10, 3: 7, 4: 7, 5: 11, 6: 11 }; 
         let myRoomID = "";
-        let votosPular = new Set(); // Votação para pular replay
+        let votosPular = new Set(); 
 
         function gerarCodigo() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let res = '';
@@ -633,6 +661,14 @@
             });
         }
 
+        function mudarTime(timeSolicitado) {
+            if (isOnline && !isHost && myConn && myConn.open) {
+                myConn.send({ type: 'change_team', team: timeSolicitado });
+            } else if (isHost) {
+                alert("Como HOST, você é o Capitão fixo do TIME AZUL.");
+            }
+        }
+
         function iniciarHost() {
             isHost = true; mySlot = 1; myRoomID = gerarCodigo();
             clientConnections = [];
@@ -650,8 +686,8 @@
                 });
                 
                 peer.on('connection', (connection) => {
-                    const isModo6Players = (modoDeJogo === 'CLASSICO_3V3' || modoDeJogo === 'RANKED_3V3');
-                    const isModo4Players = (modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED_2V2');
+                    const isModo6Players = (modoDeJogo.includes('3V3'));
+                    const isModo4Players = (modoDeJogo.includes('2V2'));
                     const maxPlayers = isModo6Players ? 6 : (isModo4Players ? 4 : 2);
                     
                     if (clientConnections.length >= maxPlayers - 1) {
@@ -674,9 +710,32 @@
                     connection.on('data', (data) => {
                         if (data.type === 'identify') {
                             connection.playerName = data.nome;
-                            playerNumbers[slotAssigned] = data.numero || 10;
+                            playerNumbers[connection.playerSlot] = data.numero || 10;
                             renderLobbySlotsHost();
                             broadcastLobbyState();
+                        }
+                        if (data.type === 'change_team') {
+                            const reqTeam = data.team; 
+                            const currentSlot = connection.playerSlot;
+                            const isCurrentlyT1 = currentSlot % 2 !== 0;
+                            const wantsT1 = reqTeam === 1;
+                            
+                            if (isCurrentlyT1 !== wantsT1) {
+                                const targetSlots = wantsT1 ? [3, 5].filter(s => s <= maxPlayers) : [2, 4, 6].filter(s => s <= maxPlayers);
+                                const uSlots = [1, ...clientConnections.map(c => c.playerSlot)];
+                                
+                                for (let s of targetSlots) {
+                                    if (!uSlots.includes(s)) {
+                                        const oldNum = playerNumbers[currentSlot];
+                                        delete playerNumbers[currentSlot];
+                                        connection.playerSlot = s;
+                                        playerNumbers[s] = oldNum || 10;
+                                        break;
+                                    }
+                                }
+                                renderLobbySlotsHost();
+                                broadcastLobbyState();
+                            }
                         }
                         if (data.type === 'input') {
                             remoteInputs[data.slot] = data.keys;
@@ -708,70 +767,74 @@
             }
         }
 
+        function getLobbyName(slot) {
+            const conn = clientConnections.find(c => c.playerSlot === slot);
+            return conn && conn.playerName ? `${conn.playerName}` : `JOGADOR ${slot}`;
+        }
+
         function renderLobbySlotsHost() {
-            const container = document.getElementById('lobby-slots-container');
-            if(!container) return;
-            container.innerHTML = '';
+            const cT1 = document.getElementById('lobby-t1-container');
+            const cT2 = document.getElementById('lobby-t2-container');
+            if(!cT1 || !cT2) return;
+            cT1.innerHTML = ''; cT2.innerHTML = '';
             
-            const isModo6Players = (modoDeJogo === 'CLASSICO_3V3' || modoDeJogo === 'RANKED_3V3');
-            const isModo4Players = (modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED_2V2');
+            const isModo6Players = (modoDeJogo.includes('3V3'));
+            const isModo4Players = (modoDeJogo.includes('2V2'));
             const max = isModo6Players ? 6 : (isModo4Players ? 4 : 2);
             
-            const slots = [
-                { num: 1, name: `JOGADOR 1 (${meuPerfil.nome}) - Host`, team: "Time 1", connected: true },
-                { num: 2, name: `JOGADOR 2 ${getLobbyName(2)}`, team: "Time 2", connected: clientConnections.some(c => c.playerSlot === 2) }
+            const slotsData = [
+                { num: 1, name: `[HOST] ${meuPerfil.nome}`, connected: true },
+                { num: 2, name: `${getLobbyName(2)}`, connected: clientConnections.some(c => c.playerSlot === 2) }
             ];
 
             if (isModo4Players || isModo6Players) {
-                slots.push({ num: 3, name: `JOGADOR 3 ${getLobbyName(3)}`, team: "Time 1", connected: clientConnections.some(c => c.playerSlot === 3) });
-                slots.push({ num: 4, name: `JOGADOR 4 ${getLobbyName(4)}`, team: "Time 2", connected: clientConnections.some(c => c.playerSlot === 4) });
+                slotsData.push({ num: 3, name: `${getLobbyName(3)}`, connected: clientConnections.some(c => c.playerSlot === 3) });
+                slotsData.push({ num: 4, name: `${getLobbyName(4)}`, connected: clientConnections.some(c => c.playerSlot === 4) });
             }
             if (isModo6Players) {
-                slots.push({ num: 5, name: `JOGADOR 5 ${getLobbyName(5)}`, team: "Time 1", connected: clientConnections.some(c => c.playerSlot === 5) });
-                slots.push({ num: 6, name: `JOGADOR 6 ${getLobbyName(6)}`, team: "Time 2", connected: clientConnections.some(c => c.playerSlot === 6) });
+                slotsData.push({ num: 5, name: `${getLobbyName(5)}`, connected: clientConnections.some(c => c.playerSlot === 5) });
+                slotsData.push({ num: 6, name: `${getLobbyName(6)}`, connected: clientConnections.some(c => c.playerSlot === 6) });
             }
 
-            slots.forEach(s => {
-                container.innerHTML += `
+            slotsData.forEach(s => {
+                const isT1 = s.num % 2 !== 0;
+                const html = `
                     <div class="lobby-slot ${s.connected ? 'connected' : 'waiting'}">
-                        <span>${s.connected ? '🟢' : '🟡'} ${s.name} [${s.team}]</span>
-                        <span>${s.connected ? 'PRONTO' : 'AGUARDANDO...'}</span>
+                        <span>${s.connected ? '🟢' : '🟡'} ${s.name}</span>
                     </div>
                 `;
+                if(isT1) cT1.innerHTML += html; else cT2.innerHTML += html;
             });
 
             const totalConnected = 1 + clientConnections.length;
             const btnAvancar = document.getElementById('btn-host-avancar');
-            if (totalConnected === max) {
+            
+            // O jogo não trava se tiver menos jogadores num 2v2/3v3. O Host pode forçar o início.
+            if (totalConnected >= 2) { 
                 btnAvancar.disabled = false;
                 btnAvancar.innerText = "AVANÇAR PARA ESCOLHA DE TIMES ➔";
             } else {
                 btnAvancar.disabled = true;
-                btnAvancar.innerText = `AGUARDANDO JOGADORES (${totalConnected}/${max})...`;
+                btnAvancar.innerText = `AGUARDANDO JOGADORES...`;
             }
-        }
-
-        function getLobbyName(slot) {
-            const conn = clientConnections.find(c => c.playerSlot === slot);
-            return conn && conn.playerName ? `(${conn.playerName})` : '';
         }
 
         function broadcastLobbyState() {
-            const isModo6Players = (modoDeJogo === 'CLASSICO_3V3' || modoDeJogo === 'RANKED_3V3');
-            const isModo4Players = (modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED_2V2');
+            const isModo6Players = (modoDeJogo.includes('3V3'));
+            const isModo4Players = (modoDeJogo.includes('2V2'));
             const max = isModo6Players ? 6 : (isModo4Players ? 4 : 2);
             
             const slotsData = [
-                { num: 1, name: `Jogador 1 (${meuPerfil.nome})`, team: "Time 1", connected: true },
-                { num: 2, name: `Jogador 2 ${getLobbyName(2)}`, team: "Time 2", connected: clientConnections.some(c => c.playerSlot === 2) }
+                { num: 1, name: `[HOST] ${meuPerfil.nome}`, connected: true },
+                { num: 2, name: `${getLobbyName(2)}`, connected: clientConnections.some(c => c.playerSlot === 2) }
             ];
             if (isModo4Players || isModo6Players) {
-                slotsData.push({ num: 3, name: `Jogador 3 ${getLobbyName(3)}`, team: "Time 1", connected: clientConnections.some(c => c.playerSlot === 3) });
-                slotsData.push({ num: 4, name: `Jogador 4 ${getLobbyName(4)}`, team: "Time 2", connected: clientConnections.some(c => c.playerSlot === 4) });
+                slotsData.push({ num: 3, name: `${getLobbyName(3)}`, connected: clientConnections.some(c => c.playerSlot === 3) });
+                slotsData.push({ num: 4, name: `${getLobbyName(4)}`, connected: clientConnections.some(c => c.playerSlot === 4) });
             }
             if (isModo6Players) {
-                slotsData.push({ num: 5, name: `Jogador 5 ${getLobbyName(5)}`, team: "Time 1", connected: clientConnections.some(c => c.playerSlot === 5) });
-                slotsData.push({ num: 6, name: `Jogador 6 ${getLobbyName(6)}`, team: "Time 2", connected: clientConnections.some(c => c.playerSlot === 6) });
+                slotsData.push({ num: 5, name: `${getLobbyName(5)}`, connected: clientConnections.some(c => c.playerSlot === 5) });
+                slotsData.push({ num: 6, name: `${getLobbyName(6)}`, connected: clientConnections.some(c => c.playerSlot === 6) });
             }
             broadcast({ type: 'lobby_update', slots: slotsData, total: 1 + clientConnections.length, max: max });
         }
@@ -801,7 +864,6 @@
                         uiText('status-conexao-client', "Conectado!");
                         showScreen('screen-client-waiting'); 
                         
-                        // Envia os dados do cliente (Nome e Número) para o Host
                         myConn.send({ type: 'identify', nome: meuPerfil.nome, numero: meuPerfil.numero });
                     };
 
@@ -814,10 +876,11 @@
                         if (data.type === 'welcome') {
                             mySlot = data.slot;
                             modoDeJogo = data.modo;
-                            uiText('txt-meu-slot-client', `VOCÊ É O JOGADOR ${mySlot} (${meuPerfil.nome})`);
+                            uiText('txt-meu-slot-client', `VOCÊ ESTÁ NO LOBBY (${meuPerfil.nome})`);
                         }
 
                         if (data.type === 'lobby_update') {
+                            mySlot = data.slots.find(s => s.name.includes(meuPerfil.nome))?.num || mySlot;
                             renderClientLobby(data.slots, data.total, data.max);
                         }
                         
@@ -844,23 +907,19 @@
                             dashP1 = data.d1; dashP2 = data.d2;
                             playerNumbers[1] = data.n1; playerNumbers[2] = data.n2;
 
-                            if ((modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED_2V2' || modoDeJogo === 'CLASSICO_3V3' || modoDeJogo === 'RANKED_3V3') && data.p3 && data.p4 && player3 && player4) {
-                                Body.setPosition(player3, data.p3); Body.setPosition(player4, data.p4);
-                                dashP3 = data.d3; dashP4 = data.d4;
-                                Body.setVelocity(player3, {x:0, y:0}); Body.setVelocity(player4, {x:0, y:0});
-                                playerNumbers[3] = data.n3; playerNumbers[4] = data.n4;
+                            if (modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3')) {
+                                if(data.p3 && player3) { Body.setPosition(player3, data.p3); Body.setVelocity(player3, {x:0, y:0}); dashP3 = data.d3; playerNumbers[3] = data.n3; }
+                                if(data.p4 && player4) { Body.setPosition(player4, data.p4); Body.setVelocity(player4, {x:0, y:0}); dashP4 = data.d4; playerNumbers[4] = data.n4; }
                             }
                             
-                            if ((modoDeJogo === 'CLASSICO_3V3' || modoDeJogo === 'RANKED_3V3') && data.p5 && data.p6 && player5 && player6) {
-                                Body.setPosition(player5, data.p5); Body.setPosition(player6, data.p6);
-                                dashP5 = data.d5; dashP6 = data.d6;
-                                Body.setVelocity(player5, {x:0, y:0}); Body.setVelocity(player6, {x:0, y:0});
-                                playerNumbers[5] = data.n5; playerNumbers[6] = data.n6;
+                            if (modoDeJogo.includes('3V3')) {
+                                if(data.p5 && player5) { Body.setPosition(player5, data.p5); Body.setVelocity(player5, {x:0, y:0}); dashP5 = data.d5; playerNumbers[5] = data.n5; }
+                                if(data.p6 && player6) { Body.setPosition(player6, data.p6); Body.setVelocity(player6, {x:0, y:0}); dashP6 = data.d6; playerNumbers[6] = data.n6; }
                             }
 
                             if (data.exp) criarExplosaoGol(data.exp.x, data.exp.y, data.exp.c);
 
-                            if(modoDeJogo !== 'PENALTI') {
+                            if(!modoDeJogo.includes('PENALTI')) {
                                 if(placar1 !== data.s1) { placar1 = data.s1; uiText('score1', placar1); }
                                 if(placar2 !== data.s2) { placar2 = data.s2; uiText('score2', placar2); }
                                 uiText('timer', data.timeStr);
@@ -879,18 +938,21 @@
         }
 
         function renderClientLobby(slots, total, max) {
-            const container = document.getElementById('client-lobby-slots-container');
-            if(!container) return;
-            container.innerHTML = '';
+            const cT1 = document.getElementById('client-t1-container');
+            const cT2 = document.getElementById('client-t2-container');
+            if(!cT1 || !cT2) return;
+            cT1.innerHTML = ''; cT2.innerHTML = '';
+            
             slots.forEach(s => {
-                container.innerHTML += `
+                const isT1 = s.num % 2 !== 0;
+                const html = `
                     <div class="lobby-slot ${s.connected ? 'connected' : 'waiting'}">
-                        <span>${s.connected ? '🟢' : '🟡'} ${s.name} [${s.team}]</span>
-                        <span>${s.connected ? 'CONECTADO' : 'AGUARDANDO...'}</span>
+                        <span>${s.connected ? '🟢' : '🟡'} ${s.name}</span>
                     </div>
                 `;
+                if(isT1) cT1.innerHTML += html; else cT2.innerHTML += html;
             });
-            uiText('txt-status-client-lobby', `Jogadores Conectados: ${total}/${max}`);
+            uiText('txt-status-client-lobby', `Aguardando Host (Jogadores: ${total}/${max})`);
         }
 
         function sincronizarUIRemota(data) {
@@ -954,7 +1016,7 @@
         let ticksJogo = 0, tempoRestante = 180;
         
         let historicoPenaltisP1 = [], historicoPenaltisP2 = [];
-        let turnoPenalti = 1, toquesNaBolaPenalti = 0, timerPosToque = 0, framesDesdeUltimoToque = 999; 
+        let turnoPenalti = 1, rodadaPenalti = 1, toquesNaBolaPenalti = 0, timerPosToque = 0, framesDesdeUltimoToque = 999; 
 
         let currPlayer = 1, selCampoW = 1000, selCampoH = 550; 
         let cfgP1 = null, cfgP2 = null, timeTemporario = "";
@@ -1009,21 +1071,6 @@
             } catch(e) {}
         }
 
-        const keys = {};
-        window.addEventListener('keydown', (e) => { 
-            if (estadoJogo === 'MENU') return; 
-            if (e.target.tagName === 'INPUT') return; 
-
-            if (e.code === 'Enter' || e.code === 'Space') { if(document.activeElement && document.activeElement.tagName !== 'INPUT') document.activeElement.blur(); e.preventDefault(); }
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
-            
-            if(e.code) keys[e.code.toLowerCase()] = true; if(e.key) keys[e.key.toLowerCase()] = true;
-        }, { passive: false });
-        
-        window.addEventListener('keyup', (e) => { 
-            if(e.code) keys[e.code.toLowerCase()] = false; if(e.key) keys[e.key.toLowerCase()] = false;
-        });
-
         function forceFocus() {
             if (estadoJogo === 'MENU') return;
             if(document.activeElement && document.activeElement.blur && document.activeElement.tagName !== 'INPUT') { document.activeElement.blur(); }
@@ -1035,7 +1082,19 @@
             forceFocus();
         });
 
-        // INPUTS LOCAIS E UNIFICADOS
+        const keys = {};
+        window.addEventListener('keydown', (e) => { 
+            if (estadoJogo === 'MENU') return; 
+            if (e.target.tagName === 'INPUT') return; 
+            if (e.code === 'Enter' || e.code === 'Space') { if(document.activeElement && document.activeElement.tagName !== 'INPUT') document.activeElement.blur(); e.preventDefault(); }
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
+            if(e.code) keys[e.code.toLowerCase()] = true; if(e.key) keys[e.key.toLowerCase()] = true;
+        }, { passive: false });
+        
+        window.addEventListener('keyup', (e) => { 
+            if(e.code) keys[e.code.toLowerCase()] = false; if(e.key) keys[e.key.toLowerCase()] = false;
+        });
+
         function getLocalInputsP1() { return { w: keys['keyw'] || keys['w'], s: keys['keys'] || keys['s'], a: keys['keya'] || keys['a'], d: keys['keyd'] || keys['d'], shoot: keys['space'] || keys[' '], dash: keys['shiftleft'] || keys['shiftright'] || keys['shift'] }; }
         function getLocalInputsP2() { return { up: keys['arrowup'], down: keys['arrowdown'], left: keys['arrowleft'], right: keys['arrowright'], shoot: keys['enter'] || keys['numpadenter'], dash: keys['controlleft'] || keys['controlright'] || keys['control'] || keys['numpad0'] || keys['0'] }; }
         function getLocalInputsP3() { return { up: keys['keyt'] || keys['t'], down: keys['keyg'] || keys['g'], left: keys['keyf'] || keys['f'], right: keys['keyh'] || keys['h'], shoot: keys['keyc'] || keys['c'], dash: keys['keyv'] || keys['v'] }; }
@@ -1055,13 +1114,20 @@
         
         function escolherModo(modo) { 
             modoDeJogo = modo; 
-            if (modo.includes('RANKED')) {
-                selCampoW = 1200; selCampoH = 660; // FORÇADO MAPA GIGANTE PARA RANKED
-                if (isOnline && isHost) iniciarHost();
+            if (modo.includes('3V3')) {
+                selCampoW = 1400; selCampoH = 750; // CAMPO TITÃ
+            } else if (modo.includes('2V2')) {
+                selCampoW = 1200; selCampoH = 660; // CAMPO MARACANÃ
+            } else if (modo.includes('RANKED')) {
+                selCampoW = 1000; selCampoH = 550;
             } else {
                 showScreen('screen-field'); 
+                return;
             }
+            if (isOnline && isHost) iniciarHost();
+            else showScreen('screen-field');
         }
+
         function escolherCampo(w, h) { 
             selCampoW = w; selCampoH = h; 
             if (isOnline && isHost) {
@@ -1167,7 +1233,7 @@
         // INICIALIZAÇÃO DA PARTIDA
         function iniciarEngineJogo() {
             estadoJogo = 'JOGANDO'; placar1 = 0; placar2 = 0; isProrrogacao = false; tempoRestante = 180; ticksJogo = 0;
-            historicoPenaltisP1 = []; historicoPenaltisP2 = []; turnoPenalti = 1; 
+            historicoPenaltisP1 = []; historicoPenaltisP2 = []; turnoPenalti = 1; rodadaPenalti = 1;
             toquesNaBolaPenalti = 0; timerPosToque = 0; framesDesdeUltimoToque = 999;
             historicoPosicoes = []; particulas = []; resetarUICompleta();
             frameReplay = 0; rewindIndex = 0; delayTimer = 0; onMessageEnd = null;
@@ -1196,7 +1262,7 @@
             try {
                 desenharCampoRealista(); configurarFisica();
                 
-                if(modoDeJogo === 'PENALTI') {
+                if(modoDeJogo.includes('PENALTI')) {
                     prepararModoPenaltiUI(); reposicionarJogadores();
                 } else {
                     uiText('timer', '03:00'); 
@@ -1307,7 +1373,7 @@
             ctx.beginPath(); ctx.arc(selCampoW / 2, selCampoH / 2, 6, 0, 2 * Math.PI); ctx.fillStyle = 'white'; ctx.fill();
             const areaW = selCampoW * 0.15, areaH = selCampoH * 0.45;
             ctx.strokeRect(60, selCampoH/2 - areaH/2, areaW, areaH); ctx.strokeRect(selCampoW - 60 - areaW, selCampoH/2 - areaH/2, areaW, areaH); 
-            if (modoDeJogo === 'PENALTI') {
+            if (modoDeJogo.includes('PENALTI')) {
                 ctx.beginPath(); ctx.arc(selCampoW * 0.25, selCampoH / 2, 4, 0, 2 * Math.PI); ctx.fill();
                 ctx.beginPath(); ctx.arc(selCampoW * 0.75, selCampoH / 2, 4, 0, 2 * Math.PI); ctx.fill();
             }
@@ -1353,10 +1419,10 @@
 
             let bodiesToAdd = [...walls, bola, player1, player2];
             
-            const isModo4Players = (modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED_2V2');
-            const isModo6Players = (modoDeJogo === 'CLASSICO_3V3' || modoDeJogo === 'RANKED_3V3');
+            const isModo4Players = (modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3'));
+            const isModo6Players = (modoDeJogo.includes('3V3'));
 
-            if (isModo4Players || isModo6Players) {
+            if (isModo4Players) {
                 player3 = Bodies.circle(selCampoW * 0.25, selCampoH * 0.7, 22, { label: 'p3', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP1.cores?.bg||'#3498db', strokeStyle: cfgP1.cores?.line||'#fff', lineWidth: 3 } });
                 player4 = Bodies.circle(selCampoW * 0.75, selCampoH * 0.7, 22, { label: 'p4', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP2.cores?.bg||'#e74c3c', strokeStyle: cfgP2.cores?.line||'#fff', lineWidth: 3 } });
                 bodiesToAdd.push(player3, player4);
@@ -1374,9 +1440,14 @@
                     if(estadoJogo !== 'JOGANDO') return;
                     event.pairs.forEach(pair => {
                         const { bodyA, bodyB } = pair;
-                        if (modoDeJogo === 'PENALTI' && toquesNaBolaPenalti < 2) {
+                        
+                        // Detecção de toque na bola (Pênaltis)
+                        if (modoDeJogo.includes('PENALTI') && toquesNaBolaPenalti < 2) {
                             if (bodyA.label === 'bola' || bodyB.label === 'bola') {
-                                let kicker = turnoPenalti === 1 ? player1 : player2;
+                                // Define qual par de jogadores tá no campo
+                                let ativos = getJogadoresRodadaPenalti();
+                                let kicker = turnoPenalti === 1 ? ativos.pT1 : ativos.pT2;
+                                
                                 if (bodyA === kicker || bodyB === kicker) {
                                     if (framesDesdeUltimoToque > 15) {
                                         toquesNaBolaPenalti++; framesDesdeUltimoToque = 0;
@@ -1391,21 +1462,21 @@
 
             Events.on(render, 'afterRender', () => {
                 const ctx = render.context; desenharTorcida(ctx);
-                const isModo4Players = (modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED_2V2');
-                const isModo6Players = (modoDeJogo === 'CLASSICO_3V3' || modoDeJogo === 'RANKED_3V3');
+                const isModo4Players = (modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3'));
+                const isModo6Players = (modoDeJogo.includes('3V3'));
 
                 let playersToRender = [ 
-                    {p: player1, cfg: cfgP1.cores, dash: dashP1, num: playerNumbers[1]}, 
-                    {p: player2, cfg: cfgP2.cores, dash: dashP2, num: playerNumbers[2]} 
+                    {p: player1, cfg: cfgP1.cores, dash: dashP1, num: playerNumbers[1] || 10}, 
+                    {p: player2, cfg: cfgP2.cores, dash: dashP2, num: playerNumbers[2] || 10} 
                 ];
                 
-                if (isModo4Players || isModo6Players) {
-                    playersToRender.push({p: player3, cfg: cfgP1.cores, dash: dashP3, num: playerNumbers[3]});
-                    playersToRender.push({p: player4, cfg: cfgP2.cores, dash: dashP4, num: playerNumbers[4]});
+                if (isModo4Players) {
+                    playersToRender.push({p: player3, cfg: cfgP1.cores, dash: dashP3, num: playerNumbers[3] || 7});
+                    playersToRender.push({p: player4, cfg: cfgP2.cores, dash: dashP4, num: playerNumbers[4] || 7});
                 }
                 if (isModo6Players) {
-                    playersToRender.push({p: player5, cfg: cfgP1.cores, dash: dashP5, num: playerNumbers[5]});
-                    playersToRender.push({p: player6, cfg: cfgP2.cores, dash: dashP6, num: playerNumbers[6]});
+                    playersToRender.push({p: player5, cfg: cfgP1.cores, dash: dashP5, num: playerNumbers[5] || 11});
+                    playersToRender.push({p: player6, cfg: cfgP2.cores, dash: dashP6, num: playerNumbers[6] || 11});
                 }
 
                 playersToRender.forEach(jog => {
@@ -1453,7 +1524,7 @@
                     if (estadoJogo === 'GOL_CELEBRATION') {
                         delayTimer--;
                         if (delayTimer <= 0) {
-                            if (modoDeJogo === 'PENALTI') {
+                            if (modoDeJogo.includes('PENALTI')) {
                                 uiHide('mensagem-overlay');
                                 registrarResultadoPenalti(true);
                             } else {
@@ -1472,14 +1543,14 @@
 
                     if (estadoJogo === 'JOGANDO') {
                         framesDesdeUltimoToque++;
-                        const isModo4Players = (modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED_2V2');
-                        const isModo6Players = (modoDeJogo === 'CLASSICO_3V3' || modoDeJogo === 'RANKED_3V3');
+                        const isModo4Players = (modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3'));
+                        const isModo6Players = (modoDeJogo.includes('3V3'));
                         
                         if (dashP1 > 0) dashP1--; if (dashP2 > 0) dashP2--;
-                        if (isModo4Players || isModo6Players) { if (dashP3 > 0) dashP3--; if (dashP4 > 0) dashP4--; }
+                        if (isModo4Players) { if (dashP3 > 0) dashP3--; if (dashP4 > 0) dashP4--; }
                         if (isModo6Players) { if (dashP5 > 0) dashP5--; if (dashP6 > 0) dashP6--; }
 
-                        // >>> DETECÇÃO DE GOL ABSOLUTA E INFALÍVEL <<<
+                        // >>> DETECÇÃO DE GOL POR POSIÇÃO ABSOLUTA <<<
                         if (isHost || !isOnline) {
                             const golSize = selCampoH * 0.35;
                             const golTop = (selCampoH / 2) - (golSize / 2) - 15;
@@ -1494,7 +1565,7 @@
 
                         processarControles();
                         
-                        if (modoDeJogo !== 'PENALTI') {
+                        if (!modoDeJogo.includes('PENALTI')) {
                             ticksJogo++;
                             if (ticksJogo >= 60) {
                                 ticksJogo = 0; tempoRestante--;
@@ -1509,9 +1580,13 @@
                                             isProrrogacao = true; tempoRestante = 30;
                                             mostrarMensagemEspecial("PRORROGAÇÃO!", 150, () => { estadoJogo = 'JOGANDO'; forceFocus(); });
                                         } else {
-                                            // TODOS OS MODOS vão para Pênaltis
+                                            // TRANSFORMAR MODO PRA PÊNALTI MAS MANTER A INFO DA SALA (1v1, 2v2 ou 3v3)
                                             mostrarMensagemEspecial("PÊNALTIS!", 180, () => {
-                                                modoDeJogo = 'PENALTI'; prepararModoPenaltiUI(); reposicionarJogadores(); estadoJogo = 'JOGANDO'; forceFocus();
+                                                if(modoDeJogo.includes('3V3')) modoDeJogo = 'PENALTI_3V3';
+                                                else if(modoDeJogo.includes('2V2')) modoDeJogo = 'PENALTI_2V2';
+                                                else modoDeJogo = 'PENALTI';
+                                                
+                                                prepararModoPenaltiUI(); reposicionarJogadores(); estadoJogo = 'JOGANDO'; forceFocus();
                                             });
                                         }
                                     }
@@ -1519,7 +1594,7 @@
                             }
 
                             let frameData = { b: {x: bola.position.x, y: bola.position.y}, p1: {x: player1.position.x, y: player1.position.y}, p2: {x: player2.position.x, y: player2.position.y} };
-                            if (isModo4Players || isModo6Players) {
+                            if (isModo4Players) {
                                 frameData.p3 = {x: player3.position.x, y: player3.position.y};
                                 frameData.p4 = {x: player4.position.x, y: player4.position.y};
                             }
@@ -1531,7 +1606,7 @@
                             if (historicoPosicoes.length > 400) historicoPosicoes.shift();
                         }
 
-                        if (modoDeJogo === 'PENALTI' && toquesNaBolaPenalti > 0) {
+                        if (modoDeJogo.includes('PENALTI') && toquesNaBolaPenalti > 0) {
                             timerPosToque--;
                             if (timerPosToque <= 0) registrarResultadoPenalti(false); 
                         }
@@ -1549,13 +1624,13 @@
                             msg: currentStatusMsg, msgC: currentStatusMsgColor,
                             hp1: historicoPenaltisP1, hp2: historicoPenaltisP2
                         };
-                        if (modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED_2V2' || modoDeJogo === 'CLASSICO_3V3' || modoDeJogo === 'RANKED_3V3') {
+                        if (modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3')) {
                             syncPayload.p3 = {x: player3.position.x, y: player3.position.y};
                             syncPayload.p4 = {x: player4.position.x, y: player4.position.y};
                             syncPayload.d3 = dashP3; syncPayload.d4 = dashP4;
                             syncPayload.n3 = playerNumbers[3]; syncPayload.n4 = playerNumbers[4];
                         }
-                        if (modoDeJogo === 'CLASSICO_3V3' || modoDeJogo === 'RANKED_3V3') {
+                        if (modoDeJogo.includes('3V3')) {
                             syncPayload.p5 = {x: player5.position.x, y: player5.position.y};
                             syncPayload.p6 = {x: player6.position.x, y: player6.position.y};
                             syncPayload.d5 = dashP5; syncPayload.d6 = dashP6;
@@ -1584,15 +1659,15 @@
         }
 
         function tentarChutar(jogador) {
-            if (modoDeJogo === 'PENALTI' && toquesNaBolaPenalti >= 2) return; 
+            if (modoDeJogo.includes('PENALTI') && toquesNaBolaPenalti >= 2) return; 
             
             const dx = bola.position.x - jogador.position.x, dy = bola.position.y - jogador.position.y;
             const dist = Math.sqrt(dx*dx + dy*dy);
             if (dist < jogador.circleRadius + bola.circleRadius + 15) {
-                const kickPower = modoDeJogo === 'PENALTI' ? 0.024 : 0.012; 
+                const kickPower = modoDeJogo.includes('PENALTI') ? 0.024 : 0.012; 
                 Body.applyForce(bola, bola.position, { x: (dx / dist) * kickPower, y: (dy / dist) * kickPower });
                 
-                if (modoDeJogo === 'PENALTI') { 
+                if (modoDeJogo.includes('PENALTI')) { 
                     if (framesDesdeUltimoToque > 15) {
                         toquesNaBolaPenalti++; framesDesdeUltimoToque = 0;
                         if(toquesNaBolaPenalti === 1) timerPosToque = 180;
@@ -1605,7 +1680,8 @@
             if (id === 1 && dashP1 > 0) return; if (id === 2 && dashP2 > 0) return;
             if (id === 3 && dashP3 > 0) return; if (id === 4 && dashP4 > 0) return;
             if (id === 5 && dashP5 > 0) return; if (id === 6 && dashP6 > 0) return;
-            if (modoDeJogo === 'PENALTI' && toquesNaBolaPenalti >= 2) return;
+            if (modoDeJogo.includes('PENALTI') && toquesNaBolaPenalti >= 2) return;
+            
             const vel = jogador.velocity; const speed = Math.sqrt(vel.x*vel.x + vel.y*vel.y);
             if (speed > 0.5) { 
                 Body.applyForce(jogador, jogador.position, { x: (vel.x/speed) * 0.056, y: (vel.y/speed) * 0.056 });
@@ -1644,37 +1720,44 @@
                 p4 = {up: local4.up, down: local4.down, left: local4.left, right: local4.right, shoot: local4.shoot, dash: local4.dash};
             }
             
-            if(modoDeJogo === 'PENALTI') {
-                if(turnoPenalti === 1) {
+            if(modoDeJogo.includes('PENALTI')) {
+                let ativos = getJogadoresRodadaPenalti();
+                
+                if(turnoPenalti === 1) { // TIME 1 CHUTA (Ex: P1/P3/P5) | TIME 2 DEFENDE (Ex: P2/P4/P6)
                     if(toquesNaBolaPenalti < 2) {
-                        if (p1.w) Body.applyForce(player1, player1.position, { x: 0, y: -forceKicker });
-                        if (p1.s) Body.applyForce(player1, player1.position, { x: 0, y: forceKicker });
-                        if (p1.a) Body.applyForce(player1, player1.position, { x: -forceKicker, y: 0 });
-                        if (p1.d) Body.applyForce(player1, player1.position, { x: forceKicker, y: 0 });
-                        if (p1.shoot) tentarChutar(player1);
-                        if (p1.dash) darArrancada(player1, 1);
+                        // Kicker Time 1
+                        if (p1.w || p3.w || p5.w) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: 0, y: -forceKicker });
+                        if (p1.s || p3.s || p5.s) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: 0, y: forceKicker });
+                        if (p1.a || p3.a || p5.a) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: -forceKicker, y: 0 });
+                        if (p1.d || p3.d || p5.d) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: forceKicker, y: 0 });
+                        if (p1.shoot || p3.shoot || p5.shoot) tentarChutar(ativos.pT1);
+                        if (p1.dash || p3.dash || p5.dash) darArrancada(ativos.pT1, 1);
                     }
-                    if (p2.up) Body.applyForce(player2, player2.position, { x: 0, y: -forceNormal });
-                    if (p2.down) Body.applyForce(player2, player2.position, { x: 0, y: forceNormal });
-                    Body.setPosition(player2, { x: selCampoW - 55, y: player2.position.y });
-                    Body.setVelocity(player2, { x: 0, y: player2.velocity.y });
-                } else {
+                    // Goleiro Time 2
+                    if (p2.up || p4.up || p6.up) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: 0, y: -forceNormal });
+                    if (p2.down || p4.down || p6.down) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: 0, y: forceNormal });
+                    Body.setPosition(ativos.pT2, { x: selCampoW - 55, y: ativos.pT2.position.y });
+                    Body.setVelocity(ativos.pT2, { x: 0, y: ativos.pT2.velocity.y });
+                } else { // TIME 2 CHUTA | TIME 1 DEFENDE
                     if(toquesNaBolaPenalti < 2) {
-                        if (p2.up) Body.applyForce(player2, player2.position, { x: 0, y: -forceKicker });
-                        if (p2.down) Body.applyForce(player2, player2.position, { x: 0, y: forceKicker });
-                        if (p2.left) Body.applyForce(player2, player2.position, { x: -forceKicker, y: 0 });
-                        if (p2.right) Body.applyForce(player2, player2.position, { x: forceKicker, y: 0 });
-                        if (p2.shoot) tentarChutar(player2);
-                        if (p2.dash) darArrancada(player2, 2);
+                        // Kicker Time 2
+                        if (p2.up || p4.up || p6.up) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: 0, y: -forceKicker });
+                        if (p2.down || p4.down || p6.down) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: 0, y: forceKicker });
+                        if (p2.left || p4.left || p6.left) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: -forceKicker, y: 0 });
+                        if (p2.right || p4.right || p6.right) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: forceKicker, y: 0 });
+                        if (p2.shoot || p4.shoot || p6.shoot) tentarChutar(ativos.pT2);
+                        if (p2.dash || p4.dash || p6.dash) darArrancada(ativos.pT2, 2);
                     }
-                    if (p1.w) Body.applyForce(player1, player1.position, { x: 0, y: -forceNormal });
-                    if (p1.s) Body.applyForce(player1, player1.position, { x: 0, y: forceNormal });
-                    Body.setPosition(player1, { x: 55, y: player1.position.y });
-                    Body.setVelocity(player1, { x: 0, y: player1.velocity.y });
+                    // Goleiro Time 1
+                    if (p1.w || p3.w || p5.w) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: 0, y: -forceNormal });
+                    if (p1.s || p3.s || p5.s) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: 0, y: forceNormal });
+                    Body.setPosition(ativos.pT1, { x: 55, y: ativos.pT1.position.y });
+                    Body.setVelocity(ativos.pT1, { x: 0, y: ativos.pT1.velocity.y });
                 }
                 return;
             }
 
+            // MODO DE JOGO NORMAL LIVRE
             if (p1.w) Body.applyForce(player1, player1.position, { x: 0, y: -forceNormal });
             if (p1.s) Body.applyForce(player1, player1.position, { x: 0, y: forceNormal });
             if (p1.a) Body.applyForce(player1, player1.position, { x: -forceNormal, y: 0 });
@@ -1689,10 +1772,7 @@
             if (p2.shoot) tentarChutar(player2);
             if (p2.dash) darArrancada(player2, 2);
 
-            const isModo4Players = (modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED_2V2');
-            const isModo6Players = (modoDeJogo === 'CLASSICO_3V3' || modoDeJogo === 'RANKED_3V3');
-
-            if (isModo4Players || isModo6Players) {
+            if (modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3')) {
                 if (p3.up) Body.applyForce(player3, player3.position, { x: 0, y: -forceNormal });
                 if (p3.down) Body.applyForce(player3, player3.position, { x: 0, y: forceNormal });
                 if (p3.left) Body.applyForce(player3, player3.position, { x: -forceNormal, y: 0 });
@@ -1708,7 +1788,7 @@
                 if (p4.dash) darArrancada(player4, 4);
             }
 
-            if (isModo6Players) {
+            if (modoDeJogo.includes('3V3')) {
                 if (p5.up) Body.applyForce(player5, player5.position, { x: 0, y: -forceNormal });
                 if (p5.down) Body.applyForce(player5, player5.position, { x: 0, y: forceNormal });
                 if (p5.left) Body.applyForce(player5, player5.position, { x: -forceNormal, y: 0 });
@@ -1725,6 +1805,20 @@
             }
         }
 
+        // SISTEMA DE ROTATIVIDADE DE PÊNALTIS
+        function getJogadoresRodadaPenalti() {
+            if(modoDeJogo.includes('3V3')) {
+                if(rodadaPenalti % 3 === 1) return { pT1: player1, pT2: player2 };
+                if(rodadaPenalti % 3 === 2) return { pT1: player3, pT2: player4 };
+                return { pT1: player5, pT2: player6 };
+            }
+            if(modoDeJogo.includes('2V2')) {
+                if(rodadaPenalti % 2 !== 0) return { pT1: player1, pT2: player2 };
+                return { pT1: player3, pT2: player4 };
+            }
+            return { pT1: player1, pT2: player2 };
+        }
+
         function proximoPenalti() {
             if(estadoJogo !== 'JOGANDO') return;
             if(isOnline && !isHost) return; 
@@ -1736,16 +1830,18 @@
             if (turnoPenalti === 1) {
                 historicoPenaltisP1.push(foiGol);
                 if(foiGol) { placar1++; uiText('score1', placar1); }
+                turnoPenalti = 2; // Passa a vez para o Time 2
             } else {
                 historicoPenaltisP2.push(foiGol);
                 if(foiGol) { placar2++; uiText('score2', placar2); }
+                turnoPenalti = 1; // Volta a vez para o Time 1
+                rodadaPenalti++;  // Avança a rodada de cobradores
             }
             
             atualizarPlacarPenaltis();
             let vencedor = avaliarVencedorPenaltis();
 
             if (vencedor) { finalizarPartida(vencedor); return; }
-            turnoPenalti = turnoPenalti === 1 ? 2 : 1;
             
             mostrarMensagemEspecial(foiGol ? "GOL VALIDADO!" : "PERDEU!", 120, () => {
                 reposicionarJogadores(); toquesNaBolaPenalti = 0; framesDesdeUltimoToque = 999; timerPosToque = 0; estadoJogo = 'JOGANDO'; forceFocus();
@@ -1771,30 +1867,23 @@
 
         function reposicionarJogadores() {
             Body.setVelocity(bola, { x: 0, y: 0 }); Body.setVelocity(player1, { x: 0, y: 0 }); Body.setVelocity(player2, { x: 0, y: 0 });
-            const isModo4Players = (modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED_2V2');
-            const isModo6Players = (modoDeJogo === 'CLASSICO_3V3' || modoDeJogo === 'RANKED_3V3');
+            
+            if(modoDeJogo.includes('PENALTI')) {
+                // Esconde todo mundo
+                [player1, player2, player3, player4, player5, player6].forEach(p => { if(p) Body.setPosition(p, {x: -100, y: -100}); });
 
-            // Nos pênaltis, os jogadores adicionais ficam escondidos para não atrapalhar
-            if(modoDeJogo === 'PENALTI') {
-                if (isModo4Players || isModo6Players) {
-                    if(player3) Body.setPosition(player3, {x: -100, y: -100});
-                    if(player4) Body.setPosition(player4, {x: -100, y: -100});
-                }
-                if (isModo6Players) {
-                    if(player5) Body.setPosition(player5, {x: -100, y: -100});
-                    if(player6) Body.setPosition(player6, {x: -100, y: -100});
-                }
+                let ativos = getJogadoresRodadaPenalti();
 
-                if(turnoPenalti === 1) { 
+                if(turnoPenalti === 1) { // TIME 1 CHUTA, TIME 2 DEFENDE
                     Body.setPosition(bola, { x: selCampoW * 0.75, y: selCampoH/2 });
-                    Body.setPosition(player1, { x: selCampoW * 0.60, y: selCampoH/2 });
-                    Body.setPosition(player2, { x: selCampoW - 55, y: selCampoH/2 });
-                } else { 
+                    Body.setPosition(ativos.pT1, { x: selCampoW * 0.60, y: selCampoH/2 });
+                    Body.setPosition(ativos.pT2, { x: selCampoW - 55, y: selCampoH/2 });
+                } else { // TIME 2 CHUTA, TIME 1 DEFENDE
                     Body.setPosition(bola, { x: selCampoW * 0.25, y: selCampoH/2 });
-                    Body.setPosition(player2, { x: selCampoW * 0.40, y: selCampoH/2 });
-                    Body.setPosition(player1, { x: 55, y: selCampoH/2 });
+                    Body.setPosition(ativos.pT2, { x: selCampoW * 0.40, y: selCampoH/2 });
+                    Body.setPosition(ativos.pT1, { x: 55, y: selCampoH/2 });
                 }
-            } else if (isModo6Players) {
+            } else if (modoDeJogo.includes('3V3')) {
                 Body.setVelocity(player3, { x: 0, y: 0 }); Body.setVelocity(player4, { x: 0, y: 0 });
                 Body.setVelocity(player5, { x: 0, y: 0 }); Body.setVelocity(player6, { x: 0, y: 0 });
                 Body.setPosition(bola, { x: selCampoW/2, y: selCampoH/2 });
@@ -1806,7 +1895,7 @@
                 Body.setPosition(player2, { x: selCampoW * 0.65, y: selCampoH * 0.50 });
                 Body.setPosition(player4, { x: selCampoW * 0.75, y: selCampoH * 0.25 });
                 Body.setPosition(player6, { x: selCampoW * 0.75, y: selCampoH * 0.75 });
-            } else if (isModo4Players) {
+            } else if (modoDeJogo.includes('2V2')) {
                 Body.setVelocity(player3, { x: 0, y: 0 }); Body.setVelocity(player4, { x: 0, y: 0 });
                 Body.setPosition(bola, { x: selCampoW/2, y: selCampoH/2 });
                 Body.setPosition(player1, { x: selCampoW * 0.35, y: selCampoH * 0.30 });
@@ -1834,6 +1923,7 @@
             votosPular.add(slot);
             let totalAtivos = isOnline ? 1 + clientConnections.length : 1;
             
+            // SE 50% OU MAIS VOTAR, PULA
             if (votosPular.size >= Math.ceil(totalAtivos / 2)) {
                 encerrarReplay();
             } else {
