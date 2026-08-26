@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>IAES BALL - Versão Definitiva Pro (Admin, Senhas & 2v2 Ranked)</title>
+    <title>IAES BALL - Versão Definitiva Pro (Admin V2 & Contas)</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
     
     <!-- BIBLIOTECAS -->
@@ -125,8 +125,15 @@
         
         .controles-info { font-size: 12px; color: #aaa; margin-top: 20px; line-height: 1.6; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 8px; }
         
-        /* RANKING E ADMIN LISTS */
-        #ranking-list, #admin-lista-contas { width: 100%; max-width: 550px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 2px solid #f1c40f; margin-bottom: 20px; text-align: left; overflow-y: auto; max-height: 400px; }
+        /* RANKING E ADMIN LISTS COM SCROLLBAR PERSONALIZADA */
+        #ranking-list, #admin-lista-contas { width: 100%; max-width: 650px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 2px solid #f1c40f; margin-bottom: 20px; text-align: left; overflow-y: auto; max-height: 450px; }
+        #admin-lista-contas { border-color: #e74c3c; }
+        
+        #ranking-list::-webkit-scrollbar, #admin-lista-contas::-webkit-scrollbar { width: 8px; }
+        #ranking-list::-webkit-scrollbar-track, #admin-lista-contas::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 10px; }
+        #ranking-list::-webkit-scrollbar-thumb { background: #f1c40f; border-radius: 10px; }
+        #admin-lista-contas::-webkit-scrollbar-thumb { background: #e74c3c; border-radius: 10px; }
+
         .ranking-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .ranking-item:last-child { border-bottom: none; }
         .ranking-pos { font-weight: 900; width: 30px; color: #ccc; }
@@ -148,18 +155,29 @@
         
         <!-- TELA DE LOGIN / REGISTRO COM SENHA -->
         <div id="screen-login" class="screen">
-            <h1>CRIAR CONTA / LOGIN</h1>
+            <h1>BEM-VINDO</h1>
             <p style="color:#aaa; margin-bottom: 20px;">Sua conta e rank são protegidos por senha!</p>
             <input type="text" id="input-nickname" class="input-sala" placeholder="NICKNAME" maxlength="12" style="text-transform: uppercase;">
             <input type="password" id="input-senha" class="input-sala input-senha" placeholder="SENHA SECRETA" maxlength="20">
-            <button id="btn-login" class="btn btn-avancar" onclick="fazerLogin()"><span id="btn-login-txt">ENTRAR NO JOGO</span></button>
+            
+            <div style="display: flex; gap: 15px; width: 80%; margin-top: 10px;">
+                <button id="btn-login" class="btn btn-avancar" style="margin-top: 0;" onclick="fazerLogin()"><span id="btn-login-txt">ENTRAR</span></button>
+                <button id="btn-criar" class="btn" style="margin-top: 0; background: linear-gradient(45deg, #8e44ad, #9b59b6); width: 100%;" onclick="criarConta()"><span id="btn-criar-txt">CRIAR CONTA</span></button>
+            </div>
+            
+            <button class="btn" style="margin-top: 40px; background: transparent; border: 2px solid #555; color: #ccc; padding: 10px 20px; font-size: 14px;" onclick="fazerLoginAdmin()">⚙️ ACESSAR PAINEL ADMIN</button>
         </div>
 
         <!-- TELA DE ADMINISTRAÇÃO -->
         <div id="screen-admin" class="screen">
-            <h1 style="color: #e74c3c;">PAINEL DE ADMINISTRAÇÃO</h1>
+            <h1 style="color: #e74c3c;">⚙️ PAINEL DE ADMINISTRAÇÃO</h1>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button class="btn" style="padding: 10px 15px; font-size: 14px;" onclick="carregarListaAdmin()">🔄 ATUALIZAR LISTA</button>
+                <button class="btn" style="padding: 10px 15px; font-size: 14px; background: #e74c3c;" onclick="showScreen('screen-login'); limparInputs();">⏴ SAIR DO PAINEL</button>
+            </div>
+
             <div id="admin-lista-contas">Carregando banco de dados...</div>
-            <button class="btn btn-voltar" onclick="showScreen('screen-login'); limparInputs();">⏴ SAIR DO PAINEL</button>
         </div>
 
         <!-- TELA INICIAL -->
@@ -171,6 +189,7 @@
                 <button class="btn" style="padding: 20px 40px; font-size: 18px; background: linear-gradient(45deg, #8e44ad, #9b59b6);" onclick="irParaModo(true)">MULTIPLAYER ONLINE</button>
             </div>
             <button class="btn" style="padding: 15px 30px; font-size: 14px; background: #f39c12; margin-top: 25px;" onclick="mostrarLeaderboard()">🏆 VER RANKING GLOBAL</button>
+            <button class="btn" style="padding: 10px 20px; font-size: 12px; background: #e74c3c; margin-top: 15px;" onclick="deslogar()">Sair da Conta</button>
         </div>
 
         <!-- TELA DE RANKING GLOBAL -->
@@ -331,13 +350,15 @@
         // --- SISTEMA DE CONTAS E ADMIN (FIREBASE) ---
         let meuPerfil = { nome: '', senha: '', elo: 0, vitorias: 0, derrotas: 0 };
         
-        window.onload = () => {
+        window.onload = async () => {
             const savedNick = localStorage.getItem('iaesball_nickname');
             const savedPass = localStorage.getItem('iaesball_senha');
-            if(savedNick && savedPass) {
+            
+            // Se o último login foi ADMIN, forçamos ele a relogar para segurança
+            if(savedNick && savedPass && savedNick !== 'ADMIN') {
                 document.getElementById('input-nickname').value = savedNick;
                 document.getElementById('input-senha').value = savedPass;
-                fazerLogin(); // Tenta logar automaticamente
+                fazerLogin(); 
             } else {
                 showScreen('screen-login');
             }
@@ -348,17 +369,33 @@
             document.getElementById('input-senha').value = "";
         }
 
-        async function fazerLogin() {
+        function deslogar() {
+            localStorage.removeItem('iaesball_nickname');
+            localStorage.removeItem('iaesball_senha');
+            meuPerfil = { nome: '', senha: '', elo: 0, vitorias: 0, derrotas: 0 };
+            uiHide('perfil-ui');
+            limparInputs();
+            showScreen('screen-login');
+        }
+
+        async function fazerLoginAdmin() {
             const nick = document.getElementById('input-nickname').value.trim().toUpperCase();
             const senha = document.getElementById('input-senha').value.trim();
             
-            // VERIFICAR PAINEL ADMIN
             if (nick === 'ADMIN' && senha === '9090') {
-                abrirAdmin();
-                return;
+                showScreen('screen-admin');
+                carregarListaAdmin();
+            } else {
+                alert("Acesso Negado! Preencha 'ADMIN' no campo de Nickname e '9090' na senha.");
             }
+        }
+
+        async function fazerLogin() {
+            const nick = document.getElementById('input-nickname').value.trim().toUpperCase();
+            const senha = document.getElementById('input-senha').value.trim();
 
             if(nick.length < 3 || senha.length < 3) { alert("Nick e senha devem ter pelo menos 3 caracteres!"); return; }
+            if(nick === 'ADMIN') { alert("Esse nome é reservado para o administrador."); return; }
 
             uiText('btn-login-txt', 'CARREGANDO...');
             document.getElementById('btn-login').disabled = true;
@@ -368,30 +405,60 @@
                 if (doc.exists) {
                     const data = doc.data();
                     if (data.senha !== senha) {
-                        alert("Senha Incorreta para o Nick: " + nick);
-                        uiText('btn-login-txt', 'ENTRAR NO JOGO');
+                        alert("Senha Incorreta para a conta: " + nick);
+                        uiText('btn-login-txt', 'ENTRAR');
                         document.getElementById('btn-login').disabled = false;
                         return;
                     }
                     meuPerfil = { nome: nick, ...data };
+                    
+                    localStorage.setItem('iaesball_nickname', nick); 
+                    localStorage.setItem('iaesball_senha', senha); 
+                    
+                    atualizarPerfilUI();
+                    showScreen('screen-home');
                 } else {
-                    // É um jogador novo
-                    meuPerfil = { nome: nick, senha: senha, elo: 0, vitorias: 0, derrotas: 0 };
-                    await db.collection("jogadores").doc(nick).set(meuPerfil);
+                    alert("A conta '" + nick + "' não foi encontrada! Se você é novo por aqui, clique no botão CRIAR CONTA.");
                 }
-                
-                // Lembrar no navegador para o próximo acesso
-                localStorage.setItem('iaesball_nickname', nick); 
-                localStorage.setItem('iaesball_senha', senha); 
-                
-                atualizarPerfilUI();
-                showScreen('screen-home');
             } catch (error) {
                 console.error(error);
                 alert("Erro ao conectar no banco de dados.");
             } finally {
-                uiText('btn-login-txt', 'ENTRAR NO JOGO');
+                uiText('btn-login-txt', 'ENTRAR');
                 document.getElementById('btn-login').disabled = false;
+            }
+        }
+
+        async function criarConta() {
+            const nick = document.getElementById('input-nickname').value.trim().toUpperCase();
+            const senha = document.getElementById('input-senha').value.trim();
+            
+            if(nick.length < 3 || senha.length < 3) { alert("Nick e senha devem ter pelo menos 3 caracteres!"); return; }
+            if(nick === 'ADMIN') { alert("Esse nome é reservado."); return; }
+
+            uiText('btn-criar-txt', 'CRIANDO...');
+            document.getElementById('btn-criar').disabled = true;
+
+            try {
+                const doc = await db.collection("jogadores").doc(nick).get();
+                if (doc.exists) {
+                    alert("Este Nickname já está em uso! Escolha outro nome ou faça o Login.");
+                } else {
+                    meuPerfil = { nome: nick, senha: senha, elo: 0, vitorias: 0, derrotas: 0 };
+                    await db.collection("jogadores").doc(nick).set(meuPerfil);
+                    
+                    localStorage.setItem('iaesball_nickname', nick); 
+                    localStorage.setItem('iaesball_senha', senha); 
+                    
+                    atualizarPerfilUI();
+                    showScreen('screen-home');
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Erro ao criar conta no banco de dados.");
+            } finally {
+                uiText('btn-criar-txt', 'CRIAR CONTA');
+                document.getElementById('btn-criar').disabled = false;
             }
         }
 
@@ -401,55 +468,76 @@
                     elo: meuPerfil.elo,
                     vitorias: meuPerfil.vitorias,
                     derrotas: meuPerfil.derrotas
-                }, { merge: true }); // Merge = não apaga a senha que tá lá na nuvem
+                }, { merge: true }); 
             } catch (error) {
                 console.error("Erro ao salvar no Firebase: ", error);
             }
         }
 
-        /* FUNÇÕES DE ADMINISTRAÇÃO */
-        async function abrirAdmin() {
-            showScreen('screen-admin');
-            carregarListaAdmin();
-        }
-
+        /* FUNÇÕES DO PAINEL DE ADMINISTRAÇÃO */
         async function carregarListaAdmin() {
             const list = document.getElementById('admin-lista-contas');
-            list.innerHTML = 'Buscando todas as contas...';
+            list.innerHTML = 'Buscando banco de dados, aguarde...';
             try {
                 const snapshot = await db.collection("jogadores").orderBy("elo", "desc").get();
                 list.innerHTML = '';
+                let contagem = 0;
                 snapshot.forEach(doc => {
+                    contagem++;
                     const d = doc.data();
                     list.innerHTML += `
-                        <div style="background: rgba(255,255,255,0.05); margin-bottom: 10px; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #555;">
-                            <div style="text-align: left;">
-                                <span style="font-weight: 900; color: #f1c40f;">${doc.id}</span><br>
-                                <span style="font-size: 12px; color: #ccc;">Senha: <span style="color:#fff;">${d.senha || 'Sem Senha'}</span> | Elo: ${d.elo} | Vit: ${d.vitorias}</span>
+                        <div style="background: rgba(255,255,255,0.05); margin-bottom: 10px; padding: 15px; border-radius: 8px; border: 1px solid #555; display: flex; flex-direction: column; gap: 10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 900; color: #f1c40f; font-size: 20px;">${doc.id}</span>
+                                <span style="font-size: 14px; color: #ccc;">Senha: <span style="color:#fff; background: #222; padding: 2px 8px; border-radius: 4px;">${d.senha || 'Não Definida'}</span></span>
                             </div>
-                            <div style="display: flex; gap: 10px;">
-                                <button onclick="zerarConta('${doc.id}')" style="background:#f39c12; color:#fff; border:none; padding:8px 12px; border-radius:5px; cursor:pointer; font-weight:bold;">ZERAR ELO</button>
-                                <button onclick="deletarConta('${doc.id}')" style="background:#e74c3c; color:#fff; border:none; padding:8px 12px; border-radius:5px; cursor:pointer; font-weight:bold;">EXCLUIR</button>
+                            <div style="font-size: 14px; color: #aaa;">
+                                🏆 Elo: <strong style="color: #fff;">${d.elo}</strong> | 🟢 Vit: <strong>${d.vitorias}</strong> | 🔴 Der: <strong>${d.derrotas}</strong>
+                            </div>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button onclick="adicionarElo('${doc.id}', 100)" style="flex:1; background:#2ecc71; color:#fff; border:none; padding:8px; border-radius:5px; cursor:pointer; font-weight:bold;">+100 PDL</button>
+                                <button onclick="adicionarElo('${doc.id}', -100)" style="flex:1; background:#e67e22; color:#fff; border:none; padding:8px; border-radius:5px; cursor:pointer; font-weight:bold;">-100 PDL</button>
+                                <button onclick="zerarConta('${doc.id}')" style="flex:1; background:#f39c12; color:#fff; border:none; padding:8px; border-radius:5px; cursor:pointer; font-weight:bold;">ZERAR ELO</button>
+                                <button onclick="deletarConta('${doc.id}')" style="flex:1; background:#c0392b; color:#fff; border:none; padding:8px; border-radius:5px; cursor:pointer; font-weight:bold;">🗑️ EXCLUIR</button>
                             </div>
                         </div>
                     `;
                 });
+                if (contagem === 0) list.innerHTML = "Nenhuma conta foi criada ainda.";
             } catch(e) {
                 list.innerHTML = 'Erro ao carregar banco: ' + e.message;
+                console.error(e);
             }
         }
 
         async function deletarConta(id) {
-            if(confirm(`Tem certeza que deseja deletar a conta [${id}]? Esta ação não tem volta.`)) {
+            if(confirm(`⚠️ ATENÇÃO: Tem certeza que deseja DELETAR a conta [${id}]? Esta ação não tem volta.`)) {
                 await db.collection("jogadores").doc(id).delete();
+                alert(`A conta ${id} foi deletada com sucesso!`);
                 carregarListaAdmin();
             }
         }
 
         async function zerarConta(id) {
-            if(confirm(`Tem certeza que deseja zerar o PDL da conta [${id}]?`)) {
+            if(confirm(`Tem certeza que deseja ZERAR todos os pontos de [${id}]?`)) {
                 await db.collection("jogadores").doc(id).set({elo: 0, vitorias: 0, derrotas: 0}, {merge: true});
+                alert(`A conta ${id} voltou à estaca zero!`);
                 carregarListaAdmin();
+            }
+        }
+
+        async function adicionarElo(id, qtd) {
+            if(confirm(`Tem certeza que deseja aplicar ${qtd} PDL na conta [${id}]?`)) {
+                try {
+                    const docRef = db.collection("jogadores").doc(id);
+                    const doc = await docRef.get();
+                    if(doc.exists) {
+                        let novoElo = Math.max(0, doc.data().elo + qtd);
+                        await docRef.update({ elo: novoElo });
+                        alert(`O PDL de ${id} foi atualizado para ${novoElo}!`);
+                        carregarListaAdmin();
+                    }
+                } catch(e) { alert("Erro: " + e.message); }
             }
         }
 
@@ -498,7 +586,7 @@
         }
 
 
-        // CONFIGURAÇÃO DO SERVIDOR WEB RTC (JOGO ONLINE P2P)
+        // --- CONFIGURAÇÃO DO SERVIDOR WEB RTC (JOGO ONLINE P2P) ---
         const peerConfig = {
             config: {
                 'iceServers': [
@@ -529,7 +617,7 @@
                 showScreen('screen-online-choice');
             } else { 
                 isHost = true; currPlayer = 1; mySlot = 1; 
-                uiHide('btn-ranked'); // Oculta ranked no modo offline
+                uiHide('btn-ranked'); 
                 uiHide('btn-ranked-2v2'); 
                 showScreen('screen-mode'); 
             }
@@ -537,7 +625,7 @@
 
         function escolherModoOnline() {
             isHost = true; currPlayer = 1; mySlot = 1;
-            uiShow('btn-ranked', 'inline-block'); // Mostra os botões Ranked no online
+            uiShow('btn-ranked', 'inline-block'); 
             uiShow('btn-ranked-2v2', 'inline-block'); 
             showScreen('screen-mode');
         }
@@ -841,7 +929,6 @@
         let dashP1 = 0, dashP2 = 0, dashP3 = 0, dashP4 = 0; const DASH_COOLDOWN = 180; 
         let currentStatusMsg = "", currentStatusMsgColor = ""; 
 
-        // UI UTILS
         function uiShow(id, display = 'block') { const el = document.getElementById(id); if(el) el.style.display = display; }
         function uiHide(id) { const el = document.getElementById(id); if(el) el.style.display = 'none'; }
         function uiText(id, txt) { const el = document.getElementById(id); if(el) el.innerText = txt; }
@@ -908,13 +995,11 @@
             };
         }
 
-        // MENUS DE ESCOLHA
         function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen')); document.getElementById(id).classList.add('active-screen'); }
         
         function escolherModo(modo) { 
             modoDeJogo = modo; 
             if (modo === 'RANKED' || modo === 'RANKED_2V2') {
-                // Ranked trava o mapa padrão (1000x550) para ser justo
                 selCampoW = 1000; selCampoH = 550;
                 if (isOnline && isHost) iniciarHost();
             } else {
@@ -1099,15 +1184,13 @@
                 const timeVencedor = vencedorStr === 'P1' ? cfgP1.time : cfgP2.time;
                 currentStatusMsg = `${timeVencedor.toUpperCase()} VENCEU!`;
                 
-                // SISTEMA DE ELO (RANKED 1v1 ou 2v2)
                 if ((modoDeJogo === 'RANKED' || modoDeJogo === 'RANKED_2V2') && isOnline) {
-                    
                     let ganhei = false; let perdi = false;
                     
-                    if (vencedorStr === 'P1') { // Time 1 venceu
+                    if (vencedorStr === 'P1') { 
                         if (mySlot === 1 || mySlot === 3) ganhei = true;
                         if (mySlot === 2 || mySlot === 4) perdi = true;
-                    } else if (vencedorStr === 'P2') { // Time 2 venceu
+                    } else if (vencedorStr === 'P2') { 
                         if (mySlot === 2 || mySlot === 4) ganhei = true;
                         if (mySlot === 1 || mySlot === 3) perdi = true;
                     }
@@ -1138,7 +1221,6 @@
             }
             
             if(isHost || !isOnline) {
-                // Em Ranked, volta pro lobby, clássico pode dar rematch
                 if (modoDeJogo === 'RANKED' || modoDeJogo === 'RANKED_2V2') {
                     document.getElementById('botoes-fim-jogo').innerHTML = `<button class="btn btn-voltar" style="margin-top:0; margin-bottom:0;" onclick="voltarMenu()">VOLTAR AO LOBBY</button>`;
                 } else {
@@ -1173,6 +1255,28 @@
                 ctx.beginPath(); ctx.arc(selCampoW * 0.75, selCampoH / 2, 4, 0, 2 * Math.PI); ctx.fill();
             }
             ctx.shadowBlur = 0;
+        }
+
+        function limparMotorFisico() {
+            try {
+                if (runner) { Matter.Runner.stop(runner); runner = null; }
+                if (render) { Matter.Render.stop(render); render = null; }
+                if (engine) { Matter.Events.off(engine); Matter.Composite.clear(engine.world, false, true); engine = null; }
+
+                const wrapper = document.getElementById('game-wrapper');
+                const oldCanvas = document.getElementById('field-canvas');
+                if (oldCanvas) oldCanvas.remove();
+                const oldMatter = document.getElementById('matter-container');
+                if (oldMatter) oldMatter.remove();
+
+                const newCanvas = document.createElement('canvas');
+                newCanvas.id = 'field-canvas';
+                wrapper.insertBefore(newCanvas, wrapper.firstChild);
+
+                const newMatter = document.createElement('div');
+                newMatter.id = 'matter-container';
+                wrapper.insertBefore(newMatter, newCanvas.nextSibling);
+            } catch(e) {}
         }
 
         function configurarFisica() {
@@ -1347,7 +1451,6 @@
                                             mostrarMensagemEspecial("PRORROGAÇÃO!", 150, () => { estadoJogo = 'JOGANDO'; forceFocus(); });
                                         } else {
                                             if (modoDeJogo === 'RANKED' || modoDeJogo === 'RANKED_2V2') {
-                                                // Rank não tem pênaltis, empata direto.
                                                 finalizarPartida(null); 
                                             } else {
                                                 mostrarMensagemEspecial("PÊNALTIS!", 180, () => {
@@ -1534,6 +1637,50 @@
                 if (p4.shoot) tentarChutar(player4);
                 if (p4.dash) darArrancada(player4, 4);
             }
+        }
+
+        function proximoPenalti() {
+            if(estadoJogo !== 'JOGANDO') return;
+            if(isOnline && !isHost) return; 
+            const btn = document.getElementById('btn-proximo-penalti'); if(btn) btn.blur();
+            registrarResultadoPenalti(false);
+        }
+
+        function registrarResultadoPenalti(foiGol) {
+            if (turnoPenalti === 1) {
+                historicoPenaltisP1.push(foiGol);
+                if(foiGol) { placar1++; uiText('score1', placar1); }
+            } else {
+                historicoPenaltisP2.push(foiGol);
+                if(foiGol) { placar2++; uiText('score2', placar2); }
+            }
+            
+            atualizarPlacarPenaltis();
+            let vencedor = avaliarVencedorPenaltis();
+
+            if (vencedor) { finalizarPartida(vencedor); return; }
+            turnoPenalti = turnoPenalti === 1 ? 2 : 1;
+            
+            mostrarMensagemEspecial(foiGol ? "GOL VALIDADO!" : "PERDEU!", 120, () => {
+                reposicionarJogadores(); toquesNaBolaPenalti = 0; framesDesdeUltimoToque = 999; timerPosToque = 0; estadoJogo = 'JOGANDO'; forceFocus();
+            });
+        }
+
+        function avaliarVencedorPenaltis() {
+            let golsP1 = historicoPenaltisP1.filter(g=>g).length; let golsP2 = historicoPenaltisP2.filter(g=>g).length;
+            let chutesP1 = historicoPenaltisP1.length; let chutesP2 = historicoPenaltisP2.length;
+            let restP1 = Math.max(0, 5 - chutesP1); let restP2 = Math.max(0, 5 - chutesP2);
+
+            if (chutesP1 <= 5 || chutesP2 <= 5) {
+                if (golsP1 > golsP2 + restP2) return 'P1';
+                if (golsP2 > golsP1 + restP1) return 'P2';
+            } else { 
+                if (chutesP1 === chutesP2) {
+                    if (golsP1 > golsP2) return 'P1';
+                    if (golsP2 > golsP1) return 'P2';
+                }
+            }
+            return null;
         }
 
         function reposicionarJogadores() {
