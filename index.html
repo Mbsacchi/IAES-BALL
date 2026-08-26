@@ -354,7 +354,6 @@
             const savedNick = localStorage.getItem('iaesball_nickname');
             const savedPass = localStorage.getItem('iaesball_senha');
             
-            // Se o último login foi ADMIN, forçamos ele a relogar para segurança
             if(savedNick && savedPass && savedNick !== 'ADMIN') {
                 document.getElementById('input-nickname').value = savedNick;
                 document.getElementById('input-senha').value = savedPass;
@@ -382,11 +381,11 @@
             const nick = document.getElementById('input-nickname').value.trim().toUpperCase();
             const senha = document.getElementById('input-senha').value.trim();
             
-            if (nick === 'ADMIN' && senha === '9090') {
+            if (nick === 'ADMIN' && senha === '8080') {
                 showScreen('screen-admin');
                 carregarListaAdmin();
             } else {
-                alert("Acesso Negado! Preencha 'ADMIN' no campo de Nickname e '9090' na senha.");
+                alert("Acesso Negado! Preencha 'ADMIN' no campo de Nickname e '8080' na senha.");
             }
         }
 
@@ -394,8 +393,14 @@
             const nick = document.getElementById('input-nickname').value.trim().toUpperCase();
             const senha = document.getElementById('input-senha').value.trim();
 
+            if (nick === 'ADMIN' && senha === '8080') {
+                showScreen('screen-admin');
+                carregarListaAdmin();
+                return;
+            }
+
             if(nick.length < 3 || senha.length < 3) { alert("Nick e senha devem ter pelo menos 3 caracteres!"); return; }
-            if(nick === 'ADMIN') { alert("Esse nome é reservado para o administrador."); return; }
+            if(nick === 'ADMIN') { alert("Acesso Negado! Senha incorreta ou nome reservado."); return; }
 
             uiText('btn-login-txt', 'CARREGANDO...');
             document.getElementById('btn-login').disabled = true;
@@ -442,7 +447,7 @@
             try {
                 const doc = await db.collection("jogadores").doc(nick).get();
                 if (doc.exists) {
-                    alert("Este Nickname já está em uso! Escolha outro nome ou faça o Login.");
+                    alert("Este Nickname já está em uso! Escolha outro nome ou clique em ENTRAR.");
                 } else {
                     meuPerfil = { nome: nick, senha: senha, elo: 0, vitorias: 0, derrotas: 0 };
                     await db.collection("jogadores").doc(nick).set(meuPerfil);
@@ -483,6 +488,9 @@
                 list.innerHTML = '';
                 let contagem = 0;
                 snapshot.forEach(doc => {
+                    // Impede que a conta ADMIN apareça na lista de jogadores do painel
+                    if (doc.id === 'ADMIN') return;
+                    
                     contagem++;
                     const d = doc.data();
                     list.innerHTML += `
@@ -550,6 +558,7 @@
                 list.innerHTML = '';
                 let pos = 1;
                 snapshot.forEach(doc => {
+                    if (doc.id === 'ADMIN') return;
                     const data = doc.data();
                     const r = getInfoRank(data.elo);
                     list.innerHTML += `
@@ -953,6 +962,28 @@
             document.getElementById('bar-top').style.height = '0'; document.getElementById('bar-bottom').style.height = '0';
         }
 
+        function limparMotorFisico() {
+            try {
+                if (runner) { Matter.Runner.stop(runner); runner = null; }
+                if (render) { Matter.Render.stop(render); render = null; }
+                if (engine) { Matter.Events.off(engine); Matter.Composite.clear(engine.world, false, true); engine = null; }
+
+                const wrapper = document.getElementById('game-wrapper');
+                const oldCanvas = document.getElementById('field-canvas');
+                if (oldCanvas) oldCanvas.remove();
+                const oldMatter = document.getElementById('matter-container');
+                if (oldMatter) oldMatter.remove();
+
+                const newCanvas = document.createElement('canvas');
+                newCanvas.id = 'field-canvas';
+                wrapper.insertBefore(newCanvas, wrapper.firstChild);
+
+                const newMatter = document.createElement('div');
+                newMatter.id = 'matter-container';
+                wrapper.insertBefore(newMatter, newCanvas.nextSibling);
+            } catch(e) {}
+        }
+
         const keys = {};
         window.addEventListener('keydown', (e) => { 
             if (estadoJogo === 'MENU') return; 
@@ -1257,28 +1288,6 @@
             ctx.shadowBlur = 0;
         }
 
-        function limparMotorFisico() {
-            try {
-                if (runner) { Matter.Runner.stop(runner); runner = null; }
-                if (render) { Matter.Render.stop(render); render = null; }
-                if (engine) { Matter.Events.off(engine); Matter.Composite.clear(engine.world, false, true); engine = null; }
-
-                const wrapper = document.getElementById('game-wrapper');
-                const oldCanvas = document.getElementById('field-canvas');
-                if (oldCanvas) oldCanvas.remove();
-                const oldMatter = document.getElementById('matter-container');
-                if (oldMatter) oldMatter.remove();
-
-                const newCanvas = document.createElement('canvas');
-                newCanvas.id = 'field-canvas';
-                wrapper.insertBefore(newCanvas, wrapper.firstChild);
-
-                const newMatter = document.createElement('div');
-                newMatter.id = 'matter-container';
-                wrapper.insertBefore(newMatter, newCanvas.nextSibling);
-            } catch(e) {}
-        }
-
         function configurarFisica() {
             engine = Engine.create(); engine.world.gravity.y = 0; engine.world.gravity.x = 0;
 
@@ -1435,6 +1444,7 @@
                         
                         processarControles();
                         
+                        // FIX: Agora gols registram e pontuam em qualquer modo diferente de PENALTI
                         if (modoDeJogo !== 'PENALTI') {
                             ticksJogo++;
                             if (ticksJogo >= 60) {
