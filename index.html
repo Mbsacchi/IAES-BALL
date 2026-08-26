@@ -2,10 +2,15 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>IAES BALL - Versão Definitiva 4 Players Online</title>
+    <title>IAES BALL - Versão Definitiva Pro (Ranked & Firebase)</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
+    
+    <!-- BIBLIOTECAS -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    
     <style>
         body {
             margin: 0; padding: 0; background: radial-gradient(circle, #1a2a3a, #000000);
@@ -36,7 +41,17 @@
         .active-screen { display: flex; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
-        .botoes-tamanho, .botoes-modo { display: flex; gap: 15px; justify-content: center; margin-top: 15px; }
+        /* PERFIL UI */
+        #perfil-ui {
+            position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8);
+            padding: 10px 20px; border-radius: 8px; border: 2px solid #f1c40f;
+            display: none; text-align: right; z-index: 200; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        #perfil-nome { font-weight: 900; font-size: 18px; color: #fff; text-transform: uppercase;}
+        #perfil-rank { font-weight: bold; font-size: 14px; color: #f1c40f; }
+        #perfil-stats { font-size: 11px; color: #aaa; margin-top: 3px;}
+
+        .botoes-tamanho, .botoes-modo { display: flex; gap: 15px; justify-content: center; margin-top: 15px; flex-wrap: wrap;}
 
         .grid-times { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-top: 20px; width: 100%; }
         .shield-btn {
@@ -59,58 +74,19 @@
         .camisa-manga-esq, .camisa-manga-dir { position: absolute; width: 35px; height: 45px; background: #fff; top: 15px; border: 5px solid #000; border-radius: 8px; box-sizing: border-box; }
         .camisa-manga-esq { left: 0; transform: rotate(20deg); } .camisa-manga-dir { right: 0; transform: rotate(-20deg); }
 
-        /* LISTA DE JOGADORES NO LOBBY ONLINE */
         .lobby-slots { display: flex; flex-direction: column; gap: 10px; width: 100%; margin: 15px 0; }
-        .lobby-slot {
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255, 255, 255, 0.05); padding: 12px 20px; border-radius: 8px;
-            border: 2px solid #444; font-weight: bold; font-size: 16px;
-        }
+        .lobby-slot { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.05); padding: 12px 20px; border-radius: 8px; border: 2px solid #444; font-weight: bold; font-size: 16px; }
         .lobby-slot.connected { border-color: #2ecc71; background: rgba(46, 204, 113, 0.15); color: #2ecc71; }
         .lobby-slot.waiting { border-color: #f39c12; color: #f39c12; }
 
-        /* PLACAR OFICIAL CENTRALIZADO */
-        #top-bar { 
-            display: none; 
-            align-items: center; 
-            justify-content: center; 
-            width: 100%; 
-            max-width: 800px; 
-            margin-bottom: 10px; 
-            padding: 10px 30px; 
-            box-sizing: border-box; 
-            position: relative; 
-            z-index: 10;
-        }
+        #top-bar { display: none; align-items: center; justify-content: center; width: 100%; max-width: 800px; margin-bottom: 10px; padding: 10px 30px; box-sizing: border-box; position: relative; z-index: 10; }
         .time-nome { flex: 1; font-size: 28px; font-weight: 900; white-space: nowrap; }
         .esquerdo { text-align: left; }
         .direito { text-align: right; }
         .pontuacao { font-size: 36px; padding: 0 25px; font-weight: 900; }
-        #timer { 
-            background-color: #000; 
-            color: #f1c40f; 
-            padding: 5px 20px; 
-            border-radius: 8px; 
-            font-size: 28px; 
-            text-align: center; 
-            min-width: 85px; 
-            border: 1px solid #333; 
-            font-weight: 900;
-        }
+        #timer { background-color: #000; color: #f1c40f; padding: 5px 20px; border-radius: 8px; font-size: 28px; text-align: center; min-width: 85px; border: 1px solid #333; font-weight: 900; }
 
-        /* BOLINHAS DE PÊNALTI */
-        #placar-penaltis { 
-            display: none; 
-            position: relative; 
-            margin: -5px auto 15px auto; 
-            background: rgba(0,0,0,0.85); 
-            padding: 8px 25px; 
-            border-radius: 15px; 
-            z-index: 10; 
-            border: 2px solid #444; 
-            white-space: nowrap; 
-            width: max-content;
-        }
+        #placar-penaltis { display: none; position: relative; margin: -5px auto 15px auto; background: rgba(0,0,0,0.85); padding: 8px 25px; border-radius: 15px; z-index: 10; border: 2px solid #444; white-space: nowrap; width: max-content; }
         .bolinha { width: 16px; height: 16px; border-radius: 50%; border: 3px solid #555; display: inline-block; margin: 0 4px; background: rgba(255,255,255,0.1); }
         .bolinha.gol { background: #2ecc71; border-color: #27ae60; box-shadow: 0 0 10px #2ecc71; }
         .bolinha.erro { background: #e74c3c; border-color: #c0392b; box-shadow: 0 0 10px #e74c3c; }
@@ -125,6 +101,8 @@
         #mensagem-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: none; justify-content: center; align-items: center; flex-direction: column; background: rgba(0,0,0,0.4); }
         #texto-gol { font-size: 70px; font-style: italic; font-weight: 900; letter-spacing: 5px; animation: zoom 0.5s ease-out forwards; -webkit-text-stroke: 2px #000; text-align: center; }
         #texto-estado { font-size: 24px; color: #fff; margin-top: 10px; font-weight: 700; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 5px; text-transform: uppercase; }
+        #texto-rank { font-size: 30px; color: #f1c40f; margin-top: 20px; font-weight: 900; text-shadow: 2px 2px 0 #000; display: none; animation: fadeIn 0.5s ease; }
+        
         @keyframes zoom { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
         #indicador-replay { position: absolute; bottom: 25px; left: 25px; z-index: 20; display: none; color: #fff; font-size: 24px; font-weight: bold; background: rgba(0,0,0,0.5); padding: 8px 15px; border-radius: 5px; border-left: 6px solid #e74c3c; }
@@ -140,20 +118,52 @@
         .input-sala:focus { border-color: #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); }
         .codigo-sala { font-size: 40px; color: #2ecc71; letter-spacing: 5px; margin: 15px 0; padding: 12px; background: rgba(0,0,0,0.5); border-radius: 10px; border: 2px dashed #2ecc71; }
         #status-conexao { margin-top: 15px; font-size: 14px; color: #f1c40f; font-weight: bold; }
+        
+        .controles-info { font-size: 12px; color: #aaa; margin-top: 20px; line-height: 1.6; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 8px; }
+        
+        /* RANKING LIST */
+        #ranking-list { width: 100%; max-width: 450px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 2px solid #f1c40f; margin-bottom: 20px; text-align: left; }
+        .ranking-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .ranking-item:last-child { border-bottom: none; }
+        .ranking-pos { font-weight: 900; width: 30px; color: #ccc; }
+        .ranking-name { flex: 1; font-weight: bold; font-size: 16px; }
+        .ranking-elo { font-weight: 900; font-size: 14px; }
     </style>
 </head>
 <body>
 
+    <!-- WIDGET DE PERFIL -->
+    <div id="perfil-ui">
+        <div id="perfil-nome">NOME</div>
+        <div id="perfil-rank">OURO (1200 PDL)</div>
+        <div id="perfil-stats">0 V / 0 D</div>
+    </div>
+
     <!-- MENUS PRINCIPAIS -->
     <div id="menu-container" class="glass-panel">
         
-        <div id="screen-home" class="screen active-screen">
+        <div id="screen-login" class="screen">
+            <h1>CRIAR CONTA / LOGIN</h1>
+            <p style="color:#aaa; margin-bottom: 30px;">Seu progresso será salvo na nuvem!</p>
+            <input type="text" id="input-nickname" class="input-sala" placeholder="SEU NICKNAME" maxlength="12" style="text-transform: uppercase;">
+            <button id="btn-login" class="btn btn-avancar" onclick="fazerLogin()"><span id="btn-login-txt">ENTRAR NO JOGO</span></button>
+        </div>
+
+        <div id="screen-home" class="screen">
             <h1 style="font-size: 54px; margin-bottom: 5px;">IAES BALL</h1>
             <div style="font-size: 16px; color: #aaa; margin-bottom: 30px;">O Futebol 2D Definitivo</div>
             <div class="botoes-modo">
                 <button class="btn" style="padding: 20px 40px; font-size: 18px;" onclick="irParaModo(false)">JOGAR LOCAL</button>
                 <button class="btn" style="padding: 20px 40px; font-size: 18px; background: linear-gradient(45deg, #8e44ad, #9b59b6);" onclick="irParaModo(true)">MULTIPLAYER ONLINE</button>
             </div>
+            <button class="btn" style="padding: 15px 30px; font-size: 14px; background: #f39c12; margin-top: 25px;" onclick="mostrarLeaderboard()">🏆 VER RANKING GLOBAL</button>
+        </div>
+
+        <!-- TELA DE RANKING GLOBAL -->
+        <div id="screen-leaderboard" class="screen">
+            <h1>🏆 TOP 10 MUNDIAL</h1>
+            <div id="ranking-list">Carregando...</div>
+            <button class="btn btn-voltar" onclick="showScreen('screen-home')">⏴ VOLTAR</button>
         </div>
 
         <div id="screen-online-choice" class="screen">
@@ -165,16 +175,11 @@
             <button class="btn btn-voltar" style="margin-top: 30px;" onclick="cancelarOnline()">⏴ VOLTAR</button>
         </div>
 
-        <!-- LOBBY DO HOST -->
         <div id="screen-online-host" class="screen">
             <h2>Sua Sala foi Criada!</h2>
             <p style="margin: 0; color: #aaa;">Envie o código para seus amigos conectarem:</p>
             <div class="codigo-sala" id="txt-codigo-sala">GERANDO...</div>
-            
-            <div class="lobby-slots" id="lobby-slots-container">
-                <!-- Slots preenchidos dinamicamente -->
-            </div>
-
+            <div class="lobby-slots" id="lobby-slots-container"></div>
             <button class="btn btn-avancar" id="btn-host-avancar" onclick="avancarAposLobby()" disabled>AGUARDANDO JOGADORES...</button>
             <button class="btn btn-voltar" style="margin-top: 15px;" onclick="cancelarOnline()">CANCELAR SALA</button>
         </div>
@@ -187,7 +192,6 @@
             <button class="btn btn-voltar" style="margin-top: 20px;" onclick="showScreen('screen-online-choice')">⏴ VOLTAR</button>
         </div>
 
-        <!-- LOBBY DO CLIENT -->
         <div id="screen-client-waiting" class="screen">
             <h2 id="txt-meu-slot-client">Conectado com Sucesso!</h2>
             <div class="codigo-sala" style="border-color:#f1c40f; color:#f1c40f; font-size: 20px;" id="txt-status-client-lobby">Aguardando Host Configurar a Partida...</div>
@@ -201,7 +205,15 @@
             <div class="botoes-modo">
                 <button class="btn" onclick="escolherModo('CLASSICO')">1v1 Clássico</button>
                 <button class="btn" style="background: linear-gradient(45deg, #e67e22, #d35400);" onclick="escolherModo('CLASSICO_2V2')">2v2 Clássico</button>
-                <button class="btn" style="background: linear-gradient(45deg, #8e44ad, #9b59b6);" onclick="escolherModo('PENALTI')">Disputa de Pênaltis</button>
+                <button class="btn" style="background: linear-gradient(45deg, #8e44ad, #9b59b6);" onclick="escolherModo('PENALTI')">Pênaltis</button>
+                <button id="btn-ranked" class="btn" style="background: linear-gradient(45deg, #c0392b, #c0392b); display: none; width: 100%; font-size: 20px; border: 2px solid #f1c40f;" onclick="escolherModo('RANKED')">👑 RANQUEADA 1v1</button>
+            </div>
+            <div class="controles-info">
+                <strong>Controles no mesmo teclado:</strong><br>
+                P1 (Time 1): W, A, S, D - Espaço (Chute) - Shift (Arrancada)<br>
+                P2 (Time 2): Setas - Enter (Chute) - Ctrl (Arrancada)<br>
+                P3 (Aliado P1): T, F, G, H - C (Chute) - V (Arrancada)<br>
+                P4 (Aliado P2): I, J, K, L - O (Chute) - P (Arrancada)
             </div>
             <button class="btn btn-voltar" style="margin-top: 30px;" onclick="cancelarOnline()">⏴ VOLTAR</button>
         </div>
@@ -271,6 +283,7 @@
         <div id="mensagem-overlay">
             <div id="texto-gol">GOL!</div>
             <div id="texto-estado"></div>
+            <div id="texto-rank"></div>
             
             <div id="botoes-fim-jogo" style="display: none; gap: 20px; margin-top: 30px; flex-direction: row; z-index: 50;">
                 <button class="btn btn-avancar" style="margin-top:0;" onclick="jogarNovamente()">JOGAR NOVAMENTE</button>
@@ -284,24 +297,137 @@
     </div>
 
     <script>
+        // --- FIREBASE INICIALIZAÇÃO ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyADvWiZTDiXzncheT3qljukYVOGcaemBDQ",
+            authDomain: "iaes-ball.firebaseapp.com",
+            projectId: "iaes-ball",
+            storageBucket: "iaes-ball.firebasestorage.app",
+            messagingSenderId: "826877189026",
+            appId: "1:826877189026:web:9b2b4864f04a29295a70fb"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // --- SISTEMA DE CONTAS (FIREBASE) ---
+        let meuPerfil = { nome: '', elo: 0, vitorias: 0, derrotas: 0 };
+        
+        window.onload = () => {
+            const savedNick = localStorage.getItem('iaesball_nickname');
+            if(savedNick) {
+                document.getElementById('input-nickname').value = savedNick;
+                fazerLogin(); // Tenta logar automaticamente usando o banco de dados
+            } else {
+                showScreen('screen-login');
+            }
+        };
+
+        async function fazerLogin() {
+            const nick = document.getElementById('input-nickname').value.trim().toUpperCase();
+            if(nick.length < 3) { alert("Digite pelo menos 3 letras!"); return; }
+
+            // Alterar o botão para mostrar carregamento
+            uiText('btn-login-txt', 'CARREGANDO DADOS...');
+            document.getElementById('btn-login').disabled = true;
+
+            try {
+                // Tenta buscar no Firebase
+                const doc = await db.collection("jogadores").doc(nick).get();
+                if (doc.exists) {
+                    meuPerfil = { nome: nick, ...doc.data() };
+                } else {
+                    // É um jogador novo, cria do zero e salva
+                    meuPerfil = { nome: nick, elo: 0, vitorias: 0, derrotas: 0 };
+                    await db.collection("jogadores").doc(nick).set(meuPerfil);
+                }
+                
+                // Lembrar no navegador quem sou eu para o próximo acesso
+                localStorage.setItem('iaesball_nickname', nick); 
+                
+                atualizarPerfilUI();
+                showScreen('screen-home');
+            } catch (error) {
+                console.error(error);
+                alert("Erro ao conectar no banco de dados.");
+            } finally {
+                uiText('btn-login-txt', 'ENTRAR NO JOGO');
+                document.getElementById('btn-login').disabled = false;
+            }
+        }
+
+        async function salvarPerfil() {
+            try {
+                await db.collection("jogadores").doc(meuPerfil.nome).set({
+                    elo: meuPerfil.elo,
+                    vitorias: meuPerfil.vitorias,
+                    derrotas: meuPerfil.derrotas
+                }, { merge: true });
+            } catch (error) {
+                console.error("Erro ao salvar no Firebase: ", error);
+            }
+        }
+
+        async function mostrarLeaderboard() {
+            showScreen('screen-leaderboard');
+            const list = document.getElementById('ranking-list');
+            list.innerHTML = 'Carregando banco de dados...';
+            try {
+                const snapshot = await db.collection("jogadores").orderBy("elo", "desc").limit(10).get();
+                list.innerHTML = '';
+                let pos = 1;
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const r = getInfoRank(data.elo);
+                    list.innerHTML += `
+                        <div class="ranking-item">
+                            <div class="ranking-pos">#${pos}</div>
+                            <div class="ranking-name">${doc.id} <span style="font-size:10px; color:#aaa;">(${data.vitorias}V / ${data.derrotas}D)</span></div>
+                            <div class="ranking-elo" style="color:${r.cor}">${r.nome} (${data.elo})</div>
+                        </div>`;
+                    pos++;
+                });
+                if (list.innerHTML === '') list.innerHTML = 'Nenhum jogador encontrado.';
+            } catch(e) {
+                list.innerHTML = 'Erro ao carregar o ranking.';
+                console.error(e);
+            }
+        }
+
+        function getInfoRank(elo) {
+            if (elo < 400) return { nome: 'BRONZE', cor: '#cd7f32' };
+            if (elo < 800) return { nome: 'PRATA', cor: '#bdc3c7' };
+            if (elo < 1200) return { nome: 'OURO', cor: '#f1c40f' };
+            if (elo < 1600) return { nome: 'PLATINA', cor: '#1abc9c' };
+            return { nome: 'DIAMANTE', cor: '#9b59b6' };
+        }
+
+        function atualizarPerfilUI() {
+            uiShow('perfil-ui');
+            uiText('perfil-nome', meuPerfil.nome);
+            const rank = getInfoRank(meuPerfil.elo);
+            uiText('perfil-rank', `${rank.nome} (${meuPerfil.elo} PDL)`);
+            uiColor('perfil-rank', rank.cor);
+            document.getElementById('perfil-ui').style.borderColor = rank.cor;
+            uiText('perfil-stats', `${meuPerfil.vitorias} V / ${meuPerfil.derrotas} D`);
+        }
+
+
+        // CONFIGURAÇÃO DO SERVIDOR WEB RTC (JOGO ONLINE P2P)
         const peerConfig = {
             config: {
                 'iceServers': [
                     { urls: 'stun:stun.l.google.com:19302' },
                     { urls: 'stun:stun1.l.google.com:19302' },
-                    { urls: 'stun:stun2.l.google.com:19302' },
-                    { urls: 'stun:stun3.l.google.com:19302' },
-                    { urls: 'stun:stun4.l.google.com:19302' }
+                    { urls: 'stun:stun2.l.google.com:19302' }
                 ]
             }
         };
 
-        // MULTIPLAYER ONLINE MULTI-CLIENT (Até 4 players)
         let peer = null;
-        let clientConnections = []; // No Host: conexões dos clientes
-        let myConn = null;          // No Cliente: conexão com o Host
+        let clientConnections = []; 
+        let myConn = null;          
         let isOnline = false, isHost = true;
-        let mySlot = 1; // 1 (Host), 2, 3 ou 4
+        let mySlot = 1; 
         let remoteInputs = { 1: {}, 2: {}, 3: {}, 4: {} };
         let myRoomID = "";
 
@@ -313,12 +439,18 @@
 
         function irParaModo(online) {
             isOnline = online;
-            if(online) showScreen('screen-online-choice');
-            else { isHost = true; currPlayer = 1; mySlot = 1; showScreen('screen-mode'); }
+            if(online) {
+                showScreen('screen-online-choice');
+            } else { 
+                isHost = true; currPlayer = 1; mySlot = 1; 
+                uiHide('btn-ranked'); // Oculta botão ranked no modo offline
+                showScreen('screen-mode'); 
+            }
         }
 
         function escolherModoOnline() {
             isHost = true; currPlayer = 1; mySlot = 1;
+            uiShow('btn-ranked', 'block'); // Mostra botão ranked no online
             showScreen('screen-mode');
         }
 
@@ -343,14 +475,12 @@
                 });
                 
                 peer.on('connection', (connection) => {
-                    const maxPlayers = modoDeJogo === 'CLASSICO_2V2' ? 4 : 2;
+                    const maxPlayers = (modoDeJogo === 'CLASSICO_2V2') ? 4 : 2;
                     if (clientConnections.length >= maxPlayers - 1) {
                         connection.on('open', () => { connection.send({ type: 'room_full' }); setTimeout(() => connection.close(), 500); });
                         return;
                     }
 
-                    // Define o slot do cliente
-                    // P2 (Líder Time 2), P3 (Aliado Time 1), P4 (Aliado Time 2)
                     let slotAssigned = 2;
                     const usedSlots = [1, ...clientConnections.map(c => c.playerSlot)];
                     for (let s of (modoDeJogo === 'CLASSICO_2V2' ? [2, 3, 4] : [2])) {
@@ -398,15 +528,15 @@
             if(!container) return;
             container.innerHTML = '';
             
-            const max = modoDeJogo === 'CLASSICO_2V2' ? 4 : 2;
+            const max = (modoDeJogo === 'CLASSICO_2V2') ? 4 : 2;
             const slots = [
-                { num: 1, name: "Jogador 1 (Você - Host)", team: "Time 1", connected: true },
-                { num: 2, name: "Jogador 2 (Líder Time 2)", team: "Time 2", connected: clientConnections.some(c => c.playerSlot === 2) },
+                { num: 1, name: `JOGADOR 1 (${meuPerfil.nome}) - Host`, team: "Time 1", connected: true },
+                { num: 2, name: "JOGADOR 2 (Líder Time 2)", team: "Time 2", connected: clientConnections.some(c => c.playerSlot === 2) },
             ];
 
             if (modoDeJogo === 'CLASSICO_2V2') {
-                slots.push({ num: 3, name: "Jogador 3 (Aliado Time 1)", team: "Time 1", connected: clientConnections.some(c => c.playerSlot === 3) });
-                slots.push({ num: 4, name: "Jogador 4 (Aliado Time 2)", team: "Time 2", connected: clientConnections.some(c => c.playerSlot === 4) });
+                slots.push({ num: 3, name: "JOGADOR 3 (Aliado Time 1)", team: "Time 1", connected: clientConnections.some(c => c.playerSlot === 3) });
+                slots.push({ num: 4, name: "JOGADOR 4 (Aliado Time 2)", team: "Time 2", connected: clientConnections.some(c => c.playerSlot === 4) });
             }
 
             slots.forEach(s => {
@@ -430,7 +560,7 @@
         }
 
         function broadcastLobbyState() {
-            const max = modoDeJogo === 'CLASSICO_2V2' ? 4 : 2;
+            const max = (modoDeJogo === 'CLASSICO_2V2') ? 4 : 2;
             const slotsData = [
                 { num: 1, name: "Jogador 1 (Host)", team: "Time 1", connected: true },
                 { num: 2, name: "Jogador 2", team: "Time 2", connected: clientConnections.some(c => c.playerSlot === 2) },
@@ -478,9 +608,9 @@
                             mySlot = data.slot;
                             modoDeJogo = data.modo;
                             const slotNames = {
-                                2: "JOGADOR 2 (LÍDER TIME 2)",
-                                3: "JOGADOR 3 (ALIADO TIME 1)",
-                                4: "JOGADOR 4 (ALIADO TIME 2)"
+                                2: `JOGADOR 2 (${meuPerfil.nome} - LÍDER TIME 2)`,
+                                3: `JOGADOR 3 (${meuPerfil.nome} - ALIADO TIME 1)`,
+                                4: `JOGADOR 4 (${meuPerfil.nome} - ALIADO TIME 2)`
                             };
                             uiText('txt-meu-slot-client', `Você é o ${slotNames[mySlot] || 'JOGADOR ' + mySlot}`);
                         }
@@ -514,7 +644,7 @@
 
                             if (data.exp) criarExplosaoGol(data.exp.x, data.exp.y, data.exp.c);
 
-                            if(modoDeJogo === 'CLASSICO' || modoDeJogo === 'CLASSICO_2V2') {
+                            if(modoDeJogo === 'CLASSICO' || modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED') {
                                 if(placar1 !== data.s1) { placar1 = data.s1; uiText('score1', placar1); }
                                 if(placar2 !== data.s2) { placar2 = data.s2; uiText('score2', placar2); }
                                 uiText('timer', data.timeStr);
@@ -562,6 +692,9 @@
                 else if (estadoJogo === 'REPLAY') { uiHide('mensagem-overlay'); uiShow('indicador-replay'); }
                 else if (estadoJogo === 'FIM') {
                     uiText('texto-gol', data.msg); uiColor('texto-gol', '#fff');
+                    
+                    if (data.msgR) { uiText('texto-rank', data.msgR); uiColor('texto-rank', data.msgRC); uiShow('texto-rank'); }
+                    
                     uiHide('texto-estado'); uiShow('mensagem-overlay', 'flex'); document.getElementById('mensagem-overlay').style.background = 'rgba(0,0,0,0.8)';
                     uiHide('botoes-fim-jogo'); 
                 }
@@ -637,7 +770,7 @@
 
         function resetarUICompleta() {
             uiHide('mensagem-overlay'); uiHide('botoes-fim-jogo'); uiHide('indicador-replay');
-            uiHide('btn-skip-replay'); uiHide('btn-proximo-penalti'); uiHide('texto-estado');
+            uiHide('btn-skip-replay'); uiHide('btn-proximo-penalti'); uiHide('texto-estado'); uiHide('texto-rank');
             document.getElementById('bar-top').style.height = '0'; document.getElementById('bar-bottom').style.height = '0';
         }
 
@@ -690,36 +823,11 @@
         });
 
         // INPUTS LOCAIS E UNIFICADOS
-        function getLocalInputsP1() {
-            return {
-                w: keys['keyw'] || keys['w'], s: keys['keys'] || keys['s'],
-                a: keys['keya'] || keys['a'], d: keys['keyd'] || keys['d'],
-                shoot: keys['space'] || keys[' '], dash: keys['shiftleft'] || keys['shiftright'] || keys['shift']
-            };
-        }
-        function getLocalInputsP2() {
-            return {
-                up: keys['arrowup'], down: keys['arrowdown'],
-                left: keys['arrowleft'], right: keys['arrowright'],
-                shoot: keys['enter'] || keys['numpadenter'], dash: keys['controlleft'] || keys['controlright'] || keys['control'] || keys['numpad0'] || keys['0']
-            };
-        }
-        function getLocalInputsP3() {
-            return {
-                up: keys['keyt'] || keys['t'], down: keys['keyg'] || keys['g'],
-                left: keys['keyf'] || keys['f'], right: keys['keyh'] || keys['h'],
-                shoot: keys['keyc'] || keys['c'], dash: keys['keyv'] || keys['v']
-            };
-        }
-        function getLocalInputsP4() {
-            return {
-                up: keys['keyi'] || keys['i'], down: keys['keyk'] || keys['k'],
-                left: keys['keyj'] || keys['j'], right: keys['keyl'] || keys['l'],
-                shoot: keys['keyo'] || keys['o'], dash: keys['keyp'] || keys['p']
-            };
-        }
+        function getLocalInputsP1() { return { w: keys['keyw'] || keys['w'], s: keys['keys'] || keys['s'], a: keys['keya'] || keys['a'], d: keys['keyd'] || keys['d'], shoot: keys['space'] || keys[' '], dash: keys['shiftleft'] || keys['shiftright'] || keys['shift'] }; }
+        function getLocalInputsP2() { return { up: keys['arrowup'], down: keys['arrowdown'], left: keys['arrowleft'], right: keys['arrowright'], shoot: keys['enter'] || keys['numpadenter'], dash: keys['controlleft'] || keys['controlright'] || keys['control'] || keys['numpad0'] || keys['0'] }; }
+        function getLocalInputsP3() { return { up: keys['keyt'] || keys['t'], down: keys['keyg'] || keys['g'], left: keys['keyf'] || keys['f'], right: keys['keyh'] || keys['h'], shoot: keys['keyc'] || keys['c'], dash: keys['keyv'] || keys['v'] }; }
+        function getLocalInputsP4() { return { up: keys['keyi'] || keys['i'], down: keys['keyk'] || keys['k'], left: keys['keyj'] || keys['j'], right: keys['keyl'] || keys['l'], shoot: keys['keyo'] || keys['o'], dash: keys['keyp'] || keys['p'] }; }
 
-        // Cada cliente no seu computador usa WASD ou Setas normalmente
         function getPlayerClientInputs() {
             const p1 = getLocalInputsP1();
             const p2 = getLocalInputsP2();
@@ -734,7 +842,13 @@
         function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen')); document.getElementById(id).classList.add('active-screen'); }
         function escolherModo(modo) { 
             modoDeJogo = modo; 
-            showScreen('screen-field'); 
+            if (modo === 'RANKED') {
+                // Ranked trava o mapa padrão (1000x550) para ser justo
+                selCampoW = 1000; selCampoH = 550;
+                if (isOnline && isHost) iniciarHost();
+            } else {
+                showScreen('screen-field'); 
+            }
         }
         function escolherCampo(w, h) { 
             selCampoW = w; selCampoH = h; 
@@ -907,18 +1021,53 @@
 
         function finalizarPartida(vencedorStr) {
             estadoJogo = 'FIM'; 
+            let stringRank = "";
+            let corRank = "#fff";
+
             if(vencedorStr) {
                 const timeVencedor = vencedorStr === 'P1' ? cfgP1.time : cfgP2.time;
                 currentStatusMsg = `${timeVencedor.toUpperCase()} VENCEU!`;
+                
+                // SISTEMA DE ELO (RANKED)
+                if (modoDeJogo === 'RANKED' && isOnline) {
+                    let ganhei = (isHost && vencedorStr === 'P1') || (!isHost && vencedorStr === 'P2');
+                    let perdi = (isHost && vencedorStr === 'P2') || (!isHost && vencedorStr === 'P1');
+                    
+                    if (ganhei) {
+                        meuPerfil.elo += 25; meuPerfil.vitorias++;
+                        stringRank = "VITÓRIA! +25 PDL 🟢"; corRank = "#2ecc71";
+                    } else if (perdi) {
+                        meuPerfil.elo = Math.max(0, meuPerfil.elo - 20); meuPerfil.derrotas++;
+                        stringRank = "DERROTA! -20 PDL 🔴"; corRank = "#e74c3c";
+                    }
+                    salvarPerfil(); atualizarPerfilUI();
+                }
             } else {
-                currentStatusMsg = "FIM DE JOGO!";
+                currentStatusMsg = "EMPATE!";
+                if (modoDeJogo === 'RANKED' && isOnline) { stringRank = "EMPATE! +0 PDL ⚪"; corRank = "#fff"; }
             }
+
             uiText('texto-gol', currentStatusMsg); uiColor('texto-gol', "#fff");
             uiHide('texto-estado'); uiShow('mensagem-overlay', 'flex');
             document.getElementById('mensagem-overlay').style.background = 'rgba(0,0,0,0.8)';
             uiHide('btn-proximo-penalti'); uiHide('btn-skip-replay');
             
-            if(isHost || !isOnline) uiShow('botoes-fim-jogo', 'flex'); 
+            if (stringRank !== "") {
+                uiText('texto-rank', stringRank); uiColor('texto-rank', corRank); uiShow('texto-rank');
+            }
+            
+            if(isHost || !isOnline) {
+                // Em Ranked, volta pro lobby, clássico pode dar rematch
+                if (modoDeJogo === 'RANKED') {
+                    document.getElementById('botoes-fim-jogo').innerHTML = `<button class="btn btn-voltar" style="margin-top:0; margin-bottom:0;" onclick="voltarMenu()">VOLTAR AO LOBBY</button>`;
+                } else {
+                    document.getElementById('botoes-fim-jogo').innerHTML = `<button class="btn btn-avancar" style="margin-top:0;" onclick="jogarNovamente()">JOGAR NOVAMENTE</button>
+                    <button class="btn btn-voltar" style="margin-top:0; margin-bottom:0;" onclick="voltarMenu()">VOLTAR AO LOBBY</button>`;
+                }
+                uiShow('botoes-fim-jogo', 'flex'); 
+            }
+            
+            if(isOnline && isHost) broadcast({ type: 'sync', st: 'FIM', msg: currentStatusMsg, msgR: stringRank, msgRC: corRank });
         }
 
         function mostrarMensagemEspecial(texto, framesEspera, callback) {
@@ -1097,7 +1246,7 @@
                         
                         processarControles();
                         
-                        if (modoDeJogo === 'CLASSICO' || modoDeJogo === 'CLASSICO_2V2') {
+                        if (modoDeJogo === 'CLASSICO' || modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED') {
                             ticksJogo++;
                             if (ticksJogo >= 60) {
                                 ticksJogo = 0; tempoRestante--;
@@ -1112,9 +1261,14 @@
                                             isProrrogacao = true; tempoRestante = 30;
                                             mostrarMensagemEspecial("PRORROGAÇÃO!", 150, () => { estadoJogo = 'JOGANDO'; forceFocus(); });
                                         } else {
-                                            mostrarMensagemEspecial("PÊNALTIS!", 180, () => {
-                                                modoDeJogo = 'PENALTI'; prepararModoPenaltiUI(); reposicionarJogadores(); estadoJogo = 'JOGANDO'; forceFocus();
-                                            });
+                                            if (modoDeJogo === 'RANKED') {
+                                                // Rank não tem pênaltis, empata direto.
+                                                finalizarPartida(null); 
+                                            } else {
+                                                mostrarMensagemEspecial("PÊNALTIS!", 180, () => {
+                                                    modoDeJogo = 'PENALTI'; prepararModoPenaltiUI(); reposicionarJogadores(); estadoJogo = 'JOGANDO'; forceFocus();
+                                                });
+                                            }
                                         }
                                     }
                                 }
@@ -1213,11 +1367,9 @@
             let p4 = {up:false, down:false, left:false, right:false, shoot:false, dash:false};
 
             if (isOnline && isHost) {
-                // Host usa seus inputs para o Slot 1
                 const hostInputs = getPlayerClientInputs();
                 p1 = {w: hostInputs.up, s: hostInputs.down, a: hostInputs.left, d: hostInputs.right, shoot: hostInputs.shoot, dash: hostInputs.dash};
                 
-                // Clientes remotos alimentam P2, P3, P4
                 const rem2 = remoteInputs[2] || {};
                 p2 = {up: rem2.up, down: rem2.down, left: rem2.left, right: rem2.right, shoot: rem2.shoot, dash: rem2.dash};
 
@@ -1384,7 +1536,7 @@
                 
                 let corVFX = '#fff'; 
 
-                if(modoDeJogo === 'CLASSICO' || modoDeJogo === 'CLASSICO_2V2') {
+                if(modoDeJogo === 'CLASSICO' || modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED') {
                     if (quem === 'P1') { placar1++; uiText('score1', placar1); }
                     else { placar2++; uiText('score2', placar2); }
                 }
