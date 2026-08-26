@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>IAES BALL - Versão Definitiva Pro (Gols Corrigidos)</title>
+    <title>IAES BALL - Versão Definitiva Pro (Gols Corrigidos & Admin Seguro)</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
     
     <!-- BIBLIOTECAS -->
@@ -117,11 +117,15 @@
         .input-sala { padding: 15px; font-size: 24px; border-radius: 8px; border: 2px solid #3498db; background: #222; color: #fff; text-align: center; margin-bottom: 15px; width: 80%; font-family: 'Montserrat'; font-weight: bold; outline: none; letter-spacing: 3px; user-select: auto; -webkit-user-select: auto; }
         .input-sala:focus { border-color: #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); }
         
+        /* Ocultar texto das senhas */
         .input-senha { text-transform: none; font-size: 20px; letter-spacing: 5px;}
+
         .codigo-sala { font-size: 40px; color: #2ecc71; letter-spacing: 5px; margin: 15px 0; padding: 12px; background: rgba(0,0,0,0.5); border-radius: 10px; border: 2px dashed #2ecc71; }
         #status-conexao { margin-top: 15px; font-size: 14px; color: #f1c40f; font-weight: bold; }
+        
         .controles-info { font-size: 12px; color: #aaa; margin-top: 20px; line-height: 1.6; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 8px; }
         
+        /* RANKING E ADMIN LISTS COM SCROLLBAR PERSONALIZADA */
         #ranking-list, #admin-lista-contas { width: 100%; max-width: 650px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 2px solid #f1c40f; margin-bottom: 20px; text-align: left; overflow-y: auto; max-height: 450px; }
         #admin-lista-contas { border-color: #e74c3c; }
         
@@ -149,6 +153,7 @@
     <!-- MENUS PRINCIPAIS -->
     <div id="menu-container" class="glass-panel">
         
+        <!-- TELA DE LOGIN / REGISTRO COM SENHA -->
         <div id="screen-login" class="screen">
             <h1>BEM-VINDO</h1>
             <p style="color:#aaa; margin-bottom: 20px;">Sua conta e rank são protegidos por senha!</p>
@@ -163,6 +168,7 @@
             <button class="btn" style="margin-top: 40px; background: transparent; border: 2px solid #555; color: #ccc; padding: 10px 20px; font-size: 14px;" onclick="fazerLoginAdmin()">⚙️ ACESSAR PAINEL ADMIN</button>
         </div>
 
+        <!-- TELA DE ADMINISTRAÇÃO -->
         <div id="screen-admin" class="screen">
             <h1 style="color: #e74c3c;">⚙️ PAINEL DE ADMINISTRAÇÃO</h1>
             
@@ -174,6 +180,7 @@
             <div id="admin-lista-contas">Carregando banco de dados...</div>
         </div>
 
+        <!-- TELA INICIAL -->
         <div id="screen-home" class="screen">
             <h1 style="font-size: 54px; margin-bottom: 5px;">IAES BALL</h1>
             <div style="font-size: 16px; color: #aaa; margin-bottom: 30px;">O Futebol 2D Definitivo</div>
@@ -185,6 +192,7 @@
             <button class="btn" style="padding: 10px 20px; font-size: 12px; background: #e74c3c; margin-top: 15px;" onclick="deslogar()">Sair da Conta</button>
         </div>
 
+        <!-- TELA DE RANKING GLOBAL -->
         <div id="screen-leaderboard" class="screen">
             <h1>🏆 TOP 10 MUNDIAL</h1>
             <div id="ranking-list">Carregando...</div>
@@ -369,6 +377,7 @@
             showScreen('screen-login');
         }
 
+        // TELA DE ADMIN: Verifica a senha correta (8080) e não expõe isso no alert
         async function fazerLoginAdmin() {
             const nick = document.getElementById('input-nickname').value.trim().toUpperCase();
             const senha = document.getElementById('input-senha').value.trim();
@@ -377,7 +386,7 @@
                 showScreen('screen-admin');
                 carregarListaAdmin();
             } else {
-                alert("Acesso Negado! Preencha 'ADMIN' no campo de Nickname e '8080' na senha.");
+                alert("Acesso Negado! Credenciais de administrador incorretas.");
             }
         }
 
@@ -385,14 +394,17 @@
             const nick = document.getElementById('input-nickname').value.trim().toUpperCase();
             const senha = document.getElementById('input-senha').value.trim();
 
-            if (nick === 'ADMIN' && senha === '8080') {
-                showScreen('screen-admin');
-                carregarListaAdmin();
+            if (nick === 'ADMIN') {
+                if (senha === '8080') {
+                    showScreen('screen-admin');
+                    carregarListaAdmin();
+                } else {
+                    alert("Acesso Negado! Credenciais de administrador incorretas.");
+                }
                 return;
             }
 
             if(nick.length < 3 || senha.length < 3) { alert("Nick e senha devem ter pelo menos 3 caracteres!"); return; }
-            if(nick === 'ADMIN') { alert("Acesso Negado! Senha incorreta ou nome reservado."); return; }
 
             uiText('btn-login-txt', 'CARREGANDO...');
             document.getElementById('btn-login').disabled = true;
@@ -1315,27 +1327,26 @@
 
             Composite.add(engine.world, bodiesToAdd);
 
+            // Apenas para Pênaltis
             if (isHost || !isOnline) {
                 Events.on(engine, 'collisionStart', function(event) {
-                    try {
-                        if(estadoJogo !== 'JOGANDO') return;
-                        event.pairs.forEach(pair => {
-                            const { bodyA, bodyB } = pair;
-                            
-                            // Pênalti detecção de toque na bola
-                            if (modoDeJogo === 'PENALTI' && toquesNaBolaPenalti < 2) {
-                                if (bodyA.label === 'bola' || bodyB.label === 'bola') {
-                                    let kicker = turnoPenalti === 1 ? player1 : player2;
-                                    if (bodyA === kicker || bodyB === kicker) {
-                                        if (framesDesdeUltimoToque > 15) {
-                                            toquesNaBolaPenalti++; framesDesdeUltimoToque = 0;
-                                            if(toquesNaBolaPenalti === 1) timerPosToque = 180; 
-                                        }
+                    if(estadoJogo !== 'JOGANDO') return;
+                    event.pairs.forEach(pair => {
+                        const { bodyA, bodyB } = pair;
+                        
+                        // Detecção de toque duplo em Pênaltis
+                        if (modoDeJogo === 'PENALTI' && toquesNaBolaPenalti < 2) {
+                            if (bodyA.label === 'bola' || bodyB.label === 'bola') {
+                                let kicker = turnoPenalti === 1 ? player1 : player2;
+                                if (bodyA === kicker || bodyB === kicker) {
+                                    if (framesDesdeUltimoToque > 15) {
+                                        toquesNaBolaPenalti++; framesDesdeUltimoToque = 0;
+                                        if(toquesNaBolaPenalti === 1) timerPosToque = 180; 
                                     }
                                 }
                             }
-                        });
-                    } catch(e) { console.error("Erro na colisao:", e); }
+                        }
+                    });
                 });
             }
 
@@ -1420,15 +1431,16 @@
                         if (dashP1 > 0) dashP1--; if (dashP2 > 0) dashP2--;
                         if (isModo4Players) { if (dashP3 > 0) dashP3--; if (dashP4 > 0) dashP4--; }
                         
-                        // >>> DETECÇÃO DE GOL POR POSIÇÃO (100% PRECISA) <<<
+                        // >>> DETECÇÃO DE GOL POR POSIÇÃO ABSOLUTA <<<
+                        // 100% Precisa, impossível ocorrer o efeito túnel (bola atravessando a rede rápido)
                         if (isHost || !isOnline) {
                             const golSize = selCampoH * 0.35;
                             const golTop = (selCampoH / 2) - (golSize / 2);
                             const golBottom = (selCampoH / 2) + (golSize / 2);
                             
-                            if (bola.position.x < 48 && bola.position.y > golTop - 5 && bola.position.y < golBottom + 5) {
+                            if (bola.position.x < 48 && bola.position.y > golTop && bola.position.y < golBottom) {
                                 marcarGol('P2');
-                            } else if (bola.position.x > selCampoW - 48 && bola.position.y > golTop - 5 && bola.position.y < golBottom + 5) {
+                            } else if (bola.position.x > selCampoW - 48 && bola.position.y > golTop && bola.position.y < golBottom) {
                                 marcarGol('P1');
                             }
                         }
