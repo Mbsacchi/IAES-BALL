@@ -474,6 +474,19 @@
         function uiText(id, txt) { const el = document.getElementById(id); if(el) el.innerText = txt; }
         function uiColor(id, color) { const el = document.getElementById(id); if(el) el.style.color = color; }
 
+        function obterCorTextoVisivel(hex) {
+            if (!hex) return '#ffffff';
+            hex = hex.replace('#', '');
+            if (hex.length === 3) {
+                hex = hex.split('').map(function (h) { return h + h; }).join('');
+            }
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+            return (yiq >= 128) ? '#000000' : '#ffffff';
+        }
+
         function resetarUICompleta() {
             uiHide('mensagem-overlay'); uiHide('botoes-fim-jogo'); uiHide('indicador-replay');
             uiHide('btn-skip-replay'); uiHide('btn-proximo-penalti'); uiHide('texto-estado');
