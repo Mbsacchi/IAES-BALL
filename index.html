@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>IAES BALL - Versão Definitiva Pro (Admin V2 & Contas)</title>
+    <title>IAES BALL - Versão Definitiva Pro (Gols Corrigidos)</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
     
     <!-- BIBLIOTECAS -->
@@ -117,15 +117,11 @@
         .input-sala { padding: 15px; font-size: 24px; border-radius: 8px; border: 2px solid #3498db; background: #222; color: #fff; text-align: center; margin-bottom: 15px; width: 80%; font-family: 'Montserrat'; font-weight: bold; outline: none; letter-spacing: 3px; user-select: auto; -webkit-user-select: auto; }
         .input-sala:focus { border-color: #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); }
         
-        /* Ocultar texto das senhas */
         .input-senha { text-transform: none; font-size: 20px; letter-spacing: 5px;}
-
         .codigo-sala { font-size: 40px; color: #2ecc71; letter-spacing: 5px; margin: 15px 0; padding: 12px; background: rgba(0,0,0,0.5); border-radius: 10px; border: 2px dashed #2ecc71; }
         #status-conexao { margin-top: 15px; font-size: 14px; color: #f1c40f; font-weight: bold; }
-        
         .controles-info { font-size: 12px; color: #aaa; margin-top: 20px; line-height: 1.6; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 8px; }
         
-        /* RANKING E ADMIN LISTS COM SCROLLBAR PERSONALIZADA */
         #ranking-list, #admin-lista-contas { width: 100%; max-width: 650px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 2px solid #f1c40f; margin-bottom: 20px; text-align: left; overflow-y: auto; max-height: 450px; }
         #admin-lista-contas { border-color: #e74c3c; }
         
@@ -153,7 +149,6 @@
     <!-- MENUS PRINCIPAIS -->
     <div id="menu-container" class="glass-panel">
         
-        <!-- TELA DE LOGIN / REGISTRO COM SENHA -->
         <div id="screen-login" class="screen">
             <h1>BEM-VINDO</h1>
             <p style="color:#aaa; margin-bottom: 20px;">Sua conta e rank são protegidos por senha!</p>
@@ -168,7 +163,6 @@
             <button class="btn" style="margin-top: 40px; background: transparent; border: 2px solid #555; color: #ccc; padding: 10px 20px; font-size: 14px;" onclick="fazerLoginAdmin()">⚙️ ACESSAR PAINEL ADMIN</button>
         </div>
 
-        <!-- TELA DE ADMINISTRAÇÃO -->
         <div id="screen-admin" class="screen">
             <h1 style="color: #e74c3c;">⚙️ PAINEL DE ADMINISTRAÇÃO</h1>
             
@@ -180,7 +174,6 @@
             <div id="admin-lista-contas">Carregando banco de dados...</div>
         </div>
 
-        <!-- TELA INICIAL -->
         <div id="screen-home" class="screen">
             <h1 style="font-size: 54px; margin-bottom: 5px;">IAES BALL</h1>
             <div style="font-size: 16px; color: #aaa; margin-bottom: 30px;">O Futebol 2D Definitivo</div>
@@ -192,7 +185,6 @@
             <button class="btn" style="padding: 10px 20px; font-size: 12px; background: #e74c3c; margin-top: 15px;" onclick="deslogar()">Sair da Conta</button>
         </div>
 
-        <!-- TELA DE RANKING GLOBAL -->
         <div id="screen-leaderboard" class="screen">
             <h1>🏆 TOP 10 MUNDIAL</h1>
             <div id="ranking-list">Carregando...</div>
@@ -488,8 +480,7 @@
                 list.innerHTML = '';
                 let contagem = 0;
                 snapshot.forEach(doc => {
-                    // Impede que a conta ADMIN apareça na lista de jogadores do painel
-                    if (doc.id === 'ADMIN') return;
+                    if (doc.id === 'ADMIN') return; // Ocultar o admin da lista
                     
                     contagem++;
                     const d = doc.data();
@@ -1308,15 +1299,12 @@
                 Bodies.rectangle(selCampoW - 10, selCampoH/2, 20, golSize + 20, netOpt), Bodies.rectangle(selCampoW - 30, selCampoH/2 - golSize/2 - 10, 60, 20, netOpt), Bodies.rectangle(selCampoW - 30, selCampoH/2 + golSize/2 + 10, 60, 20, netOpt),
             ];
 
-            const golEsq = Bodies.rectangle(40, selCampoH/2, 30, golSize, { isSensor: true, isStatic: true, label: 'golEsq', render: { visible: false } });
-            const golDir = Bodies.rectangle(selCampoW - 40, selCampoH/2, 30, golSize, { isSensor: true, isStatic: true, label: 'golDir', render: { visible: false } });
-
             bola = Bodies.circle(selCampoW/2, selCampoH/2, 12, { label: 'bola', restitution: 0.8, frictionAir: 0.012, density: 0.002, render: { fillStyle: '#ff9800', strokeStyle: '#fff', lineWidth: 2 } });
             
             player1 = Bodies.circle(selCampoW * 0.25, selCampoH/2, 22, { label: 'p1', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP1.cores?.bg||'#3498db', strokeStyle: cfgP1.cores?.line||'#fff', lineWidth: 3 } });
             player2 = Bodies.circle(selCampoW * 0.75, selCampoH/2, 22, { label: 'p2', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP2.cores?.bg||'#e74c3c', strokeStyle: cfgP2.cores?.line||'#fff', lineWidth: 3 } });
 
-            let bodiesToAdd = [...walls, golEsq, golDir, bola, player1, player2];
+            let bodiesToAdd = [...walls, bola, player1, player2];
             const isModo4Players = (modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED_2V2');
 
             if (isModo4Players) {
@@ -1331,11 +1319,10 @@
                 Events.on(engine, 'collisionStart', function(event) {
                     try {
                         if(estadoJogo !== 'JOGANDO') return;
-                        let golDetectado = false; let quemFez = null;
-
                         event.pairs.forEach(pair => {
                             const { bodyA, bodyB } = pair;
                             
+                            // Pênalti detecção de toque na bola
                             if (modoDeJogo === 'PENALTI' && toquesNaBolaPenalti < 2) {
                                 if (bodyA.label === 'bola' || bodyB.label === 'bola') {
                                     let kicker = turnoPenalti === 1 ? player1 : player2;
@@ -1347,16 +1334,7 @@
                                     }
                                 }
                             }
-
-                            if ((bodyA.label === 'bola' && bodyB.label === 'golEsq') || (bodyB.label === 'bola' && bodyA.label === 'golEsq')) {
-                                golDetectado = true; quemFez = 'P2';
-                            }
-                            if ((bodyA.label === 'bola' && bodyB.label === 'golDir') || (bodyB.label === 'bola' && bodyA.label === 'golDir')) {
-                                golDetectado = true; quemFez = 'P1';
-                            }
                         });
-
-                        if (golDetectado && estadoJogo === 'JOGANDO') { marcarGol(quemFez); }
                     } catch(e) { console.error("Erro na colisao:", e); }
                 });
             }
@@ -1442,9 +1420,21 @@
                         if (dashP1 > 0) dashP1--; if (dashP2 > 0) dashP2--;
                         if (isModo4Players) { if (dashP3 > 0) dashP3--; if (dashP4 > 0) dashP4--; }
                         
+                        // >>> DETECÇÃO DE GOL POR POSIÇÃO (100% PRECISA) <<<
+                        if (isHost || !isOnline) {
+                            const golSize = selCampoH * 0.35;
+                            const golTop = (selCampoH / 2) - (golSize / 2);
+                            const golBottom = (selCampoH / 2) + (golSize / 2);
+                            
+                            if (bola.position.x < 48 && bola.position.y > golTop - 5 && bola.position.y < golBottom + 5) {
+                                marcarGol('P2');
+                            } else if (bola.position.x > selCampoW - 48 && bola.position.y > golTop - 5 && bola.position.y < golBottom + 5) {
+                                marcarGol('P1');
+                            }
+                        }
+
                         processarControles();
                         
-                        // FIX: Agora gols registram e pontuam em qualquer modo diferente de PENALTI
                         if (modoDeJogo !== 'PENALTI') {
                             ticksJogo++;
                             if (ticksJogo >= 60) {
