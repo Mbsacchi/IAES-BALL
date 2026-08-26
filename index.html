@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>IAES BALL - Versão Definitiva Pro 3.0</title>
+    <title>IAES BALL - Versão Definitiva 4 Players Online</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
@@ -29,6 +29,7 @@
         }
         .btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4); }
         .btn-avancar { background: linear-gradient(45deg, #27ae60, #2ecc71); margin-top: 20px; width: 100%; font-size: 20px;}
+        .btn-avancar:disabled { background: #555; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-voltar { background: #e74c3c; margin-bottom: 20px; font-size: 14px; padding: 10px 20px; }
 
         .screen { display: none; flex-direction: column; align-items: center; width: 100%; }
@@ -57,6 +58,16 @@
         .camisa-corpo { position: absolute; width: 80px; height: 110px; background: #fff; left: 20px; top: 15px; border-radius: 10px 10px 5px 5px; border: 5px solid #000; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 900; }
         .camisa-manga-esq, .camisa-manga-dir { position: absolute; width: 35px; height: 45px; background: #fff; top: 15px; border: 5px solid #000; border-radius: 8px; box-sizing: border-box; }
         .camisa-manga-esq { left: 0; transform: rotate(20deg); } .camisa-manga-dir { right: 0; transform: rotate(-20deg); }
+
+        /* LISTA DE JOGADORES NO LOBBY ONLINE */
+        .lobby-slots { display: flex; flex-direction: column; gap: 10px; width: 100%; margin: 15px 0; }
+        .lobby-slot {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 255, 255, 0.05); padding: 12px 20px; border-radius: 8px;
+            border: 2px solid #444; font-weight: bold; font-size: 16px;
+        }
+        .lobby-slot.connected { border-color: #2ecc71; background: rgba(46, 204, 113, 0.15); color: #2ecc71; }
+        .lobby-slot.waiting { border-color: #f39c12; color: #f39c12; }
 
         /* PLACAR OFICIAL CENTRALIZADO */
         #top-bar { 
@@ -87,7 +98,7 @@
             font-weight: 900;
         }
 
-        /* BOLINHAS DE PÊNALTI REPOSICIONADAS (Ficam sob o placar) */
+        /* BOLINHAS DE PÊNALTI */
         #placar-penaltis { 
             display: none; 
             position: relative; 
@@ -127,7 +138,7 @@
 
         .input-sala { padding: 15px; font-size: 24px; border-radius: 8px; border: 2px solid #3498db; background: #222; color: #fff; text-align: center; margin-bottom: 15px; width: 80%; font-family: 'Montserrat'; font-weight: bold; outline: none; letter-spacing: 3px; user-select: auto; -webkit-user-select: auto; }
         .input-sala:focus { border-color: #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); }
-        .codigo-sala { font-size: 40px; color: #2ecc71; letter-spacing: 5px; margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.5); border-radius: 10px; border: 2px dashed #2ecc71; }
+        .codigo-sala { font-size: 40px; color: #2ecc71; letter-spacing: 5px; margin: 15px 0; padding: 12px; background: rgba(0,0,0,0.5); border-radius: 10px; border: 2px dashed #2ecc71; }
         #status-conexao { margin-top: 15px; font-size: 14px; color: #f1c40f; font-weight: bold; }
     </style>
 </head>
@@ -148,18 +159,24 @@
         <div id="screen-online-choice" class="screen">
             <h1>IAES BALL ONLINE</h1>
             <div class="botoes-modo">
-                <button class="btn" onclick="iniciarHost()">CRIAR SALA (HOST)</button>
+                <button class="btn" onclick="escolherModoOnline()">CRIAR SALA (HOST)</button>
                 <button class="btn" onclick="showScreen('screen-online-join')">ENTRAR EM SALA</button>
             </div>
             <button class="btn btn-voltar" style="margin-top: 30px;" onclick="cancelarOnline()">⏴ VOLTAR</button>
         </div>
 
+        <!-- LOBBY DO HOST -->
         <div id="screen-online-host" class="screen">
             <h2>Sua Sala foi Criada!</h2>
-            <p>Envie o código abaixo para seu amigo:</p>
+            <p style="margin: 0; color: #aaa;">Envie o código para seus amigos conectarem:</p>
             <div class="codigo-sala" id="txt-codigo-sala">GERANDO...</div>
-            <div id="status-conexao">Aguardando jogador se conectar...</div>
-            <button class="btn btn-voltar" style="margin-top: 30px;" onclick="cancelarOnline()">CANCELAR</button>
+            
+            <div class="lobby-slots" id="lobby-slots-container">
+                <!-- Slots preenchidos dinamicamente -->
+            </div>
+
+            <button class="btn btn-avancar" id="btn-host-avancar" onclick="avancarAposLobby()" disabled>AGUARDANDO JOGADORES...</button>
+            <button class="btn btn-voltar" style="margin-top: 15px;" onclick="cancelarOnline()">CANCELAR SALA</button>
         </div>
 
         <div id="screen-online-join" class="screen">
@@ -170,25 +187,23 @@
             <button class="btn btn-voltar" style="margin-top: 20px;" onclick="showScreen('screen-online-choice')">⏴ VOLTAR</button>
         </div>
 
+        <!-- LOBBY DO CLIENT -->
         <div id="screen-client-waiting" class="screen">
-            <h2>Conectado com Sucesso!</h2>
-            <div class="codigo-sala" style="border-color:#f1c40f; color:#f1c40f; font-size: 20px;">Aguardando Host Configurar a Partida...</div>
-            <button class="btn btn-voltar" style="margin-top: 30px;" onclick="cancelarOnline()">DESCONECTAR</button>
-        </div>
-        
-        <div id="screen-host-waiting-p2" class="screen">
-            <h2>Quase lá!</h2>
-            <div class="codigo-sala" style="border-color:#3498db; color:#3498db; font-size: 20px;">O Jogador 2 está escolhendo o Time...</div>
+            <h2 id="txt-meu-slot-client">Conectado com Sucesso!</h2>
+            <div class="codigo-sala" style="border-color:#f1c40f; color:#f1c40f; font-size: 20px;" id="txt-status-client-lobby">Aguardando Host Configurar a Partida...</div>
+            <div class="lobby-slots" id="client-lobby-slots-container"></div>
+            <button class="btn btn-voltar" style="margin-top: 20px;" onclick="cancelarOnline()">DESCONECTAR</button>
         </div>
 
         <div id="screen-mode" class="screen">
             <h1>IAES BALL</h1>
             <h2>Modo de Jogo</h2>
             <div class="botoes-modo">
-                <button class="btn" onclick="escolherModo('CLASSICO')">Partida Clássica</button>
+                <button class="btn" onclick="escolherModo('CLASSICO')">1v1 Clássico</button>
+                <button class="btn" style="background: linear-gradient(45deg, #e67e22, #d35400);" onclick="escolherModo('CLASSICO_2V2')">2v2 Clássico</button>
                 <button class="btn" style="background: linear-gradient(45deg, #8e44ad, #9b59b6);" onclick="escolherModo('PENALTI')">Disputa de Pênaltis</button>
             </div>
-            <button class="btn btn-voltar" style="margin-top: 30px;" onclick="cancelarOnline()">⏴ SAIR</button>
+            <button class="btn btn-voltar" style="margin-top: 30px;" onclick="cancelarOnline()">⏴ VOLTAR</button>
         </div>
 
         <div id="screen-field" class="screen">
@@ -205,7 +220,7 @@
         <div id="screen-team" class="screen">
             <h2 id="title-jogador-team">JOGADOR 1: Escolha seu Time</h2>
             <div class="grid-times" id="grid-times"></div>
-            <button class="btn btn-voltar" style="margin-top: 30px;" onclick="showScreen('screen-field')">⏴ VOLTAR</button>
+            <button class="btn btn-voltar" style="margin-top: 30px;" onclick="voltarDeTimes()">⏴ VOLTAR</button>
         </div>
 
         <div id="screen-uniform" class="screen">
@@ -269,7 +284,6 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO SERVIDOR WEB RTC COM STUN DO GOOGLE
         const peerConfig = {
             config: {
                 'iceServers': [
@@ -282,9 +296,14 @@
             }
         };
 
-        // --- MULTIPLAYER P2P ---
-        let peer = null; let conn = null; let isOnline = false; let isHost = true;
-        let remoteKeys = {}; let myRoomID = "";
+        // MULTIPLAYER ONLINE MULTI-CLIENT (Até 4 players)
+        let peer = null;
+        let clientConnections = []; // No Host: conexões dos clientes
+        let myConn = null;          // No Cliente: conexão com o Host
+        let isOnline = false, isHost = true;
+        let mySlot = 1; // 1 (Host), 2, 3 ou 4
+        let remoteInputs = { 1: {}, 2: {}, 3: {}, 4: {} };
+        let myRoomID = "";
 
         function gerarCodigo() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let res = '';
@@ -295,60 +314,152 @@
         function irParaModo(online) {
             isOnline = online;
             if(online) showScreen('screen-online-choice');
-            else { isHost = true; currPlayer = 1; showScreen('screen-mode'); }
+            else { isHost = true; currPlayer = 1; mySlot = 1; showScreen('screen-mode'); }
+        }
+
+        function escolherModoOnline() {
+            isHost = true; currPlayer = 1; mySlot = 1;
+            showScreen('screen-mode');
+        }
+
+        function broadcast(msg) {
+            clientConnections.forEach(conn => {
+                if (conn && conn.open) conn.send(msg);
+            });
         }
 
         function iniciarHost() {
-            isHost = true; currPlayer = 1; myRoomID = gerarCodigo();
-            showScreen('screen-online-host'); uiText('txt-codigo-sala', "GERANDO...");
+            isHost = true; mySlot = 1; myRoomID = gerarCodigo();
+            clientConnections = [];
+            showScreen('screen-online-host'); 
+            uiText('txt-codigo-sala', "GERANDO...");
+            renderLobbySlotsHost();
 
             try {
                 peer = new Peer('iaesball-' + myRoomID, peerConfig);
                 
-                peer.on('open', (id) => { uiText('txt-codigo-sala', myRoomID); });
+                peer.on('open', (id) => { 
+                    uiText('txt-codigo-sala', myRoomID); 
+                });
                 
-                peer.on('connection', (connection) => { 
-                    conn = connection; 
-                    uiText('status-conexao', "Jogador conectado! Entrando no Menu...");
-                    
-                    conn.on('data', (data) => { 
-                        if (data.type === 'input') remoteKeys = data.keys; 
-                        
+                peer.on('connection', (connection) => {
+                    const maxPlayers = modoDeJogo === 'CLASSICO_2V2' ? 4 : 2;
+                    if (clientConnections.length >= maxPlayers - 1) {
+                        connection.on('open', () => { connection.send({ type: 'room_full' }); setTimeout(() => connection.close(), 500); });
+                        return;
+                    }
+
+                    // Define o slot do cliente
+                    // P2 (Líder Time 2), P3 (Aliado Time 1), P4 (Aliado Time 2)
+                    let slotAssigned = 2;
+                    const usedSlots = [1, ...clientConnections.map(c => c.playerSlot)];
+                    for (let s of (modoDeJogo === 'CLASSICO_2V2' ? [2, 3, 4] : [2])) {
+                        if (!usedSlots.includes(s)) { slotAssigned = s; break; }
+                    }
+                    connection.playerSlot = slotAssigned;
+                    clientConnections.push(connection);
+
+                    connection.on('open', () => {
+                        connection.send({ type: 'welcome', slot: slotAssigned, modo: modoDeJogo, max: maxPlayers });
+                        renderLobbySlotsHost();
+                        broadcastLobbyState();
+                    });
+
+                    connection.on('data', (data) => {
+                        if (data.type === 'input') {
+                            remoteInputs[data.slot] = data.keys;
+                        }
                         if (data.type === 'p2_ready') {
                             cfgP2 = data.cfgP2;
-                            uiHide('menu-container'); 
-                            conn.send({ type: 'start', cfgP1: cfgP1, cfgP2: cfgP2, w: selCampoW, h: selCampoH, modo: modoDeJogo });
+                            uiHide('menu-container');
+                            broadcast({ type: 'start', cfgP1: cfgP1, cfgP2: cfgP2, w: selCampoW, h: selCampoH, modo: modoDeJogo });
                             iniciarEngineJogo();
                         }
                     });
 
-                    // HOST AVANÇA SEM BUROCRACIA
-                    const avancarRapido = () => { setTimeout(() => { showScreen('screen-mode'); }, 500); };
-                    if (conn.open) avancarRapido();
-                    else conn.on('open', avancarRapido);
+                    connection.on('close', () => {
+                        clientConnections = clientConnections.filter(c => c !== connection);
+                        renderLobbySlotsHost();
+                        broadcastLobbyState();
+                    });
                 });
                 
                 peer.on('error', (err) => { 
                     if (err.type === 'unavailable-id') { iniciarHost(); } 
-                    else { uiText('status-conexao', "Erro na rede. Clique Cancelar e tente novamente."); console.error(err); }
+                    else { console.error(err); }
                 });
             } catch (e) {
-                uiText('status-conexao', "Falha ao criar sala. Verifique a internet.");
+                console.error("Falha ao criar sala:", e);
             }
+        }
+
+        function renderLobbySlotsHost() {
+            const container = document.getElementById('lobby-slots-container');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            const max = modoDeJogo === 'CLASSICO_2V2' ? 4 : 2;
+            const slots = [
+                { num: 1, name: "Jogador 1 (Você - Host)", team: "Time 1", connected: true },
+                { num: 2, name: "Jogador 2 (Líder Time 2)", team: "Time 2", connected: clientConnections.some(c => c.playerSlot === 2) },
+            ];
+
+            if (modoDeJogo === 'CLASSICO_2V2') {
+                slots.push({ num: 3, name: "Jogador 3 (Aliado Time 1)", team: "Time 1", connected: clientConnections.some(c => c.playerSlot === 3) });
+                slots.push({ num: 4, name: "Jogador 4 (Aliado Time 2)", team: "Time 2", connected: clientConnections.some(c => c.playerSlot === 4) });
+            }
+
+            slots.forEach(s => {
+                container.innerHTML += `
+                    <div class="lobby-slot ${s.connected ? 'connected' : 'waiting'}">
+                        <span>${s.connected ? '🟢' : '🟡'} ${s.name} [${s.team}]</span>
+                        <span>${s.connected ? 'PRONTO' : 'AGUARDANDO...'}</span>
+                    </div>
+                `;
+            });
+
+            const totalConnected = 1 + clientConnections.length;
+            const btnAvancar = document.getElementById('btn-host-avancar');
+            if (totalConnected === max) {
+                btnAvancar.disabled = false;
+                btnAvancar.innerText = "AVANÇAR PARA ESCOLHA DE TIMES ➔";
+            } else {
+                btnAvancar.disabled = true;
+                btnAvancar.innerText = `AGUARDANDO JOGADORES (${totalConnected}/${max})...`;
+            }
+        }
+
+        function broadcastLobbyState() {
+            const max = modoDeJogo === 'CLASSICO_2V2' ? 4 : 2;
+            const slotsData = [
+                { num: 1, name: "Jogador 1 (Host)", team: "Time 1", connected: true },
+                { num: 2, name: "Jogador 2", team: "Time 2", connected: clientConnections.some(c => c.playerSlot === 2) },
+            ];
+            if (modoDeJogo === 'CLASSICO_2V2') {
+                slotsData.push({ num: 3, name: "Jogador 3", team: "Time 1", connected: clientConnections.some(c => c.playerSlot === 3) });
+                slotsData.push({ num: 4, name: "Jogador 4", team: "Time 2", connected: clientConnections.some(c => c.playerSlot === 4) });
+            }
+            broadcast({ type: 'lobby_update', slots: slotsData, total: 1 + clientConnections.length, max: max });
+        }
+
+        function avancarAposLobby() {
+            currPlayer = 1;
+            prepararTelaTime();
+            showScreen('screen-team');
         }
 
         function conectarNaSala() {
             const val = document.getElementById('input-sala-codigo').value.trim().toUpperCase();
             if(val.length < 5) return;
             
-            isHost = false; currPlayer = 2; 
+            isHost = false; 
             uiText('status-conexao-client', "Conectando ao servidor...");
             
             try {
                 peer = new Peer(peerConfig);
                 peer.on('open', (id) => {
                     uiText('status-conexao-client', "Buscando sala " + val + "...");
-                    conn = peer.connect('iaesball-' + val, { reliable: true });
+                    myConn = peer.connect('iaesball-' + val, { reliable: true });
                     
                     let conectou = false;
                     const appCliente = () => {
@@ -357,12 +468,27 @@
                         showScreen('screen-client-waiting'); 
                     };
 
-                    if(conn.open) appCliente();
-                    else conn.on('open', appCliente);
+                    if(myConn.open) appCliente();
+                    else myConn.on('open', appCliente);
 
-                    setTimeout(() => { if(!conectou && estadoJogo === 'MENU') uiText('status-conexao-client', "Erro: Tempo esgotado ou Sala Inexistente."); }, 4000);
+                    setTimeout(() => { if(!conectou && estadoJogo === 'MENU') uiText('status-conexao-client', "Erro: Sala cheia ou não encontrada."); }, 4000);
                     
-                    conn.on('data', (data) => {
+                    myConn.on('data', (data) => {
+                        if (data.type === 'welcome') {
+                            mySlot = data.slot;
+                            modoDeJogo = data.modo;
+                            const slotNames = {
+                                2: "JOGADOR 2 (LÍDER TIME 2)",
+                                3: "JOGADOR 3 (ALIADO TIME 1)",
+                                4: "JOGADOR 4 (ALIADO TIME 2)"
+                            };
+                            uiText('txt-meu-slot-client', `Você é o ${slotNames[mySlot] || 'JOGADOR ' + mySlot}`);
+                        }
+
+                        if (data.type === 'lobby_update') {
+                            renderClientLobby(data.slots, data.total, data.max);
+                        }
+
                         if (data.type === 'your_turn') {
                             cfgP1 = data.cfgP1; modoDeJogo = data.modo; selCampoW = data.w; selCampoH = data.h;
                             currPlayer = 2; timeTemporario = ""; 
@@ -380,15 +506,21 @@
                             Body.setVelocity(bola, {x:0, y:0}); Body.setVelocity(player1, {x:0, y:0}); Body.setVelocity(player2, {x:0, y:0});
                             
                             dashP1 = data.d1; dashP2 = data.d2;
+                            if (modoDeJogo === 'CLASSICO_2V2' && data.p3 && data.p4 && player3 && player4) {
+                                Body.setPosition(player3, data.p3); Body.setPosition(player4, data.p4);
+                                dashP3 = data.d3; dashP4 = data.d4;
+                                Body.setVelocity(player3, {x:0, y:0}); Body.setVelocity(player4, {x:0, y:0});
+                            }
+
                             if (data.exp) criarExplosaoGol(data.exp.x, data.exp.y, data.exp.c);
 
-                            if(modoDeJogo === 'CLASSICO') {
+                            if(modoDeJogo === 'CLASSICO' || modoDeJogo === 'CLASSICO_2V2') {
                                 if(placar1 !== data.s1) { placar1 = data.s1; uiText('score1', placar1); }
                                 if(placar2 !== data.s2) { placar2 = data.s2; uiText('score2', placar2); }
                                 uiText('timer', data.timeStr);
                             } else {
                                 if(data.hp1) { historicoPenaltisP1 = data.hp1; historicoPenaltisP2 = data.hp2; atualizarPlacarPenaltis(); }
-                                uiText('timer', 'PÊNALTIS'); // Mantem a formatação do flexbox no cliente
+                                uiText('timer', 'PÊNALTIS'); 
                             }
                             sincronizarUIRemota(data);
                         }
@@ -398,6 +530,21 @@
             } catch (e) {
                 uiText('status-conexao-client', "Erro ao conectar. Tente novamente.");
             }
+        }
+
+        function renderClientLobby(slots, total, max) {
+            const container = document.getElementById('client-lobby-slots-container');
+            if(!container) return;
+            container.innerHTML = '';
+            slots.forEach(s => {
+                container.innerHTML += `
+                    <div class="lobby-slot ${s.connected ? 'connected' : 'waiting'}">
+                        <span>${s.connected ? '🟢' : '🟡'} ${s.name} [${s.team}]</span>
+                        <span>${s.connected ? 'CONECTADO' : 'AGUARDANDO...'}</span>
+                    </div>
+                `;
+            });
+            uiText('txt-status-client-lobby', `Jogadores Conectados: ${total}/${max}`);
         }
 
         function sincronizarUIRemota(data) {
@@ -428,13 +575,14 @@
         }
 
         function cancelarOnline() {
-            if(conn) { conn.close(); conn = null; }
+            if(myConn) { myConn.close(); myConn = null; }
+            if(clientConnections.length > 0) { clientConnections.forEach(c => c.close()); clientConnections = []; }
             if(peer) { peer.destroy(); peer = null; }
-            isOnline = false; isHost = true; timeTemporario = "";
+            isOnline = false; isHost = true; timeTemporario = ""; mySlot = 1;
             showScreen('screen-home');
         }
 
-        // --- SISTEMA FÍSICO E BD DE TIMES ---
+        // FÍSICA E TIMES
         const Engine = Matter.Engine, Render = Matter.Render, Runner = Matter.Runner, Bodies = Matter.Bodies, Body = Matter.Body, Composite = Matter.Composite, Events = Matter.Events;
 
         const TIMES = {
@@ -450,7 +598,7 @@
             "Vasco":       { bg: "#000000", fg: "#fff", detail: "#ffffff", cor1: { bg: "#000000", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#000000", num: "#000" } }
         };
 
-        let engine, render, runner, bola, player1, player2;
+        let engine, render, runner, bola, player1, player2, player3, player4;
         let estadoJogo = 'MENU';
         let delayTimer = 0, onMessageEnd = null; 
         
@@ -465,7 +613,7 @@
         
         let historicoPosicoes = [], particulas = [];
         let frameReplay = 0, rewindIndex = 0;
-        let dashP1 = 0, dashP2 = 0; const DASH_COOLDOWN = 180; 
+        let dashP1 = 0, dashP2 = 0, dashP3 = 0, dashP4 = 0; const DASH_COOLDOWN = 180; 
         let currentStatusMsg = "", currentStatusMsgColor = ""; 
 
         // UI UTILS
@@ -493,7 +641,6 @@
             document.getElementById('bar-top').style.height = '0'; document.getElementById('bar-bottom').style.height = '0';
         }
 
-        // LIMPEZA 100% BLINDADA DA MEMÓRIA PARA EVITAR A TELA PRETA
         function limparMotorFisico() {
             try {
                 if (runner) { Matter.Runner.stop(runner); runner = null; }
@@ -506,7 +653,6 @@
                 const oldMatter = document.getElementById('matter-container');
                 if (oldMatter) oldMatter.remove();
 
-                // Recria as divs puras para injetar a renderização novamente
                 const newCanvas = document.createElement('canvas');
                 newCanvas.id = 'field-canvas';
                 wrapper.insertBefore(newCanvas, wrapper.firstChild);
@@ -517,10 +663,9 @@
             } catch(e) {}
         }
 
-        // --- CONTROLES DE TECLADO 100% LIVRES NO MENU ---
         const keys = {};
         window.addEventListener('keydown', (e) => { 
-            if (estadoJogo === 'MENU') return; // Libera toda digitação
+            if (estadoJogo === 'MENU') return; 
             if (e.target.tagName === 'INPUT') return; 
 
             if (e.code === 'Enter' || e.code === 'Space') { if(document.activeElement && document.activeElement.tagName !== 'INPUT') document.activeElement.blur(); e.preventDefault(); }
@@ -533,7 +678,6 @@
             if(e.code) keys[e.code.toLowerCase()] = false; if(e.key) keys[e.key.toLowerCase()] = false;
         });
 
-        // Só rouba o foco se a partida tiver começado
         function forceFocus() {
             if (estadoJogo === 'MENU') return;
             if(document.activeElement && document.activeElement.blur && document.activeElement.tagName !== 'INPUT') { document.activeElement.blur(); }
@@ -545,42 +689,66 @@
             forceFocus();
         });
 
-        // SEPARAÇÃO ESTRITA ENTRE P1 E P2 (Resolve o bug das setas movendo os dois juntos)
+        // INPUTS LOCAIS E UNIFICADOS
         function getLocalInputsP1() {
             return {
-                w: keys['keyw'] || keys['w'],
-                s: keys['keys'] || keys['s'],
-                a: keys['keya'] || keys['a'],
-                d: keys['keyd'] || keys['d'],
-                shoot: keys['space'] || keys[' '],
-                dash: keys['shiftleft'] || keys['shiftright'] || keys['shift']
+                w: keys['keyw'] || keys['w'], s: keys['keys'] || keys['s'],
+                a: keys['keya'] || keys['a'], d: keys['keyd'] || keys['d'],
+                shoot: keys['space'] || keys[' '], dash: keys['shiftleft'] || keys['shiftright'] || keys['shift']
             };
         }
-
         function getLocalInputsP2() {
             return {
-                up: keys['arrowup'],
-                down: keys['arrowdown'],
-                left: keys['arrowleft'],
-                right: keys['arrowright'],
-                shoot: keys['enter'] || keys['numpadenter'],
-                dash: keys['controlleft'] || keys['controlright'] || keys['control'] || keys['numpad0'] || keys['0']
+                up: keys['arrowup'], down: keys['arrowdown'],
+                left: keys['arrowleft'], right: keys['arrowright'],
+                shoot: keys['enter'] || keys['numpadenter'], dash: keys['controlleft'] || keys['controlright'] || keys['control'] || keys['numpad0'] || keys['0']
+            };
+        }
+        function getLocalInputsP3() {
+            return {
+                up: keys['keyt'] || keys['t'], down: keys['keyg'] || keys['g'],
+                left: keys['keyf'] || keys['f'], right: keys['keyh'] || keys['h'],
+                shoot: keys['keyc'] || keys['c'], dash: keys['keyv'] || keys['v']
+            };
+        }
+        function getLocalInputsP4() {
+            return {
+                up: keys['keyi'] || keys['i'], down: keys['keyk'] || keys['k'],
+                left: keys['keyj'] || keys['j'], right: keys['keyl'] || keys['l'],
+                shoot: keys['keyo'] || keys['o'], dash: keys['keyp'] || keys['p']
             };
         }
 
-        // Função usada pelo CLIENTE ONLINE, que junta tudo e envia (o Host destrincha)
-        function getUnifiedLocalInputs() {
-            const p1 = getLocalInputsP1(); const p2 = getLocalInputsP2();
+        // Cada cliente no seu computador usa WASD ou Setas normalmente
+        function getPlayerClientInputs() {
+            const p1 = getLocalInputsP1();
+            const p2 = getLocalInputsP2();
             return {
-                w: p1.w || p2.up, s: p1.s || p2.down, a: p1.a || p2.left, d: p1.d || p2.right,
+                up: p1.w || p2.up, down: p1.s || p2.down,
+                left: p1.a || p2.left, right: p1.d || p2.right,
                 shoot: p1.shoot || p2.shoot, dash: p1.dash || p2.dash
             };
         }
 
-        // --- MENUS DE ESCOLHA ---
+        // MENUS DE ESCOLHA
         function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen')); document.getElementById(id).classList.add('active-screen'); }
-        function escolherModo(modo) { modoDeJogo = modo; showScreen('screen-field'); }
-        function escolherCampo(w, h) { selCampoW = w; selCampoH = h; currPlayer = 1; prepararTelaTime(); showScreen('screen-team'); }
+        function escolherModo(modo) { 
+            modoDeJogo = modo; 
+            showScreen('screen-field'); 
+        }
+        function escolherCampo(w, h) { 
+            selCampoW = w; selCampoH = h; 
+            if (isOnline && isHost) {
+                iniciarHost();
+            } else {
+                currPlayer = 1; prepararTelaTime(); showScreen('screen-team'); 
+            }
+        }
+
+        function voltarDeTimes() {
+            if (isOnline && isHost) showScreen('screen-online-host');
+            else showScreen('screen-field');
+        }
 
         function prepararTelaTime() {
             uiText('title-jogador-team', `JOGADOR ${currPlayer}: Escolha seu Time`);
@@ -623,11 +791,13 @@
                 timeTemporario = ""; 
                 
                 if (isOnline) {
-                    if (isHost && conn && conn.open) {
-                        conn.send({ type: 'your_turn', modo: modoDeJogo, w: selCampoW, h: selCampoH, cfgP1: cfgP1 });
-                        showScreen('screen-host-waiting-p2');
+                    const connP2 = clientConnections.find(c => c.playerSlot === 2);
+                    if (connP2 && connP2.open) {
+                        connP2.send({ type: 'your_turn', modo: modoDeJogo, w: selCampoW, h: selCampoH, cfgP1: cfgP1 });
+                        showScreen('screen-online-host');
+                        uiText('txt-codigo-sala', "P2 ESCOLHENDO...");
                     } else {
-                        alert("A conexão com o outro jogador caiu!"); voltarMenu();
+                        alert("O Jogador 2 não está conectado!");
                     }
                 } else {
                     currPlayer = 2; prepararTelaTime(); showScreen('screen-team');
@@ -637,11 +807,9 @@
                 timeTemporario = "";
                 
                 if (isOnline) {
-                    if (!isHost && conn && conn.open) {
-                        conn.send({ type: 'p2_ready', cfgP2: cfgP2 });
+                    if (!isHost && myConn && myConn.open) {
+                        myConn.send({ type: 'p2_ready', cfgP2: cfgP2 });
                         showScreen('screen-client-waiting');
-                    } else {
-                        alert("O Host desconectou da sala!"); voltarMenu();
                     }
                 } else {
                     uiHide('menu-container'); iniciarEngineJogo();
@@ -651,7 +819,7 @@
 
         function jogarNovamente() {
             limparMotorFisico(); resetarUICompleta();
-            if(isOnline && isHost && conn) conn.send({ type: 'start', cfgP1: cfgP1, cfgP2: cfgP2, w: selCampoW, h: selCampoH, modo: modoDeJogo });
+            if(isOnline && isHost) broadcast({ type: 'start', cfgP1: cfgP1, cfgP2: cfgP2, w: selCampoW, h: selCampoH, modo: modoDeJogo });
             iniciarEngineJogo();
         }
 
@@ -661,8 +829,7 @@
             uiHide('game-wrapper'); uiHide('top-bar'); uiHide('btn-voltar-partida'); uiHide('placar-penaltis'); 
             resetarUICompleta();
             
-            // Garantir que as variáveis voltem para o zero absoluto
-            timeTemporario = ""; cfgP1 = null; cfgP2 = null; currPlayer = 1;
+            timeTemporario = ""; cfgP1 = null; cfgP2 = null; currPlayer = 1; mySlot = 1;
             
             if (isOnline) {
                 cancelarOnline(); 
@@ -671,13 +838,15 @@
             }
         }
 
-        // --- INICIALIZAÇÃO DA PARTIDA ---
+        // INICIALIZAÇÃO DA PARTIDA
         function iniciarEngineJogo() {
             estadoJogo = 'JOGANDO'; placar1 = 0; placar2 = 0; isProrrogacao = false; tempoRestante = 180; ticksJogo = 0;
             historicoPenaltisP1 = []; historicoPenaltisP2 = []; turnoPenalti = 1; 
             toquesNaBolaPenalti = 0; timerPosToque = 0; framesDesdeUltimoToque = 999;
             historicoPosicoes = []; particulas = []; resetarUICompleta();
-            frameReplay = 0; rewindIndex = 0; dashP1 = 0; dashP2 = 0; delayTimer = 0; onMessageEnd = null;
+            frameReplay = 0; rewindIndex = 0; delayTimer = 0; onMessageEnd = null;
+            
+            dashP1 = 0; dashP2 = 0; dashP3 = 0; dashP4 = 0;
 
             if (!cfgP1 || !cfgP1.cores) cfgP1 = { time: "P1", uni: 1, cores: {bg: "#3498db", line: "#fff", num: "#fff"} };
             if (!cfgP2 || !cfgP2.cores) cfgP2 = { time: "P2", uni: 1, cores: {bg: "#e74c3c", line: "#fff", num: "#fff"} };
@@ -703,7 +872,7 @@
                 if(modoDeJogo === 'PENALTI') {
                     prepararModoPenaltiUI(); reposicionarJogadores();
                 } else {
-                    uiText('timer', '03:00'); // Reseta título caso venha de penaltis
+                    uiText('timer', '03:00'); 
                     uiShow('timer'); uiHide('placar-penaltis'); reposicionarJogadores();
                 }
                 forceFocus();
@@ -715,7 +884,7 @@
         }
 
         function prepararModoPenaltiUI() {
-            uiText('timer', 'PÊNALTIS'); // EVITA QUE O FLEXBOX DESMONTE
+            uiText('timer', 'PÊNALTIS'); 
             uiShow('timer');
             uiShow('placar-penaltis'); 
             if (isHost || !isOnline) uiShow('btn-proximo-penalti'); 
@@ -800,12 +969,20 @@
             const golDir = Bodies.rectangle(selCampoW - 40, selCampoH/2, 30, golSize, { isSensor: true, isStatic: true, label: 'golDir', render: { visible: false } });
 
             bola = Bodies.circle(selCampoW/2, selCampoH/2, 12, { label: 'bola', restitution: 0.8, frictionAir: 0.012, density: 0.002, render: { fillStyle: '#ff9800', strokeStyle: '#fff', lineWidth: 2 } });
+            
             player1 = Bodies.circle(selCampoW * 0.25, selCampoH/2, 22, { label: 'p1', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP1.cores?.bg||'#3498db', strokeStyle: cfgP1.cores?.line||'#fff', lineWidth: 3 } });
             player2 = Bodies.circle(selCampoW * 0.75, selCampoH/2, 22, { label: 'p2', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP2.cores?.bg||'#e74c3c', strokeStyle: cfgP2.cores?.line||'#fff', lineWidth: 3 } });
 
-            Composite.add(engine.world, [...walls, golEsq, golDir, bola, player1, player2]);
+            let bodiesToAdd = [...walls, golEsq, golDir, bola, player1, player2];
 
-            // SOMENTE O HOST (ou local) calcula os gols
+            if (modoDeJogo === 'CLASSICO_2V2') {
+                player3 = Bodies.circle(selCampoW * 0.25, selCampoH * 0.7, 22, { label: 'p3', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP1.cores?.bg||'#3498db', strokeStyle: cfgP1.cores?.line||'#fff', lineWidth: 3 } });
+                player4 = Bodies.circle(selCampoW * 0.75, selCampoH * 0.7, 22, { label: 'p4', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP2.cores?.bg||'#e74c3c', strokeStyle: cfgP2.cores?.line||'#fff', lineWidth: 3 } });
+                bodiesToAdd.push(player3, player4);
+            }
+
+            Composite.add(engine.world, bodiesToAdd);
+
             if (isHost || !isOnline) {
                 Events.on(engine, 'collisionStart', function(event) {
                     try {
@@ -843,9 +1020,20 @@
             Events.on(render, 'afterRender', () => {
                 const ctx = render.context; desenharTorcida(ctx);
 
-                [ {p: player1, cfg: cfgP1.cores, dash: dashP1}, {p: player2, cfg: cfgP2.cores, dash: dashP2} ].forEach(jog => {
+                let playersToRender = [ 
+                    {p: player1, cfg: cfgP1.cores, dash: dashP1, num: '10'}, 
+                    {p: player2, cfg: cfgP2.cores, dash: dashP2, num: '10'} 
+                ];
+                
+                if (modoDeJogo === 'CLASSICO_2V2') {
+                    playersToRender.push({p: player3, cfg: cfgP1.cores, dash: dashP3, num: '7'});
+                    playersToRender.push({p: player4, cfg: cfgP2.cores, dash: dashP4, num: '7'});
+                }
+
+                playersToRender.forEach(jog => {
+                    if(!jog.p) return;
                     ctx.fillStyle = jog.cfg?.num || '#000'; ctx.font = 'bold 18px Montserrat'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                    ctx.fillText('10', jog.p.position.x, jog.p.position.y);
+                    ctx.fillText(jog.num, jog.p.position.x, jog.p.position.y);
                     
                     const dx = bola.position.x - jog.p.position.x, dy = bola.position.y - jog.p.position.y;
                     if (Math.sqrt(dx*dx + dy*dy) < jog.p.circleRadius + bola.circleRadius + 15) {
@@ -870,8 +1058,8 @@
 
             Events.on(engine, 'beforeUpdate', () => {
                 try {
-                    if(isOnline && !isHost) {
-                        conn.send({ type: 'input', keys: getUnifiedLocalInputs() });
+                    if(isOnline && !isHost && myConn) {
+                        myConn.send({ type: 'input', slot: mySlot, keys: getPlayerClientInputs() });
                         return; 
                     }
                     
@@ -905,9 +1093,11 @@
                     if (estadoJogo === 'JOGANDO') {
                         framesDesdeUltimoToque++;
                         if (dashP1 > 0) dashP1--; if (dashP2 > 0) dashP2--;
+                        if (modoDeJogo === 'CLASSICO_2V2') { if (dashP3 > 0) dashP3--; if (dashP4 > 0) dashP4--; }
+                        
                         processarControles();
                         
-                        if (modoDeJogo === 'CLASSICO') {
+                        if (modoDeJogo === 'CLASSICO' || modoDeJogo === 'CLASSICO_2V2') {
                             ticksJogo++;
                             if (ticksJogo >= 60) {
                                 ticksJogo = 0; tempoRestante--;
@@ -930,7 +1120,12 @@
                                 }
                             }
 
-                            historicoPosicoes.push({ b: {x: bola.position.x, y: bola.position.y}, p1: {x: player1.position.x, y: player1.position.y}, p2: {x: player2.position.x, y: player2.position.y} });
+                            let frameData = { b: {x: bola.position.x, y: bola.position.y}, p1: {x: player1.position.x, y: player1.position.y}, p2: {x: player2.position.x, y: player2.position.y} };
+                            if (modoDeJogo === 'CLASSICO_2V2') {
+                                frameData.p3 = {x: player3.position.x, y: player3.position.y};
+                                frameData.p4 = {x: player4.position.x, y: player4.position.y};
+                            }
+                            historicoPosicoes.push(frameData);
                             if (historicoPosicoes.length > 400) historicoPosicoes.shift();
                         }
 
@@ -940,9 +1135,9 @@
                         }
                     }
 
-                    if(isOnline && isHost && conn) {
+                    if(isOnline && isHost) {
                         let min = Math.floor(tempoRestante / 60); let sec = tempoRestante % 60;
-                        conn.send({
+                        let syncPayload = {
                             type: 'sync', st: estadoJogo,
                             b: {x: bola.position.x, y: bola.position.y},
                             p1: {x: player1.position.x, y: player1.position.y}, p2: {x: player2.position.x, y: player2.position.y},
@@ -950,7 +1145,13 @@
                             timeStr: `0${min}:${sec < 10 ? '0'+sec : sec}`,
                             msg: currentStatusMsg, msgC: currentStatusMsgColor,
                             hp1: historicoPenaltisP1, hp2: historicoPenaltisP2
-                        });
+                        };
+                        if (modoDeJogo === 'CLASSICO_2V2') {
+                            syncPayload.p3 = {x: player3.position.x, y: player3.position.y};
+                            syncPayload.p4 = {x: player4.position.x, y: player4.position.y};
+                            syncPayload.d3 = dashP3; syncPayload.d4 = dashP4;
+                        }
+                        broadcast(syncPayload);
                     }
                 } catch(e) { console.error("Erro no engine loop:", e); }
             });
@@ -972,7 +1173,6 @@
             }
         }
 
-        // --- SISTEMA DE CONTROLES: FORÇAS E REGRAS ---
         function tentarChutar(jogador) {
             if (modoDeJogo === 'PENALTI' && toquesNaBolaPenalti >= 2) return; 
             
@@ -993,11 +1193,13 @@
         
         function darArrancada(jogador, id) {
             if (id === 1 && dashP1 > 0) return; if (id === 2 && dashP2 > 0) return;
+            if (id === 3 && dashP3 > 0) return; if (id === 4 && dashP4 > 0) return;
             if (modoDeJogo === 'PENALTI' && toquesNaBolaPenalti >= 2) return;
             const vel = jogador.velocity; const speed = Math.sqrt(vel.x*vel.x + vel.y*vel.y);
             if (speed > 0.5) { 
                 Body.applyForce(jogador, jogador.position, { x: (vel.x/speed) * 0.056, y: (vel.y/speed) * 0.056 });
                 if (id === 1) dashP1 = DASH_COOLDOWN; if (id === 2) dashP2 = DASH_COOLDOWN;
+                if (id === 3) dashP3 = DASH_COOLDOWN; if (id === 4) dashP4 = DASH_COOLDOWN;
             }
         }
 
@@ -1005,67 +1207,98 @@
             const forceNormal = 0.0037; 
             const forceKicker = forceNormal * 0.6; 
             
-            let w, s, a, d, space, shift, up, down, left, right, enter, ctrl;
+            let p1 = {w:false, s:false, a:false, d:false, shoot:false, dash:false};
+            let p2 = {up:false, down:false, left:false, right:false, shoot:false, dash:false};
+            let p3 = {up:false, down:false, left:false, right:false, shoot:false, dash:false};
+            let p4 = {up:false, down:false, left:false, right:false, shoot:false, dash:false};
 
             if (isOnline && isHost) {
-                const p1Local = getLocalInputsP1();
-                w = p1Local.w; s = p1Local.s; a = p1Local.a; d = p1Local.d; space = p1Local.shoot; shift = p1Local.dash;
-                up = remoteKeys.w; down = remoteKeys.s; left = remoteKeys.a; right = remoteKeys.d; enter = remoteKeys.shoot; ctrl = remoteKeys.dash;
+                // Host usa seus inputs para o Slot 1
+                const hostInputs = getPlayerClientInputs();
+                p1 = {w: hostInputs.up, s: hostInputs.down, a: hostInputs.left, d: hostInputs.right, shoot: hostInputs.shoot, dash: hostInputs.dash};
+                
+                // Clientes remotos alimentam P2, P3, P4
+                const rem2 = remoteInputs[2] || {};
+                p2 = {up: rem2.up, down: rem2.down, left: rem2.left, right: rem2.right, shoot: rem2.shoot, dash: rem2.dash};
+
+                const rem3 = remoteInputs[3] || {};
+                p3 = {up: rem3.up, down: rem3.down, left: rem3.left, right: rem3.right, shoot: rem3.shoot, dash: rem3.dash};
+
+                const rem4 = remoteInputs[4] || {};
+                p4 = {up: rem4.up, down: rem4.down, left: rem4.left, right: rem4.right, shoot: rem4.shoot, dash: rem4.dash};
             } else {
-                const p1Local = getLocalInputsP1();
-                const p2Local = getLocalInputsP2();
-                w = p1Local.w; s = p1Local.s; a = p1Local.a; d = p1Local.d; space = p1Local.shoot; shift = p1Local.dash;
-                up = p2Local.up; down = p2Local.down; left = p2Local.left; right = p2Local.right; enter = p2Local.shoot; ctrl = p2Local.dash;
+                const local1 = getLocalInputsP1();
+                const local2 = getLocalInputsP2();
+                const local3 = getLocalInputsP3();
+                const local4 = getLocalInputsP4();
+                p1 = {w: local1.w, s: local1.s, a: local1.a, d: local1.d, shoot: local1.shoot, dash: local1.dash};
+                p2 = {up: local2.up, down: local2.down, left: local2.left, right: local2.right, shoot: local2.shoot, dash: local2.dash};
+                p3 = {up: local3.up, down: local3.down, left: local3.left, right: local3.right, shoot: local3.shoot, dash: local3.dash};
+                p4 = {up: local4.up, down: local4.down, left: local4.left, right: local4.right, shoot: local4.shoot, dash: local4.dash};
             }
             
             if(modoDeJogo === 'PENALTI') {
-                // POSIÇÕES EXATAS ALINHADAS COM AS TRAVAS: ESQUERDA = 55, DIREITA = selCampoW - 55
                 if(turnoPenalti === 1) {
                     if(toquesNaBolaPenalti < 2) {
-                        if (w) Body.applyForce(player1, player1.position, { x: 0, y: -forceKicker });
-                        if (s) Body.applyForce(player1, player1.position, { x: 0, y: forceKicker });
-                        if (a) Body.applyForce(player1, player1.position, { x: -forceKicker, y: 0 });
-                        if (d) Body.applyForce(player1, player1.position, { x: forceKicker, y: 0 });
-                        if (space) tentarChutar(player1);
-                        if (shift) darArrancada(player1, 1);
+                        if (p1.w) Body.applyForce(player1, player1.position, { x: 0, y: -forceKicker });
+                        if (p1.s) Body.applyForce(player1, player1.position, { x: 0, y: forceKicker });
+                        if (p1.a) Body.applyForce(player1, player1.position, { x: -forceKicker, y: 0 });
+                        if (p1.d) Body.applyForce(player1, player1.position, { x: forceKicker, y: 0 });
+                        if (p1.shoot) tentarChutar(player1);
+                        if (p1.dash) darArrancada(player1, 1);
                     }
-                    if (up) Body.applyForce(player2, player2.position, { x: 0, y: -forceNormal });
-                    if (down) Body.applyForce(player2, player2.position, { x: 0, y: forceNormal });
+                    if (p2.up) Body.applyForce(player2, player2.position, { x: 0, y: -forceNormal });
+                    if (p2.down) Body.applyForce(player2, player2.position, { x: 0, y: forceNormal });
                     Body.setPosition(player2, { x: selCampoW - 55, y: player2.position.y });
                     Body.setVelocity(player2, { x: 0, y: player2.velocity.y });
                 } else {
                     if(toquesNaBolaPenalti < 2) {
-                        if (up) Body.applyForce(player2, player2.position, { x: 0, y: -forceKicker });
-                        if (down) Body.applyForce(player2, player2.position, { x: 0, y: forceKicker });
-                        if (left) Body.applyForce(player2, player2.position, { x: -forceKicker, y: 0 });
-                        if (right) Body.applyForce(player2, player2.position, { x: forceKicker, y: 0 });
-                        if (enter) tentarChutar(player2);
-                        if (ctrl) darArrancada(player2, 2);
+                        if (p2.up) Body.applyForce(player2, player2.position, { x: 0, y: -forceKicker });
+                        if (p2.down) Body.applyForce(player2, player2.position, { x: 0, y: forceKicker });
+                        if (p2.left) Body.applyForce(player2, player2.position, { x: -forceKicker, y: 0 });
+                        if (p2.right) Body.applyForce(player2, player2.position, { x: forceKicker, y: 0 });
+                        if (p2.shoot) tentarChutar(player2);
+                        if (p2.dash) darArrancada(player2, 2);
                     }
-                    if (w) Body.applyForce(player1, player1.position, { x: 0, y: -forceNormal });
-                    if (s) Body.applyForce(player1, player1.position, { x: 0, y: forceNormal });
+                    if (p1.w) Body.applyForce(player1, player1.position, { x: 0, y: -forceNormal });
+                    if (p1.s) Body.applyForce(player1, player1.position, { x: 0, y: forceNormal });
                     Body.setPosition(player1, { x: 55, y: player1.position.y });
                     Body.setVelocity(player1, { x: 0, y: player1.velocity.y });
                 }
                 return;
             }
 
-            if (w) Body.applyForce(player1, player1.position, { x: 0, y: -forceNormal });
-            if (s) Body.applyForce(player1, player1.position, { x: 0, y: forceNormal });
-            if (a) Body.applyForce(player1, player1.position, { x: -forceNormal, y: 0 });
-            if (d) Body.applyForce(player1, player1.position, { x: forceNormal, y: 0 });
-            if (space) tentarChutar(player1);
-            if (shift) darArrancada(player1, 1);
+            if (p1.w) Body.applyForce(player1, player1.position, { x: 0, y: -forceNormal });
+            if (p1.s) Body.applyForce(player1, player1.position, { x: 0, y: forceNormal });
+            if (p1.a) Body.applyForce(player1, player1.position, { x: -forceNormal, y: 0 });
+            if (p1.d) Body.applyForce(player1, player1.position, { x: forceNormal, y: 0 });
+            if (p1.shoot) tentarChutar(player1);
+            if (p1.dash) darArrancada(player1, 1);
 
-            if (up) Body.applyForce(player2, player2.position, { x: 0, y: -forceNormal });
-            if (down) Body.applyForce(player2, player2.position, { x: 0, y: forceNormal });
-            if (left) Body.applyForce(player2, player2.position, { x: -forceNormal, y: 0 });
-            if (right) Body.applyForce(player2, player2.position, { x: forceNormal, y: 0 });
-            if (enter) tentarChutar(player2);
-            if (ctrl) darArrancada(player2, 2);
+            if (p2.up) Body.applyForce(player2, player2.position, { x: 0, y: -forceNormal });
+            if (p2.down) Body.applyForce(player2, player2.position, { x: 0, y: forceNormal });
+            if (p2.left) Body.applyForce(player2, player2.position, { x: -forceNormal, y: 0 });
+            if (p2.right) Body.applyForce(player2, player2.position, { x: forceNormal, y: 0 });
+            if (p2.shoot) tentarChutar(player2);
+            if (p2.dash) darArrancada(player2, 2);
+
+            if (modoDeJogo === 'CLASSICO_2V2') {
+                if (p3.up) Body.applyForce(player3, player3.position, { x: 0, y: -forceNormal });
+                if (p3.down) Body.applyForce(player3, player3.position, { x: 0, y: forceNormal });
+                if (p3.left) Body.applyForce(player3, player3.position, { x: -forceNormal, y: 0 });
+                if (p3.right) Body.applyForce(player3, player3.position, { x: forceNormal, y: 0 });
+                if (p3.shoot) tentarChutar(player3);
+                if (p3.dash) darArrancada(player3, 3);
+
+                if (p4.up) Body.applyForce(player4, player4.position, { x: 0, y: -forceNormal });
+                if (p4.down) Body.applyForce(player4, player4.position, { x: 0, y: forceNormal });
+                if (p4.left) Body.applyForce(player4, player4.position, { x: -forceNormal, y: 0 });
+                if (p4.right) Body.applyForce(player4, player4.position, { x: forceNormal, y: 0 });
+                if (p4.shoot) tentarChutar(player4);
+                if (p4.dash) darArrancada(player4, 4);
+            }
         }
 
-        // --- PÊNALTIS E GOL ---
         function proximoPenalti() {
             if(estadoJogo !== 'JOGANDO') return;
             if(isOnline && !isHost) return; 
@@ -1123,6 +1356,13 @@
                     Body.setPosition(player2, { x: selCampoW * 0.40, y: selCampoH/2 });
                     Body.setPosition(player1, { x: 55, y: selCampoH/2 });
                 }
+            } else if (modoDeJogo === 'CLASSICO_2V2') {
+                Body.setVelocity(player3, { x: 0, y: 0 }); Body.setVelocity(player4, { x: 0, y: 0 });
+                Body.setPosition(bola, { x: selCampoW/2, y: selCampoH/2 });
+                Body.setPosition(player1, { x: selCampoW * 0.35, y: selCampoH * 0.30 });
+                Body.setPosition(player3, { x: selCampoW * 0.25, y: selCampoH * 0.70 });
+                Body.setPosition(player2, { x: selCampoW * 0.65, y: selCampoH * 0.30 });
+                Body.setPosition(player4, { x: selCampoW * 0.75, y: selCampoH * 0.70 });
             } else { 
                 Body.setPosition(bola, { x: selCampoW/2, y: selCampoH/2 });
                 Body.setPosition(player1, { x: selCampoW * 0.25, y: selCampoH/2 });
@@ -1132,7 +1372,7 @@
 
         function criarExplosaoGol(x, y, cor) {
             for(let i = 0; i < 60; i++) particulas.push({ x: x, y: y, vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 0.5) * 12, life: 50 + Math.random() * 30, color: Math.random() > 0.5 ? cor : '#ffffff' });
-            if(isOnline && isHost && conn) conn.send({type:'sync', exp:{x:x, y:y, c:cor}});
+            if(isOnline && isHost) broadcast({type:'sync', exp:{x:x, y:y, c:cor}});
         }
 
         function marcarGol(quem) {
@@ -1144,7 +1384,7 @@
                 
                 let corVFX = '#fff'; 
 
-                if(modoDeJogo === 'CLASSICO') {
+                if(modoDeJogo === 'CLASSICO' || modoDeJogo === 'CLASSICO_2V2') {
                     if (quem === 'P1') { placar1++; uiText('score1', placar1); }
                     else { placar2++; uiText('score2', placar2); }
                 }
@@ -1172,7 +1412,6 @@
             }
         }
 
-        // --- SISTEMA DE REPLAY ---
         function processarRewind() {
             rewindIndex -= 4; 
             if (rewindIndex <= 0 || historicoPosicoes.length === 0) {
@@ -1185,6 +1424,10 @@
                 if (e && e.b && e.p1 && e.p2) {
                     Body.setPosition(bola, e.b); Body.setPosition(player1, e.p1); Body.setPosition(player2, e.p2);
                     Body.setVelocity(bola, { x: 0, y: 0 }); Body.setVelocity(player1, { x: 0, y: 0 }); Body.setVelocity(player2, { x: 0, y: 0 });
+                    if (modoDeJogo === 'CLASSICO_2V2' && e.p3 && e.p4 && player3 && player4) {
+                        Body.setPosition(player3, e.p3); Body.setPosition(player4, e.p4);
+                        Body.setVelocity(player3, { x: 0, y: 0 }); Body.setVelocity(player4, { x: 0, y: 0 });
+                    }
                 }
             }
         }
@@ -1207,6 +1450,10 @@
                 if (e && e.b && e.p1 && e.p2) {
                     Body.setPosition(bola, e.b); Body.setPosition(player1, e.p1); Body.setPosition(player2, e.p2);
                     Body.setVelocity(bola, { x: 0, y: 0 }); Body.setVelocity(player1, { x: 0, y: 0 }); Body.setVelocity(player2, { x: 0, y: 0 });
+                    if (modoDeJogo === 'CLASSICO_2V2' && e.p3 && e.p4 && player3 && player4) {
+                        Body.setPosition(player3, e.p3); Body.setPosition(player4, e.p4);
+                        Body.setVelocity(player3, { x: 0, y: 0 }); Body.setVelocity(player4, { x: 0, y: 0 });
+                    }
                 }
                 frameReplay += 0.5; 
             } else {
