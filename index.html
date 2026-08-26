@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>IAES BALL - Versão Definitiva Pro (Gols Corrigidos & Admin Seguro)</title>
+    <title>IAES BALL - Versão Definitiva Pro (Gols 100% Corrigidos)</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
     
     <!-- BIBLIOTECAS -->
@@ -117,15 +117,11 @@
         .input-sala { padding: 15px; font-size: 24px; border-radius: 8px; border: 2px solid #3498db; background: #222; color: #fff; text-align: center; margin-bottom: 15px; width: 80%; font-family: 'Montserrat'; font-weight: bold; outline: none; letter-spacing: 3px; user-select: auto; -webkit-user-select: auto; }
         .input-sala:focus { border-color: #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); }
         
-        /* Ocultar texto das senhas */
         .input-senha { text-transform: none; font-size: 20px; letter-spacing: 5px;}
-
         .codigo-sala { font-size: 40px; color: #2ecc71; letter-spacing: 5px; margin: 15px 0; padding: 12px; background: rgba(0,0,0,0.5); border-radius: 10px; border: 2px dashed #2ecc71; }
         #status-conexao { margin-top: 15px; font-size: 14px; color: #f1c40f; font-weight: bold; }
-        
         .controles-info { font-size: 12px; color: #aaa; margin-top: 20px; line-height: 1.6; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 8px; }
         
-        /* RANKING E ADMIN LISTS COM SCROLLBAR PERSONALIZADA */
         #ranking-list, #admin-lista-contas { width: 100%; max-width: 650px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 2px solid #f1c40f; margin-bottom: 20px; text-align: left; overflow-y: auto; max-height: 450px; }
         #admin-lista-contas { border-color: #e74c3c; }
         
@@ -143,17 +139,14 @@
 </head>
 <body>
 
-    <!-- WIDGET DE PERFIL -->
     <div id="perfil-ui">
         <div id="perfil-nome">NOME</div>
         <div id="perfil-rank">OURO (1200 PDL)</div>
         <div id="perfil-stats">0 V / 0 D</div>
     </div>
 
-    <!-- MENUS PRINCIPAIS -->
     <div id="menu-container" class="glass-panel">
         
-        <!-- TELA DE LOGIN / REGISTRO COM SENHA -->
         <div id="screen-login" class="screen">
             <h1>BEM-VINDO</h1>
             <p style="color:#aaa; margin-bottom: 20px;">Sua conta e rank são protegidos por senha!</p>
@@ -168,19 +161,15 @@
             <button class="btn" style="margin-top: 40px; background: transparent; border: 2px solid #555; color: #ccc; padding: 10px 20px; font-size: 14px;" onclick="fazerLoginAdmin()">⚙️ ACESSAR PAINEL ADMIN</button>
         </div>
 
-        <!-- TELA DE ADMINISTRAÇÃO -->
         <div id="screen-admin" class="screen">
             <h1 style="color: #e74c3c;">⚙️ PAINEL DE ADMINISTRAÇÃO</h1>
-            
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <button class="btn" style="padding: 10px 15px; font-size: 14px;" onclick="carregarListaAdmin()">🔄 ATUALIZAR LISTA</button>
                 <button class="btn" style="padding: 10px 15px; font-size: 14px; background: #e74c3c;" onclick="showScreen('screen-login'); limparInputs();">⏴ SAIR DO PAINEL</button>
             </div>
-
             <div id="admin-lista-contas">Carregando banco de dados...</div>
         </div>
 
-        <!-- TELA INICIAL -->
         <div id="screen-home" class="screen">
             <h1 style="font-size: 54px; margin-bottom: 5px;">IAES BALL</h1>
             <div style="font-size: 16px; color: #aaa; margin-bottom: 30px;">O Futebol 2D Definitivo</div>
@@ -192,7 +181,6 @@
             <button class="btn" style="padding: 10px 20px; font-size: 12px; background: #e74c3c; margin-top: 15px;" onclick="deslogar()">Sair da Conta</button>
         </div>
 
-        <!-- TELA DE RANKING GLOBAL -->
         <div id="screen-leaderboard" class="screen">
             <h1>🏆 TOP 10 MUNDIAL</h1>
             <div id="ranking-list">Carregando...</div>
@@ -240,12 +228,10 @@
                 <button class="btn" style="background: linear-gradient(45deg, #e67e22, #d35400);" onclick="escolherModo('CLASSICO_2V2')">2v2 Clássico</button>
                 <button class="btn" style="background: linear-gradient(45deg, #8e44ad, #9b59b6);" onclick="escolherModo('PENALTI')">Pênaltis</button>
             </div>
-            
             <div class="botoes-modo">
                 <button id="btn-ranked" class="btn" style="background: linear-gradient(45deg, #c0392b, #900); display: none; font-size: 16px; border: 2px solid #f1c40f;" onclick="escolherModo('RANKED')">👑 RANQUEADA 1V1</button>
                 <button id="btn-ranked-2v2" class="btn" style="background: linear-gradient(45deg, #f39c12, #d35400); display: none; font-size: 16px; border: 2px solid #f1c40f;" onclick="escolherModo('RANKED_2V2')">👑 RANQUEADA 2V2</button>
             </div>
-            
             <div class="controles-info">
                 <strong>Controles no mesmo teclado:</strong><br>
                 P1 (Time 1): W, A, S, D - Espaço (Chute) - Shift (Arrancada)<br>
@@ -377,7 +363,6 @@
             showScreen('screen-login');
         }
 
-        // TELA DE ADMIN: Verifica a senha correta (8080) e não expõe isso no alert
         async function fazerLoginAdmin() {
             const nick = document.getElementById('input-nickname').value.trim().toUpperCase();
             const senha = document.getElementById('input-senha').value.trim();
@@ -492,7 +477,7 @@
                 list.innerHTML = '';
                 let contagem = 0;
                 snapshot.forEach(doc => {
-                    if (doc.id === 'ADMIN') return; // Ocultar o admin da lista
+                    if (doc.id === 'ADMIN') return; // Oculta o Admin da lista
                     
                     contagem++;
                     const d = doc.data();
@@ -1013,7 +998,6 @@
             forceFocus();
         });
 
-        // INPUTS LOCAIS E UNIFICADOS
         function getLocalInputsP1() { return { w: keys['keyw'] || keys['w'], s: keys['keys'] || keys['s'], a: keys['keya'] || keys['a'], d: keys['keyd'] || keys['d'], shoot: keys['space'] || keys[' '], dash: keys['shiftleft'] || keys['shiftright'] || keys['shift'] }; }
         function getLocalInputsP2() { return { up: keys['arrowup'], down: keys['arrowdown'], left: keys['arrowleft'], right: keys['arrowright'], shoot: keys['enter'] || keys['numpadenter'], dash: keys['controlleft'] || keys['controlright'] || keys['control'] || keys['numpad0'] || keys['0'] }; }
         function getLocalInputsP3() { return { up: keys['keyt'] || keys['t'], down: keys['keyg'] || keys['g'], left: keys['keyf'] || keys['f'], right: keys['keyh'] || keys['h'], shoot: keys['keyc'] || keys['c'], dash: keys['keyv'] || keys['v'] }; }
@@ -1327,14 +1311,11 @@
 
             Composite.add(engine.world, bodiesToAdd);
 
-            // Apenas para Pênaltis
             if (isHost || !isOnline) {
                 Events.on(engine, 'collisionStart', function(event) {
                     if(estadoJogo !== 'JOGANDO') return;
                     event.pairs.forEach(pair => {
                         const { bodyA, bodyB } = pair;
-                        
-                        // Detecção de toque duplo em Pênaltis
                         if (modoDeJogo === 'PENALTI' && toquesNaBolaPenalti < 2) {
                             if (bodyA.label === 'bola' || bodyB.label === 'bola') {
                                 let kicker = turnoPenalti === 1 ? player1 : player2;
@@ -1430,17 +1411,17 @@
                         
                         if (dashP1 > 0) dashP1--; if (dashP2 > 0) dashP2--;
                         if (isModo4Players) { if (dashP3 > 0) dashP3--; if (dashP4 > 0) dashP4--; }
-                        
-                        // >>> DETECÇÃO DE GOL POR POSIÇÃO ABSOLUTA <<<
-                        // 100% Precisa, impossível ocorrer o efeito túnel (bola atravessando a rede rápido)
+
+                        // >>> DETECÇÃO DE GOL ABSOLUTA E INFALÍVEL <<<
                         if (isHost || !isOnline) {
                             const golSize = selCampoH * 0.35;
-                            const golTop = (selCampoH / 2) - (golSize / 2);
-                            const golBottom = (selCampoH / 2) + (golSize / 2);
+                            const golTop = (selCampoH / 2) - (golSize / 2) - 15;
+                            const golBottom = (selCampoH / 2) + (golSize / 2) + 15;
                             
-                            if (bola.position.x < 48 && bola.position.y > golTop && bola.position.y < golBottom) {
+                            // Se a bola cruzar a linha (margem 45px), o gol é detectado na hora
+                            if (bola.position.x < 45 && bola.position.y > golTop && bola.position.y < golBottom) {
                                 marcarGol('P2');
-                            } else if (bola.position.x > selCampoW - 48 && bola.position.y > golTop && bola.position.y < golBottom) {
+                            } else if (bola.position.x > selCampoW - 45 && bola.position.y > golTop && bola.position.y < golBottom) {
                                 marcarGol('P1');
                             }
                         }
@@ -1719,6 +1700,98 @@
                 Body.setPosition(bola, { x: selCampoW/2, y: selCampoH/2 });
                 Body.setPosition(player1, { x: selCampoW * 0.25, y: selCampoH/2 });
                 Body.setPosition(player2, { x: selCampoW * 0.75, y: selCampoH/2 });
+            }
+        }
+
+        function marcarGol(quem) {
+            try {
+                if (estadoJogo !== 'JOGANDO') return; // Segurança contra acionamento duplo
+                estadoJogo = 'GOL_CELEBRATION'; 
+                delayTimer = 120; 
+
+                resetarUICompleta();
+                
+                let corVFX = '#fff'; 
+
+                if(modoDeJogo === 'CLASSICO' || modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED') {
+                    if (quem === 'P1') { placar1++; uiText('score1', placar1); }
+                    else { placar2++; uiText('score2', placar2); }
+                }
+
+                if (quem === 'P1') {
+                    currentStatusMsg = `GOL DO ${cfgP1.time ? cfgP1.time.toUpperCase() : 'P1'}!`;
+                    corVFX = cfgP1 && cfgP1.cores && cfgP1.cores.bg ? cfgP1.cores.bg : '#fff';
+                    criarExplosaoGol(selCampoW - 40, selCampoH/2, corVFX);
+                } else {
+                    currentStatusMsg = `GOL DO ${cfgP2.time ? cfgP2.time.toUpperCase() : 'P2'}!`;
+                    corVFX = cfgP2 && cfgP2.cores && cfgP2.cores.bg ? cfgP2.cores.bg : '#fff';
+                    criarExplosaoGol(40, selCampoH/2, corVFX);
+                }
+
+                currentStatusMsgColor = obterCorTextoVisivel(corVFX);
+                uiText('texto-gol', currentStatusMsg);
+                uiColor('texto-gol', currentStatusMsgColor);
+                uiShow('texto-gol');
+
+                uiShow('mensagem-overlay', 'flex');
+                document.getElementById('mensagem-overlay').style.background = 'rgba(0,0,0,0.4)';
+            } catch (err) {
+                console.error("Erro no Gol:", err);
+                estadoJogo = 'JOGANDO'; reposicionarJogadores(); forceFocus();
+            }
+        }
+
+        function criarExplosaoGol(x, y, cor) {
+            for(let i = 0; i < 60; i++) particulas.push({ x: x, y: y, vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 0.5) * 12, life: 50 + Math.random() * 30, color: Math.random() > 0.5 ? cor : '#ffffff' });
+            if(isOnline && isHost) broadcast({type:'sync', exp:{x:x, y:y, c:cor}});
+        }
+
+        function processarRewind() {
+            rewindIndex -= 4; 
+            if (rewindIndex <= 0 || historicoPosicoes.length === 0) {
+                rewindIndex = 0; estadoJogo = 'REPLAY'; frameReplay = 0; 
+                resetarUICompleta();
+                uiShow('indicador-replay');
+                if (isHost || !isOnline) uiShow('btn-skip-replay');
+            } else {
+                const e = historicoPosicoes[rewindIndex];
+                if (e && e.b && e.p1 && e.p2) {
+                    Body.setPosition(bola, e.b); Body.setPosition(player1, e.p1); Body.setPosition(player2, e.p2);
+                    Body.setVelocity(bola, { x: 0, y: 0 }); Body.setVelocity(player1, { x: 0, y: 0 }); Body.setVelocity(player2, { x: 0, y: 0 });
+                    if ((modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED_2V2') && e.p3 && e.p4 && player3 && player4) {
+                        Body.setPosition(player3, e.p3); Body.setPosition(player4, e.p4);
+                        Body.setVelocity(player3, { x: 0, y: 0 }); Body.setVelocity(player4, { x: 0, y: 0 });
+                    }
+                }
+            }
+        }
+
+        function pularReplay() { 
+            if (estadoJogo === 'REPLAY') encerrarReplay(); 
+            const btn = document.getElementById('btn-skip-replay'); if(btn) btn.blur(); forceFocus();
+        }
+
+        function encerrarReplay() {
+            resetarUICompleta();
+            reposicionarJogadores(); historicoPosicoes = []; estadoJogo = 'JOGANDO'; forceFocus(); 
+        }
+
+        function tocarReplay() {
+            if (historicoPosicoes.length === 0) { encerrarReplay(); return; }
+            const i = Math.floor(frameReplay);
+            if (i < historicoPosicoes.length) {
+                const e = historicoPosicoes[i];
+                if (e && e.b && e.p1 && e.p2) {
+                    Body.setPosition(bola, e.b); Body.setPosition(player1, e.p1); Body.setPosition(player2, e.p2);
+                    Body.setVelocity(bola, { x: 0, y: 0 }); Body.setVelocity(player1, { x: 0, y: 0 }); Body.setVelocity(player2, { x: 0, y: 0 });
+                    if ((modoDeJogo === 'CLASSICO_2V2' || modoDeJogo === 'RANKED_2V2') && e.p3 && e.p4 && player3 && player4) {
+                        Body.setPosition(player3, e.p3); Body.setPosition(player4, e.p4);
+                        Body.setVelocity(player3, { x: 0, y: 0 }); Body.setVelocity(player4, { x: 0, y: 0 });
+                    }
+                }
+                frameReplay += 0.5; 
+            } else {
+                encerrarReplay();
             }
         }
     </script>
