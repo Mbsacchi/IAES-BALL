@@ -74,7 +74,7 @@
         .camisa-manga-esq, .camisa-manga-dir { position: absolute; width: 35px; height: 45px; background: #fff; top: 15px; border: 5px solid #000; border-radius: 8px; box-sizing: border-box; }
         .camisa-manga-esq { left: 0; transform: rotate(20deg); } .camisa-manga-dir { right: 0; transform: rotate(-20deg); }
 
-        /* NOVO DESIGN DO LOBBY - DIVIDIDO POR TIMES */
+        /* LOBBY DIVIDIDO POR TIMES */
         .lobby-panel { display: flex; width: 100%; gap: 15px; margin: 15px 0; text-align: left; }
         .lobby-team-box { flex: 1; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
         .box-azul { border: 2px solid #3498db; background: rgba(52, 152, 219, 0.1); }
@@ -151,7 +151,6 @@
 
     <div id="menu-container" class="glass-panel">
         
-        <!-- O active-screen fixo aqui impede que a tela fique preta no carregamento -->
         <div id="screen-login" class="screen active-screen">
             <h1>BEM-VINDO</h1>
             <p style="color:#aaa; margin-bottom: 20px;">Sua conta e rank são protegidos por senha!</p>
@@ -397,7 +396,7 @@
         let currentStatusMsg = "", currentStatusMsgColor = "";
 
         // --- SISTEMA DE CONTAS E ADMIN ---
-        let meuPerfil = { nome: '', senha: '', elo: 0, vitorias: 0, derrotas: 0 };
+        let meuPerfil = { nome: '', senha: '', elo: 0, vitorias: 0, derrotas: 0, numero: 10 };
         
         window.onload = async () => {
             const savedNick = localStorage.getItem('iaesball_nickname');
@@ -408,7 +407,6 @@
                 document.getElementById('input-senha').value = savedPass;
                 fazerLogin(); // Auto-login
             }
-            // A tela 'screen-login' já possui 'active-screen' no HTML, logo evita tela preta.
         };
 
         function limparInputs() {
@@ -419,7 +417,7 @@
         function deslogar() {
             localStorage.removeItem('iaesball_nickname');
             localStorage.removeItem('iaesball_senha');
-            meuPerfil = { nome: '', senha: '', elo: 0, vitorias: 0, derrotas: 0 };
+            meuPerfil = { nome: '', senha: '', elo: 0, vitorias: 0, derrotas: 0, numero: 10 };
             uiHide('perfil-ui');
             limparInputs();
             showScreen('screen-login');
@@ -462,7 +460,7 @@
                         document.getElementById('btn-login').disabled = false;
                         return;
                     }
-                    meuPerfil = { nome: nick, ...data };
+                    meuPerfil = { nome: nick, numero: data.numero || 10, ...data };
                     
                     localStorage.setItem('iaesball_nickname', nick); 
                     localStorage.setItem('iaesball_senha', senha); 
@@ -496,7 +494,7 @@
                 if (doc.exists) {
                     alert("Este Nickname já está em uso! Faça Login.");
                 } else {
-                    meuPerfil = { nome: nick, senha: senha, elo: 0, vitorias: 0, derrotas: 0 };
+                    meuPerfil = { nome: nick, senha: senha, elo: 0, vitorias: 0, derrotas: 0, numero: 10 };
                     await db.collection("jogadores").doc(nick).set(meuPerfil);
                     
                     localStorage.setItem('iaesball_nickname', nick); 
@@ -519,7 +517,8 @@
                 await db.collection("jogadores").doc(meuPerfil.nome).set({
                     elo: meuPerfil.elo,
                     vitorias: meuPerfil.vitorias,
-                    derrotas: meuPerfil.derrotas
+                    derrotas: meuPerfil.derrotas,
+                    numero: meuPerfil.numero
                 }, { merge: true }); 
             } catch (error) {
                 console.error("Erro ao salvar no Firebase: ", error);
@@ -692,6 +691,9 @@
             let n = parseInt(document.getElementById(inputId).value);
             if (isNaN(n) || n < 1 || n > 99) n = 10;
             
+            meuPerfil.numero = n;
+            salvarPerfil();
+
             if (isHost) {
                 playerNumbers[mySlot] = n;
                 renderLobbySlotsHost();
@@ -735,7 +737,8 @@
             isHost = true; mySlot = 1; myRoomID = gerarCodigo();
             clientConnections = [];
             playerNames[mySlot] = meuPerfil.nome;
-            document.getElementById('lobby-host-numero').value = playerNumbers[mySlot] || 10;
+            document.getElementById('lobby-host-numero').value = meuPerfil.numero || 10;
+            playerNumbers[mySlot] = meuPerfil.numero || 10;
             
             showScreen('screen-online-host'); 
             uiText('txt-codigo-sala', "GERANDO...");
@@ -843,7 +846,7 @@
         function getLobbyName(slot) {
             if (slot === mySlot) return `(${meuPerfil.nome})`;
             const conn = clientConnections.find(c => c.playerSlot === slot);
-            return conn && conn.playerName ? `(${conn.playerName})` : `JOGADOR VAZIO`;
+            return conn && conn.playerName ? `(${conn.playerName})` : `Vazio`;
         }
         
         function getLobbyNum(slot) {
@@ -946,7 +949,8 @@
                         uiText('status-conexao-client', "Conectado!");
                         showScreen('screen-client-waiting'); 
                         
-                        myConn.send({ type: 'identify', nome: meuPerfil.nome, numero: parseInt(document.getElementById('lobby-client-numero').value) || 10 });
+                        document.getElementById('lobby-client-numero').value = meuPerfil.numero || 10;
+                        myConn.send({ type: 'identify', nome: meuPerfil.nome, numero: meuPerfil.numero || 10 });
                     };
 
                     if(myConn.open) appCliente();
@@ -1112,13 +1116,29 @@
         let historicoPenaltisP1 = [], historicoPenaltisP2 = [];
         let turnoPenalti = 1, rodadaPenalti = 1, toquesNaBolaPenalti = 0, timerPosToque = 0, framesDesdeUltimoToque = 999; 
 
-        let currPlayer = 1, selCampoW = 1000, selCampoH = 550; 
-        let cfgP1 = null, cfgP2 = null, timeTemporario = "";
-        
-        let historicoPosicoes = [], particulas = [];
-        let frameReplay = 0, rewindIndex = 0;
-        let dashP1 = 0, dashP2 = 0, dashP3 = 0, dashP4 = 0, dashP5 = 0, dashP6 = 0; const DASH_COOLDOWN = 180; 
-        let currentStatusMsg = "", currentStatusMsgColor = ""; 
+        function uiShow(id, display = 'block') { const el = document.getElementById(id); if(el) el.style.display = display; }
+        function uiHide(id) { const el = document.getElementById(id); if(el) el.style.display = 'none'; }
+        function uiText(id, txt) { const el = document.getElementById(id); if(el) el.innerText = txt; }
+        function uiColor(id, color) { const el = document.getElementById(id); if(el) el.style.color = color; }
+
+        function obterCorTextoVisivel(hex) {
+            if (!hex) return '#ffffff';
+            hex = hex.replace('#', '');
+            if (hex.length === 3) {
+                hex = hex.split('').map(function (h) { return h + h; }).join('');
+            }
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+            return (yiq >= 128) ? '#000000' : '#ffffff';
+        }
+
+        function resetarUICompleta() {
+            uiHide('mensagem-overlay'); uiHide('botoes-fim-jogo'); uiHide('indicador-replay');
+            uiHide('btn-skip-replay'); uiHide('btn-proximo-penalti'); uiHide('texto-estado'); uiHide('texto-rank');
+            document.getElementById('bar-top').style.height = '0'; document.getElementById('bar-bottom').style.height = '0';
+        }
 
         // INICIALIZAÇÃO DA PARTIDA
         function iniciarEngineJogo() {
@@ -1292,7 +1312,7 @@
                 Bodies.rectangle(selCampoW - 30, 20 + yOff/2, 60, yOff, wallOpt), 
                 Bodies.rectangle(selCampoW - 30, selCampoH - 20 - yOff/2, 60, yOff, wallOpt), 
                 
-                // >>> SEMICÍRCULOS NOS CANTOS PARA BOLA DESLIZAR (CANTOS CURVADOS) <<<
+                // >>> SEMICÍRCULOS NOS CANTOS PARA BOLA DESLIZAR <<<
                 Bodies.circle(60, 30, 45, { isStatic: true, restitution: 1, friction: 0, render: { fillStyle: '#333' } }),
                 Bodies.circle(selCampoW - 60, 30, 45, { isStatic: true, restitution: 1, friction: 0, render: { fillStyle: '#333' } }),
                 Bodies.circle(60, selCampoH - 30, 45, { isStatic: true, restitution: 1, friction: 0, render: { fillStyle: '#333' } }),
@@ -1334,6 +1354,8 @@
                     if(estadoJogo !== 'JOGANDO') return;
                     event.pairs.forEach(pair => {
                         const { bodyA, bodyB } = pair;
+                        
+                        // Detecção de toque na bola (Pênaltis)
                         if (modoDeJogo.includes('PENALTI') && toquesNaBolaPenalti < 2) {
                             if (bodyA.label === 'bola' || bodyB.label === 'bola') {
                                 let ativos = getJogadoresRodadaPenalti();
@@ -1372,11 +1394,17 @@
 
                 playersToRender.forEach(jog => {
                     if(!jog.p) return;
-                    ctx.fillStyle = jog.cfg?.num || '#000'; ctx.font = 'bold 18px Montserrat'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    
+                    // Desenha Número
+                    ctx.fillStyle = jog.cfg?.num || '#000'; 
+                    ctx.font = 'bold 18px Montserrat'; 
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                     ctx.fillText(jog.num, jog.p.position.x, jog.p.position.y);
                     
+                    // Desenha Nome do Jogador Acima
                     if(jog.name) {
-                        ctx.fillStyle = '#fff'; ctx.font = 'bold 12px Montserrat'; 
+                        ctx.fillStyle = '#fff'; 
+                        ctx.font = 'bold 12px Montserrat'; 
                         ctx.fillText(jog.name.substring(0,8), jog.p.position.x, jog.p.position.y - 32);
                     }
                     
@@ -1444,10 +1472,10 @@
                         // >>> DETECÇÃO DE GOL POR POSIÇÃO ABSOLUTA <<<
                         if (isHost || !isOnline) {
                             const golSize = selCampoH * 0.35;
-                            const golTop = (selCampoH / 2) - (golSize / 2) - 15;
-                            const golBottom = (selCampoH / 2) + (golSize / 2) + 15;
+                            const golTop = (selCampoH / 2) - (golSize / 2);
+                            const golBottom = (selCampoH / 2) + (golSize / 2);
                             
-                            // A trave no Matter.js agora é mais espessa (X < 45)
+                            // Se a bola passar de x=45 ou x=selCampoW-45 é gol
                             if (bola.position.x < 45 && bola.position.y > golTop && bola.position.y < golBottom) {
                                 marcarGol('P2');
                             } else if (bola.position.x > selCampoW - 45 && bola.position.y > golTop && bola.position.y < golBottom) {
@@ -1720,16 +1748,15 @@
             Body.setVelocity(bola, { x: 0, y: 0 }); Body.setVelocity(player1, { x: 0, y: 0 }); Body.setVelocity(player2, { x: 0, y: 0 });
             
             if(modoDeJogo.includes('PENALTI')) {
-                // Esconde todo mundo
                 [player1, player2, player3, player4, player5, player6].forEach(p => { if(p) Body.setPosition(p, {x: -100, y: -100}); });
 
                 let ativos = getJogadoresRodadaPenalti();
 
-                if(turnoPenalti === 1) { // TIME 1 CHUTA, TIME 2 DEFENDE
+                if(turnoPenalti === 1) { 
                     Body.setPosition(bola, { x: selCampoW * 0.75, y: selCampoH/2 });
                     Body.setPosition(ativos.pT1, { x: selCampoW * 0.60, y: selCampoH/2 });
                     Body.setPosition(ativos.pT2, { x: selCampoW - 55, y: selCampoH/2 });
-                } else { // TIME 2 CHUTA, TIME 1 DEFENDE
+                } else { 
                     Body.setPosition(bola, { x: selCampoW * 0.25, y: selCampoH/2 });
                     Body.setPosition(ativos.pT2, { x: selCampoW * 0.40, y: selCampoH/2 });
                     Body.setPosition(ativos.pT1, { x: 55, y: selCampoH/2 });
@@ -1757,28 +1784,6 @@
                 Body.setPosition(bola, { x: selCampoW/2, y: selCampoH/2 });
                 Body.setPosition(player1, { x: selCampoW * 0.25, y: selCampoH/2 });
                 Body.setPosition(player2, { x: selCampoW * 0.75, y: selCampoH/2 });
-            }
-        }
-
-        // SISTEMA DE VOTAR PARA PULAR REPLAY
-        function votarPular() {
-            if (isOnline && !isHost && myConn) {
-                myConn.send({ type: 'vote_skip', slot: mySlot });
-            } else if (isHost || !isOnline) {
-                adicionarVotoPular(1);
-            }
-            const btn = document.getElementById('btn-skip-replay'); if(btn) btn.blur(); forceFocus();
-        }
-
-        function adicionarVotoPular(slot) {
-            votosPular.add(slot);
-            let totalAtivos = isOnline ? 1 + clientConnections.length : 1;
-            
-            if (votosPular.size >= Math.ceil(totalAtivos / 2)) {
-                encerrarReplay();
-            } else {
-                uiText('btn-skip-replay', `PULAR ⏭ (${votosPular.size}/${totalAtivos})`);
-                if (isOnline && isHost) broadcast({ type: 'update_votes', v: votosPular.size, t: totalAtivos });
             }
         }
 
