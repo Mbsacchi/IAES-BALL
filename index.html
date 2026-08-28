@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IAES BALL PRO - Futebol & HaxBall Champions</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&family=Rajdhani:wght@600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,900;1,900&family=Rajdhani:wght@600;700;900&display=swap" rel="stylesheet">
     
-    <!-- BIBLIOTECAS FIREBASE & FÍSICA -->
+    <!-- BIBLIOTECAS FIREBASE, FÍSICA & PEERJS -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -14,209 +14,205 @@
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
         :root {
             --primary-gold: #f1c40f;
-            --pitch-green-dark: #071f12;
-            --pitch-green-mid: #0d3820;
-            --pitch-green-light: #165b33;
+            --pitch-green-dark: #051a0e;
+            --pitch-green-mid: #0a2d18;
+            --pitch-green-light: #104c28;
             --pitch-emerald: #10b981;
-            --pitch-grass-glow: rgba(16, 185, 129, 0.35);
-            --hax-panel: #0a1f14;
+            --pitch-emerald-glow: rgba(16, 185, 129, 0.4);
+            --hax-panel: rgba(6, 26, 15, 0.96);
             --hax-border: #1a4a2e;
-            --hax-blue: #3498db;
-            --hax-green: #2ecc71;
-            --hax-red: #e74c3c;
             --accent-cyan: #00f2fe;
+            --accent-purple: #9b59b6;
             --admin-orange: #f39c12;
+            --danger-red: #e74c3c;
         }
 
         /* CUSTOM SCROLLBARS */
-        ::-webkit-scrollbar { width: 7px; height: 7px; }
-        ::-webkit-scrollbar-track { background: rgba(3, 18, 10, 0.8); border-radius: 4px; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(3, 18, 10, 0.9); }
         ::-webkit-scrollbar-thumb { background: #165b33; border-radius: 4px; border: 1px solid #10b981; }
         ::-webkit-scrollbar-thumb:hover { background: #10b981; }
 
-        body {
-            margin: 0; padding: 0;
-            background: radial-gradient(ellipse at center top, #144627 0%, #082816 50%, #03120a 100%);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            height: 100vh; width: 100vw; font-family: 'Montserrat', sans-serif; overflow: hidden; color: white;
-            user-select: none;
+        html, body {
+            width: 100vw; height: 100vh; overflow: hidden;
+            background: radial-gradient(circle at 50% 20%, #114324 0%, #062112 55%, #020e07 100%);
+            font-family: 'Montserrat', sans-serif; color: white; user-select: none;
         }
 
-        .glass-panel {
-            background: rgba(6, 26, 16, 0.95); backdrop-filter: blur(16px);
-            border: 1.5px solid rgba(16, 185, 129, 0.35);
-            box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 35px rgba(16, 185, 129, 0.2);
-            border-radius: 16px;
+        /* TOP NAVIGATION BAR (HEADER GLOBAL) */
+        #top-nav-bar {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 60px;
+            background: rgba(4, 18, 10, 0.92); backdrop-filter: blur(12px);
+            border-bottom: 2px solid rgba(16, 185, 129, 0.3);
+            display: none; align-items: center; justify-content: space-between;
+            padding: 0 25px; z-index: 500; box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+        .nav-brand {
+            display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 900;
+            color: #fff; font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;
+        }
+        .nav-brand span { color: var(--pitch-emerald); }
+        .nav-stats-group { display: flex; align-items: center; gap: 16px; }
+
+        .nav-badge-pill {
+            background: rgba(10, 36, 20, 0.85); border: 1px solid rgba(16, 185, 129, 0.4);
+            padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;
+            display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s;
+        }
+        .nav-badge-pill:hover { border-color: var(--pitch-emerald); background: rgba(16, 55, 30, 0.95); transform: translateY(-1px); }
+        .nav-badge-pill.gold { border-color: var(--primary-gold); color: var(--primary-gold); }
+
+        /* WRAPPER PRINCIPAL DO CONTEÚDO (FULLSCREEN) */
+        #main-content-wrapper {
+            position: fixed; top: 60px; left: 0; width: 100vw; height: calc(100vh - 60px);
+            overflow-y: auto; overflow-x: hidden; display: flex; justify-content: center; align-items: center;
+            padding: 20px; z-index: 100;
         }
 
-        #menu-container {
-            padding: 24px 30px; text-align: center; position: absolute; z-index: 100;
-            max-height: 94vh; overflow-y: auto; overflow-x: hidden;
-            width: 95vw; max-width: 1100px;
+        .screen-card {
+            width: 100%; max-width: 1100px; background: rgba(6, 26, 15, 0.92);
+            backdrop-filter: blur(16px); border: 1.5px solid rgba(16, 185, 129, 0.35);
+            border-radius: 16px; padding: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(16,185,129,0.15);
+            text-align: center;
         }
 
-        h1, h2, h3 { margin: 0 0 10px 0; text-transform: uppercase; font-weight: 900; }
-        h1 { font-size: 34px; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.6); }
-        h2 { font-size: 20px; color: var(--primary-gold); }
-
-        /* BOTÕES */
-        .btn {
-            background: linear-gradient(135deg, #165b33, #10b981); color: white; border: none; padding: 11px 18px;
-            font-size: 12px; font-weight: 900; border-radius: 6px; cursor: pointer; transition: all 0.2s;
-            text-transform: uppercase; outline: none; letter-spacing: 0.5px;
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-        }
-        .btn:hover { transform: translateY(-2px); filter: brightness(1.15); box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4); }
-        .btn:active { transform: translateY(1px); }
-        
-        .btn-avancar { background: linear-gradient(135deg, #10b981, #059669); width: 100%; font-size: 13px; margin-top: 15px; }
-        .btn-voltar { background: linear-gradient(135deg, #962d22, #e74c3c); font-size: 11px; padding: 8px 16px; }
-        .btn-gold { background: linear-gradient(135deg, #d4ac0d, #f1c40f); color: #0b131b; }
-        .btn-ranked { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: #fff; }
-        .btn-pix { background: linear-gradient(135deg, #00b4d8, #0077b6); color: #fff; }
-
-        .screen { display: none; flex-direction: column; align-items: center; width: 100%; }
-        .active-screen { display: flex; animation: fadeIn 0.25s ease; }
+        .screen { display: none; width: 100%; animation: fadeIn 0.25s ease; }
+        .active-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
-        /* PERFIL CARD */
-        #perfil-ui {
-            position: absolute; top: 15px; right: 25px;
-            background: rgba(5, 20, 12, 0.95);
-            padding: 8px 16px; border-radius: 10px; border: 2px solid var(--primary-gold);
-            display: none; text-align: right; z-index: 200;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.7); cursor: pointer; transition: 0.2s;
+        /* BOTÕES MODERNOS */
+        .btn {
+            background: linear-gradient(135deg, #165b33, #10b981); color: white; border: none; padding: 12px 20px;
+            font-size: 12px; font-weight: 900; border-radius: 8px; cursor: pointer; transition: all 0.2s;
+            text-transform: uppercase; outline: none; letter-spacing: 0.5px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
-        #perfil-ui:hover { transform: translateY(-2px); border-color: #fff; }
-        #perfil-nome-linha { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
-        #perfil-nome { font-weight: 900; font-size: 15px; color: #fff; text-transform: uppercase; }
-        #perfil-nivel-badge { background: #10b981; color: #000; font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 4px; }
-        #perfil-admin-badge { background: #e74c3c; color: #fff; font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 4px; display:none; }
-        #perfil-rank { font-weight: 800; font-size: 11px; color: var(--primary-gold); }
-        #perfil-moedas { font-size: 13px; color: var(--primary-gold); font-weight: 900; font-family: 'Rajdhani', sans-serif; }
-        .xp-bar-container { width: 130px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; margin-top: 5px; overflow: hidden; margin-left: auto; }
-        .xp-bar-fill { height: 100%; background: #10b981; width: 0%; transition: width 0.4s; }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.15); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
+        .btn:active { transform: translateY(1px); }
+        
+        .btn-avancar { background: linear-gradient(135deg, #10b981, #059669); }
+        .btn-voltar { background: linear-gradient(135deg, #78281f, #c0392b); }
+        .btn-gold { background: linear-gradient(135deg, #d4ac0d, #f1c40f); color: #071f12; }
+        .btn-ranked { background: linear-gradient(135deg, #6c3483, #8e44ad); color: #fff; }
+        .btn-pix { background: linear-gradient(135deg, #0096c7, #0077b6); color: #fff; }
 
-        /* TOAST DE NOTIFICAÇÃO */
+        /* INPUTS */
+        .input-iaes {
+            padding: 12px 16px; font-size: 14px; border-radius: 8px; border: 2px solid #1a4a2e;
+            background: #03140a; color: #fff; text-align: center; margin-bottom: 12px; width: 100%;
+            font-family: 'Rajdhani', sans-serif; font-weight: 800; outline: none; transition: 0.2s;
+        }
+        .input-iaes:focus { border-color: var(--pitch-emerald); box-shadow: 0 0 12px rgba(16,185,129,0.4); }
+
+        /* TOAST */
         #toast-notif {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            position: fixed; top: 75px; left: 50%; transform: translateX(-50%);
             background: rgba(6, 26, 16, 0.98); border: 2px solid var(--pitch-emerald);
-            padding: 10px 24px; border-radius: 8px; font-weight: 900; font-size: 13px;
-            color: #fff; z-index: 1000; display: none; box-shadow: 0 8px 25px rgba(0,0,0,0.8);
+            padding: 12px 28px; border-radius: 10px; font-weight: 900; font-size: 13px;
+            color: #fff; z-index: 9999; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.9);
             animation: slideDown 0.3s ease; text-align: center;
         }
-        @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
+        @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 75px; opacity: 1; } }
 
-        /* POPUP DE CONVITE DE GRUPO */
+        /* POPUP CONVITE */
         #invite-popup {
             position: fixed; bottom: 25px; right: 25px;
-            background: #082012; border: 2px solid #00f2fe; border-radius: 10px;
-            padding: 15px 20px; z-index: 1000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.9);
-            animation: slideUp 0.3s ease; text-align: left;
+            background: #082012; border: 2px solid #00f2fe; border-radius: 12px;
+            padding: 16px 22px; z-index: 9999; display: none; box-shadow: 0 12px 35px rgba(0,0,0,0.95);
+            text-align: left;
         }
-        @keyframes slideUp { from { bottom: -80px; opacity: 0; } to { bottom: 25px; opacity: 1; } }
 
-        /* MENU PRINCIPAL GRID */
-        .menu-modes-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; margin: 12px 0; }
-        .mode-card {
-            background: linear-gradient(145deg, rgba(13, 45, 25, 0.85), rgba(6, 24, 14, 0.95));
-            border: 2px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 14px;
-            text-align: left; cursor: pointer; transition: all 0.2s; min-height: 115px;
+        /* GRID DO MENU PRINCIPAL (HERO CARDS) */
+        .main-modes-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; width: 100%; margin: 18px 0;
+        }
+        .mode-hero-card {
+            background: linear-gradient(160deg, rgba(13, 45, 25, 0.9), rgba(5, 20, 11, 0.98));
+            border: 2px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 20px 16px;
+            text-align: left; cursor: pointer; transition: all 0.25s; min-height: 140px;
             display: flex; flex-direction: column; justify-content: space-between;
         }
-        .mode-card:hover { transform: translateY(-3px); border-color: var(--pitch-emerald); box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 15px var(--pitch-grass-glow); }
-        .mode-card-title { font-size: 15px; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 6px; }
-        .mode-card-desc { font-size: 10px; color: #a7f3d0; margin-top: 4px; line-height: 1.3; }
-        .mode-card-badge { align-self: flex-start; margin-top: 8px; font-size: 9px; font-weight: 900; padding: 2px 7px; border-radius: 4px; }
-
-        .menu-sub-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; width: 100%; margin-top: 8px; }
-        .sub-btn-card {
-            background: rgba(10, 36, 20, 0.85); border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 8px; padding: 10px 6px; text-align: center; cursor: pointer; transition: 0.2s;
-            font-size: 10px; font-weight: 800; text-transform: uppercase; color: #e2e8f0;
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
+        .mode-hero-card:hover {
+            transform: translateY(-4px); border-color: var(--pitch-emerald);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.7), 0 0 20px var(--pitch-emerald-glow);
         }
-        .sub-btn-card:hover { background: rgba(16, 55, 30, 0.95); border-color: var(--pitch-emerald); transform: translateY(-2px); color: #fff; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
-        .sub-btn-card span { font-size: 18px; }
+        .mode-hero-title { font-size: 16px; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .mode-hero-desc { font-size: 11px; color: #a7f3d0; margin-top: 6px; line-height: 1.4; }
+        .mode-hero-badge { align-self: flex-start; margin-top: 10px; font-size: 9px; font-weight: 900; padding: 3px 8px; border-radius: 4px; }
 
-        /* HAXBALL ROOM LIST UI */
+        /* SUB-MENU (FEATURES) */
+        .sub-features-grid {
+            display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; width: 100%; margin-top: 10px;
+        }
+        .sub-feature-btn {
+            background: rgba(10, 36, 20, 0.85); border: 1.5px solid rgba(16, 185, 129, 0.3);
+            border-radius: 10px; padding: 12px 8px; text-align: center; cursor: pointer; transition: 0.2s;
+            font-size: 11px; font-weight: 800; text-transform: uppercase; color: #e2e8f0;
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+        }
+        .sub-feature-btn:hover {
+            background: rgba(16, 55, 30, 0.95); border-color: var(--pitch-emerald);
+            transform: translateY(-2px); color: #fff; box-shadow: 0 6px 18px rgba(16,185,129,0.3);
+        }
+        .sub-feature-btn span { font-size: 22px; }
+
+        /* MODAIS DESACOPLADOS (FULLSCREEN OVERLAY) */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+            z-index: 9000; justify-content: center; align-items: center;
+        }
+        .modal-box {
+            background: #082012; border: 2px solid #10b981; border-radius: 14px; padding: 26px;
+            width: 90vw; max-width: 680px; text-align: left; box-shadow: 0 25px 60px rgba(0,0,0,0.95);
+            max-height: 88vh; overflow-y: auto; overflow-x: hidden;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+
+        /* PACOTES PIX */
+        .pix-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 14px 0; }
+        .pix-card {
+            background: linear-gradient(145deg, #092615, #04140b); border: 2px solid #10b981;
+            border-radius: 10px; padding: 14px 10px; text-align: center; display: flex; flex-direction: column;
+            justify-content: space-between; gap: 8px; cursor: pointer; transition: 0.2s;
+        }
+        .pix-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(16,185,129,0.4); border-color: #fff; }
+        .pix-moedas { font-size: 16px; font-weight: 900; color: var(--primary-gold); font-family: 'Rajdhani'; }
+        .pix-preco { font-size: 13px; font-weight: 900; color: #fff; }
+
+        /* SEÇÃO DE ADMIN */
+        .admin-section {
+            background: rgba(10, 36, 20, 0.85); border: 1px solid #1a4a2e; border-radius: 8px;
+            padding: 14px; margin-bottom: 12px;
+        }
+        .admin-section-title { font-size: 12px; font-weight: 900; color: var(--primary-gold); margin-bottom: 8px; text-transform: uppercase; }
+        .admin-pix-item {
+            background: #05180e; border: 1px solid #10b981; border-radius: 6px; padding: 10px 12px;
+            margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 11px;
+        }
+
+        /* HAXBALL ROOM LIST */
         .hax-roomlist-window {
-            width: 100%; background: #082012; border: 2px solid #1a4a2e; border-radius: 8px;
+            width: 100%; background: #082012; border: 2px solid #1a4a2e; border-radius: 10px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.8); overflow: hidden; text-align: left;
         }
-        .hax-header {
-            background: #04140b; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 2px solid #1a4a2e;
-        }
-        .hax-header-title { font-size: 18px; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
-        .hax-header-counter { font-size: 12px; color: #e74c3c; font-weight: 800; }
-        .hax-tip { background: #061a0e; padding: 6px 15px; font-size: 11px; color: #94a3b8; border-bottom: 1px solid #10331f; display:flex; justify-content:space-between; align-items:center; }
-
+        .hax-header { background: #04140b; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1a4a2e; }
         .hax-body { display: flex; width: 100%; min-height: 380px; }
         .hax-table-container { flex: 1; background: #031008; overflow-y: auto; max-height: 380px; }
-        
         .hax-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .hax-table th {
-            position: sticky; top: 0; background: #0a2817; color: #cbd5e1;
-            padding: 8px 10px; text-align: left; font-weight: 800; font-size: 11px; border-bottom: 2px solid #1a4a2e;
-        }
-        .hax-table td { padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 700; }
+        .hax-table th { position: sticky; top: 0; background: #0a2817; color: #cbd5e1; padding: 10px; text-align: left; font-weight: 800; border-bottom: 2px solid #1a4a2e; }
+        .hax-table td { padding: 9px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 700; }
         .hax-row { cursor: pointer; transition: 0.15s; }
         .hax-row:hover { background: rgba(16, 185, 129, 0.2); }
         .hax-row.selected { background: #165b33 !important; color: #fff !important; }
-        
-        .hax-side-actions {
-            width: 160px; background: #061a0e; padding: 12px 10px; display: flex; flex-direction: column;
-            gap: 8px; border-left: 2px solid #1a4a2e; justify-content: space-between;
-        }
-        .hax-side-btn {
-            background: #0d2f1b; border: 1px solid #1a4a2e; color: #fff; padding: 8px 10px;
-            border-radius: 4px; font-size: 11px; font-weight: 800; cursor: pointer; text-align: left;
-            display: flex; align-items: center; gap: 6px; transition: 0.2s;
-        }
+        .hax-side-actions { width: 160px; background: #061a0e; padding: 14px 10px; display: flex; flex-direction: column; gap: 8px; border-left: 2px solid #1a4a2e; justify-content: space-between; }
+        .hax-side-btn { background: #0d2f1b; border: 1px solid #1a4a2e; color: #fff; padding: 9px 10px; border-radius: 5px; font-size: 11px; font-weight: 800; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
         .hax-side-btn:hover { background: #165b33; border-color: #10b981; }
-        .hax-side-btn.primary { background: #10b981; border-color: #059669; color:#000; font-weight:900; }
-
-        .hax-footer {
-            background: #04140b; padding: 8px 15px; display: flex; align-items: center; gap: 15px;
-            border-top: 2px solid #1a4a2e; font-size: 11px; color: #cbd5e1; font-weight: 700;
-        }
-        .hax-footer label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
-
-        /* MODAIS */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.85); z-index: 500; justify-content: center; align-items: center;
-        }
-        .modal-box {
-            background: #082012; border: 2px solid #10b981; border-radius: 12px; padding: 22px 24px;
-            width: 90vw; max-width: 650px; text-align: left; box-shadow: 0 20px 50px rgba(0,0,0,0.95);
-            max-height: 90vh; overflow-y: auto; overflow-x: hidden;
-        }
-
-        /* PAINEL ADMIN STYLES */
-        .admin-section {
-            background: rgba(10, 36, 20, 0.85); border: 1px solid #1a4a2e; border-radius: 8px;
-            padding: 12px 14px; margin-bottom: 12px;
-        }
-        .admin-section-title { font-size: 12px; font-weight: 900; color: var(--primary-gold); margin-bottom: 8px; text-transform: uppercase; }
-
-        /* CONFIGURAÇÕES DE ÁUDIO */
-        .config-row { margin-bottom: 14px; }
-        .config-row label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: #cbd5e1; margin-bottom: 4px; }
-        .config-slider {
-            width: 100%; -webkit-appearance: none; height: 6px; border-radius: 3px;
-            background: #1a4a2e; outline: none; transition: background 0.2s;
-        }
-        .config-slider::-webkit-slider-thumb {
-            -webkit-appearance: none; appearance: none; width: 16px; height: 16px;
-            border-radius: 50%; background: var(--pitch-emerald); cursor: pointer; box-shadow: 0 0 8px rgba(16,185,129,0.6);
-        }
 
         /* GRID DE ESCUDOS */
         .grid-times { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 15px; width: 100%; }
@@ -226,21 +222,26 @@
             border: 4px solid; transition: 0.2s; position: relative; overflow: hidden; background: #fff; color: #000;
             box-shadow: 0 6px 15px rgba(0,0,0,0.5);
         }
-        .shield-btn:hover { transform: scale(1.06) translateY(-3px); z-index: 2; }
+        .shield-btn:hover { transform: scale(1.06) translateY(-3px); z-index: 2; border-color: #fff; }
         .shield-btn span { font-size: 12px; font-weight: 900; z-index: 2; text-align: center; }
         .shield-faixa { position: absolute; width: 150%; height: 26px; transform: rotate(-45deg); z-index: 1; opacity: 0.85; }
 
-        /* UNIFORMES */
-        .uniforme-container { display: flex; gap: 30px; margin: 15px 0; align-items: center; justify-content: center; }
-        .camisa-preview { position: relative; width: 110px; height: 130px; margin: 0 auto; }
+        /* UNIFORME */
+        .uniforme-container { display: flex; gap: 30px; margin: 18px 0; align-items: center; justify-content: center; }
+        .camisa-preview { position: relative; width: 110px; height: 130px; }
         .camisa-corpo { position: absolute; width: 72px; height: 100px; background: #fff; left: 19px; top: 15px; border-radius: 8px; border: 5px solid #000; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 900; font-family: 'Rajdhani', sans-serif; }
         .camisa-manga-esq, .camisa-manga-dir { position: absolute; width: 30px; height: 42px; background: #fff; top: 15px; border: 5px solid #000; border-radius: 6px; box-sizing: border-box; }
         .camisa-manga-esq { left: 2px; transform: rotate(20deg); } .camisa-manga-dir { right: 2px; transform: rotate(-20deg); }
 
-        /* PLACAR TV */
+        /* HUD IN-GAME TV */
+        #game-screen-container {
+            display: none; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0;
+            flex-direction: column; align-items: center; justify-content: center;
+            background: #020c06; z-index: 8000;
+        }
         #top-bar {
-            display: none; align-items: center; justify-content: center;
-            width: 100%; max-width: 860px; margin-bottom: 8px;
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; max-width: 880px; margin-bottom: 8px;
             background: #04140b; border: 2px solid rgba(16, 185, 129, 0.3); border-top: 3px solid var(--pitch-emerald);
             border-radius: 10px; padding: 6px 15px; position: relative; z-index: 10;
         }
@@ -264,11 +265,10 @@
             font-weight: 900; font-family: 'Rajdhani', sans-serif; margin: 0 10px;
         }
 
-        /* CAMPO DE JOGO RESPONSIVO */
         #game-wrapper {
-            position: relative; display: none; border-radius: 12px; overflow: hidden;
+            position: relative; border-radius: 12px; overflow: hidden;
             box-shadow: 0 25px 60px rgba(0,0,0,0.9), 0 0 0 3px rgba(16, 185, 129, 0.3);
-            outline: none; cursor: default;
+            outline: none;
         }
         #field-canvas, #matter-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
         #field-canvas { z-index: 1; } #matter-container { z-index: 2; pointer-events: none; }
@@ -276,99 +276,51 @@
         .cine-bar { position: absolute; left: 0; width: 100%; height: 0; background: #000; z-index: 5; transition: height 0.4s ease; }
         #bar-top { top: 0; } #bar-bottom { bottom: 0; }
 
-        /* OVERLAYS */
         #mensagem-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
             display: none; justify-content: center; align-items: center; flex-direction: column;
             background: rgba(0,0,0,0.75); text-align: center; padding: 20px;
         }
-        #texto-gol {
-            font-size: 60px; font-style: italic; font-weight: 900; letter-spacing: 4px;
-            font-family: 'Rajdhani', sans-serif; text-shadow: 0 0 25px rgba(16, 185, 129, 0.8);
-        }
+        #texto-gol { font-size: 58px; font-style: italic; font-weight: 900; font-family: 'Rajdhani', sans-serif; text-shadow: 0 0 25px rgba(16, 185, 129, 0.8); }
         #texto-assist { font-size: 18px; color: #a7f3d0; font-weight: 800; margin-top: 4px; }
-        #texto-estado { font-size: 18px; color: #fff; margin-top: 8px; font-weight: 700; background: rgba(0,0,0,0.7); padding: 5px 15px; border-radius: 5px; text-transform: uppercase; }
-        
-        #recompensas-partida {
-            display: none; background: rgba(8, 32, 18, 0.9); border: 2px solid var(--primary-gold);
-            border-radius: 8px; padding: 10px 20px; margin-top: 12px; font-size: 13px; font-weight: bold;
-        }
+        #texto-estado { font-size: 18px; color: #fff; margin-top: 8px; font-weight: 700; background: rgba(0,0,0,0.7); padding: 5px 15px; border-radius: 5px; }
 
-        #indicador-replay {
-            position: absolute; bottom: 20px; left: 20px; z-index: 20; display: none;
-            color: #fff; font-size: 16px; font-weight: 900; background: rgba(5, 20, 12, 0.85);
-            padding: 5px 12px; border-radius: 5px; border-left: 4px solid #e74c3c;
-        }
-        
-        .btn-ingame {
-            position: absolute; z-index: 20; background: rgba(4, 18, 10, 0.85); color: white;
-            border: 1px solid rgba(16, 185, 129, 0.4); padding: 7px 14px; font-weight: 800; font-size: 11px;
-            border-radius: 5px; cursor: pointer; transition: 0.2s;
-        }
-        #btn-voltar-partida { top: 15px; left: 15px; display: none; }
-        #btn-config-ingame { top: 15px; right: 15px; display: none; }
+        #indicador-replay { position: absolute; bottom: 20px; left: 20px; z-index: 20; display: none; color: #fff; font-size: 16px; font-weight: 900; background: rgba(5, 20, 12, 0.85); padding: 5px 12px; border-radius: 5px; border-left: 4px solid #e74c3c; }
+        .btn-ingame { position: absolute; z-index: 20; background: rgba(4, 18, 10, 0.85); color: white; border: 1px solid rgba(16, 185, 129, 0.4); padding: 7px 14px; font-weight: 800; font-size: 11px; border-radius: 5px; cursor: pointer; transition: 0.2s; }
+        #btn-voltar-partida { top: 15px; left: 15px; }
+        #btn-config-ingame { top: 15px; right: 15px; }
         #btn-admin-ingame { top: 15px; right: 90px; display: none; background: #e67e22; border-color: #d35400; }
         #btn-skip-replay { bottom: 20px; right: 20px; display: none; background: #c0392b; }
 
-        .input-sala {
-            padding: 10px; font-size: 14px; border-radius: 6px; border: 2px solid #10b981;
-            background: #04140b; color: #fff; text-align: center; margin-bottom: 10px; width: 80%;
-            font-family: 'Rajdhani', sans-serif; font-weight: 800; outline: none;
-        }
-
         /* LOJA & PASSE */
-        .shop-tabs { display: flex; gap: 8px; margin-bottom: 12px; width: 100%; justify-content: center; }
-        .shop-tab-btn { background: #082012; border: 1px solid #1a4a2e; color: #94a3b8; padding: 7px 14px; border-radius: 5px; cursor: pointer; font-weight: 800; font-size: 11px; }
+        .shop-tabs { display: flex; gap: 8px; margin-bottom: 14px; width: 100%; justify-content: center; }
+        .shop-tab-btn { background: #082012; border: 1px solid #1a4a2e; color: #94a3b8; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 800; font-size: 12px; }
         .shop-tab-btn.active { background: var(--pitch-emerald); color: #000; border-color: var(--pitch-emerald); font-weight: 900; }
-        .shop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; max-height: 380px; overflow-y: auto; }
-        .shop-item-card { background: rgba(8, 28, 16, 0.85); border: 2px solid #1a4a2e; border-radius: 8px; padding: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 4px; }
+        .shop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; max-height: 420px; overflow-y: auto; }
+        .shop-item-card { background: rgba(8, 28, 16, 0.85); border: 2px solid #1a4a2e; border-radius: 10px; padding: 12px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 6px; }
         .shop-item-card.equipped { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
-        .shop-item-preview { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .shop-item-name { font-size: 11px; font-weight: 900; }
-        .shop-item-desc { font-size: 9px; color: #a7f3d0; }
-        .shop-item-btn { padding: 5px 8px; font-size: 10px; border-radius: 4px; border: none; cursor: pointer; font-weight: 900; width: 100%; }
+        .shop-item-preview { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .shop-item-name { font-size: 12px; font-weight: 900; }
+        .shop-item-desc { font-size: 10px; color: #a7f3d0; }
+        .shop-item-btn { padding: 6px 10px; font-size: 11px; border-radius: 6px; border: none; cursor: pointer; font-weight: 900; width: 100%; }
         .btn-comprar { background: var(--primary-gold); color: #000; }
         .btn-equipar { background: #10b981; color: #000; }
         .btn-equipado { background: #059669; color: #fff; cursor: default; }
 
-        .pass-track-container { width: 100%; overflow-x: auto; padding: 8px 0; margin-bottom: 12px; }
-        .pass-track { display: flex; gap: 10px; }
-        .pass-tier-card { min-width: 125px; background: rgba(8, 28, 16, 0.85); border: 2px solid #1a4a2e; border-radius: 8px; padding: 8px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .pass-track-container { width: 100%; overflow-x: auto; padding: 10px 0; margin-bottom: 14px; }
+        .pass-track { display: flex; gap: 12px; }
+        .pass-tier-card { min-width: 135px; background: rgba(8, 28, 16, 0.85); border: 2px solid #1a4a2e; border-radius: 10px; padding: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .pass-tier-card.unlocked { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
         .pass-tier-card.claimed { border-color: #475569; opacity: 0.6; }
-        .pass-tier-num { font-size: 9px; font-weight: 900; background: #0d3820; padding: 2px 5px; border-radius: 3px; color: var(--pitch-emerald); }
-        .pass-tier-icon { font-size: 24px; }
-        .pass-tier-name { font-size: 10px; font-weight: 800; }
-        .pass-tier-reward { font-size: 9px; color: var(--pitch-emerald); font-weight: 900; }
+        .pass-tier-num { font-size: 10px; font-weight: 900; background: #0d3820; padding: 2px 6px; border-radius: 4px; color: var(--pitch-emerald); }
+        .pass-tier-icon { font-size: 26px; }
+        .pass-tier-name { font-size: 11px; font-weight: 800; }
+        .pass-tier-reward { font-size: 10px; color: var(--pitch-emerald); font-weight: 900; }
 
-        /* LISTA DE AMIGOS & LEADERBOARD */
-        .amigo-card {
-            background: #0a2817; border: 1px solid #1a4a2e; border-radius: 6px; padding: 8px 12px;
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
-        }
-
-        /* HUD PÊNALTIS */
         .penalty-dots-box { display: flex; gap: 6px; margin-top: 4px; }
         .penalty-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a4a2e; border: 1px solid #fff; }
         .penalty-dot.goal { background: #2ecc71; box-shadow: 0 0 6px #2ecc71; }
         .penalty-dot.miss { background: #e74c3c; box-shadow: 0 0 6px #e74c3c; }
-
-        /* PACOTES PIX COMPRA DE MOEDAS */
-        .pix-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-        .pix-card {
-            background: linear-gradient(145deg, #092615, #04140b); border: 2px solid #10b981;
-            border-radius: 8px; padding: 12px 10px; text-align: center; display: flex; flex-direction: column;
-            justify-content: space-between; gap: 6px; cursor: pointer; transition: 0.2s;
-        }
-        .pix-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(16,185,129,0.4); }
-        .pix-moedas { font-size: 16px; font-weight: 900; color: var(--primary-gold); font-family: 'Rajdhani'; }
-        .pix-preco { font-size: 13px; font-weight: 900; color: #fff; }
-
-        /* PEDIDOS PIX NO PAINEL ADM */
-        .admin-pix-item {
-            background: #05180e; border: 1px solid #10b981; border-radius: 6px; padding: 8px 10px;
-            margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 11px;
-        }
     </style>
 </head>
 <body>
@@ -376,430 +328,451 @@
     <!-- TOAST DE NOTIFICAÇÃO -->
     <div id="toast-notif"></div>
 
-    <!-- POPUP DE CONVITE DE GRUPO -->
+    <!-- POPUP CONVITE -->
     <div id="invite-popup">
         <div style="font-size:11px; color:#00f2fe; font-weight:bold;">✉️ CONVITE DE GRUPO</div>
         <div id="invite-popup-txt" style="font-size:13px; font-weight:900; margin:6px 0;">Jogador te convidou para o grupo!</div>
         <div style="display:flex; gap:8px;">
-            <button class="btn btn-avancar" style="margin:0; padding:6px 12px; font-size:11px;" onclick="aceitarConviteGrupo()">ACEITAR</button>
-            <button class="btn btn-voltar" style="margin:0; padding:6px 12px; font-size:11px;" onclick="recusarConviteGrupo()">RECUSAR</button>
+            <button class="btn btn-avancar" style="padding:6px 12px; font-size:11px;" onclick="aceitarConviteGrupo()">ACEITAR</button>
+            <button class="btn btn-voltar" style="padding:6px 12px; font-size:11px;" onclick="recusarConviteGrupo()">RECUSAR</button>
         </div>
     </div>
 
-    <!-- CARD DE PERFIL -->
-    <div id="perfil-ui" onclick="abrirEstatisticas()">
-        <div id="perfil-nome-linha">
-            <span id="perfil-admin-badge">👑 ADM</span>
-            <span id="perfil-nivel-badge">NVL 1</span>
-            <div id="perfil-nome">CRAQUE</div>
+    <!-- TOP NAVIGATION BAR (HEADER GLOBAL) -->
+    <header id="top-nav-bar">
+        <div class="nav-brand">
+            <span>⚽</span> IAES BALL <span>PRO</span>
         </div>
-        <div id="perfil-rank">OURO (1000 PDL)</div>
-        <div id="perfil-moedas">🪙 <span id="perfil-moedas-val">0</span></div>
-        <div class="xp-bar-container"><div class="xp-bar-fill" id="perfil-xp-bar"></div></div>
-    </div>
 
-    <!-- CONTAINER DOS MENUS EM TELA CHEIA RESPONSIVA -->
-    <div id="menu-container" class="glass-panel">
+        <div class="nav-stats-group">
+            <div class="nav-badge-pill" id="nav-btn-admin" style="border-color:#e67e22; color:#f39c12; display:none;" onclick="abrirModalAdmin()">
+                <span>👑</span> PAINEL ADM
+            </div>
+            
+            <div class="nav-badge-pill gold" onclick="abrirModalComprarMoedasPix()">
+                <span>🪙</span> <b id="nav-moedas-txt">300</b> <span style="background:var(--primary-gold); color:#000; font-size:9px; padding:1px 5px; border-radius:3px; font-weight:900;">+ COMPRAR</span>
+            </div>
+
+            <div class="nav-badge-pill" onclick="abrirLeaderboardGlobal()">
+                <span>🏆</span> <span id="nav-rank-txt">1000 PDL</span>
+            </div>
+
+            <div class="nav-badge-pill" onclick="abrirEstatisticas()">
+                <span id="nav-nivel-badge" style="background:#10b981; color:#000; font-size:9px; padding:1px 5px; border-radius:3px; font-weight:900;">NVL 1</span>
+                <span id="nav-nome-txt">CRAQUE</span>
+            </div>
+
+            <div class="nav-badge-pill" onclick="abrirModalConfiguracoes()">
+                <span>⚙️</span> SOM
+            </div>
+
+            <div class="nav-badge-pill" style="border-color:#e74c3c; color:#e74c3c;" onclick="deslogar()">
+                SAIR
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTAINER PRINCIPAL DO MENU (TELA CHEIA RESPONSIVA) -->
+    <main id="main-content-wrapper">
         
-        <!-- TELA DE LOGIN / REGISTRO -->
+        <!-- 1. TELA DE LOGIN / REGISTRO -->
         <div id="screen-login" class="screen active-screen">
-            <h1 style="color:#10b981; font-size:38px;">🏆 IAES BALL PRO</h1>
-            <p style="color:#a7f3d0; margin-bottom: 20px; font-size: 13px;">Entre com seu Nickname para jogar online ou offline</p>
-            <input type="text" id="input-nickname" class="input-sala" placeholder="SEU NICKNAME (MÍN. 3 LETRAS)" maxlength="16">
-            <input type="password" id="input-senha" class="input-sala" placeholder="SENHA (MÍN. 6 DÍGITOS)" maxlength="32">
-            
-            <div style="display: flex; gap: 12px; width: 80%; max-width: 380px; margin-top: 8px;">
-                <button id="btn-login" class="btn btn-avancar" style="margin-top: 0;" onclick="fazerLogin()"><span id="btn-login-txt">⚽ ENTRAR</span></button>
-                <button id="btn-criar" class="btn" style="margin-top: 0; background: #059669; width: 100%;" onclick="criarConta()"><span id="btn-criar-txt">CRIAR CONTA</span></button>
-            </div>
-            <div id="auth-status-msg" style="color: #e74c3c; margin-top: 12px; font-size: 12px; font-weight: bold;"></div>
-        </div>
-
-        <!-- MENU PRINCIPAL -->
-        <div id="screen-home" class="screen">
-            <h1 style="font-size: 40px; color: #10b981; margin-bottom: 2px; text-shadow: 0 0 20px rgba(16,185,129,0.5);">IAES BALL</h1>
-            <div style="font-size: 11px; color: #a7f3d0; margin-bottom: 16px; letter-spacing: 2px; font-weight: 700;">HAXBALL & FUTEBOL CHAMPIONS</div>
-            
-            <div class="menu-modes-grid">
-                <!-- MODO RANKED MATCHMAKING -->
-                <div class="mode-card" style="border-color: rgba(155, 89, 182, 0.8);" onclick="abrirMatchmakingRanked()">
-                    <div>
-                        <div class="mode-card-title" style="color: #d2a8ff;">⚔️ BUSCAR RANKED</div>
-                        <div class="mode-card-desc">1v1 (Padrão), 2v2 (Maracanã) e 3v3 (Titã) valendo PDL!</div>
-                    </div>
-                    <div class="mode-card-badge" style="background: rgba(142, 68, 173, 0.4); color:#d2a8ff;">MATCHMAKING • PDL</div>
-                </div>
-
-                <!-- JOGO RÁPIDO LOCAL -->
-                <div class="mode-card" onclick="irParaModo(false)">
-                    <div>
-                        <div class="mode-card-title">⚽ JOGO RÁPIDO</div>
-                        <div class="mode-card-desc">1v1 a 5v5 com 2 tempos de 1m30s e troca de lados no intervalo!</div>
-                    </div>
-                    <div class="mode-card-badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">OFFLINE • 2 TEMPOS</div>
-                </div>
-
-                <!-- MODO PÊNALTIS -->
-                <div class="mode-card" style="border-color: rgba(230, 126, 34, 0.8);" onclick="iniciarModoPenaltis()">
-                    <div>
-                        <div class="mode-card-title" style="color: #f39c12;">🎯 PÊNALTIS</div>
-                        <div class="mode-card-desc">Disputa de pênaltis eletrizante com 5 cobranças e goleiro!</div>
-                    </div>
-                    <div class="mode-card-badge" style="background: rgba(230, 126, 34, 0.3); color:#f39c12;">DISPUTA 5 CHUTES</div>
-                </div>
-
-                <!-- SALAS HAXBALL -->
-                <div class="mode-card" onclick="irParaModo(true)">
-                    <div>
-                        <div class="mode-card-title" style="color: #00f2fe;">🌐 SALAS ONLINE</div>
-                        <div class="mode-card-desc">Navegador estilo HaxBall com lista de salas em tempo real!</div>
-                    </div>
-                    <div class="mode-card-badge" style="background: rgba(0, 242, 254, 0.2); color:#00f2fe;">ROOM LIST</div>
-                </div>
-            </div>
-
-            <div class="menu-sub-grid" id="menu-sub-botoes">
-                <div class="sub-btn-card" onclick="abrirModalAmigos()" style="border-color: rgba(0,242,254,0.4);"><span>👥</span><div>AMIGOS/GRUPO</div></div>
-                <div class="sub-btn-card" onclick="abrirLeaderboardGlobal()" style="border-color: rgba(241,196,15,0.4);"><span>🏆</span><div>RANK GLOBAL</div></div>
-                <div class="sub-btn-card" onclick="abrirModalComprarMoedasPix()" style="border-color: rgba(0, 180, 216, 0.6); background: rgba(0,180,216,0.15);"><span>🪙</span><div style="color:#00f2fe;">COMPRAR MOEDAS</div></div>
-                <div class="sub-btn-card" onclick="abrirPasseBatalha()" style="border-color: rgba(16,185,129,0.5);"><span>🎫</span><div>PASSE (20)</div></div>
-                <div class="sub-btn-card" onclick="abrirLoja()"><span>🛒</span><div>MERCADO</div></div>
-                <div class="sub-btn-card" onclick="abrirModalConfiguracoes()"><span>⚙️</span><div>ÁUDIO</div></div>
-                <!-- BOTÃO DO ADMIN EXCLUSIVO -->
-                <div class="sub-btn-card" id="btn-menu-admin" onclick="abrirModalAdmin()" style="border-color: #e67e22; background: rgba(230, 126, 34, 0.2); display: none;"><span>👑</span><div style="color:#f39c12;">PAINEL ADM</div></div>
-            </div>
-
-            <button class="btn btn-voltar" style="margin-top: 16px;" onclick="deslogar()">Sair da Conta</button>
-        </div>
-
-        <!-- TELA DE FILA RANKED COM 1V1, 2V2 E 3V3 (COM MAPAS OFICIAIS) -->
-        <div id="screen-matchmaking" class="screen">
-            <h1 style="color: #d2a8ff;">⚔️ FILA RANKED COMPETITIVA</h1>
-            <p style="color:#a7f3d0; font-size:12px; margin-bottom:15px;">Partidas competitivas valendo PDL nos mapas oficiais</p>
-
-            <div style="background: #082012; border: 2px solid #8e44ad; border-radius: 10px; padding: 20px; width: 500px; max-width: 90%; margin-bottom: 15px;">
-                <div style="display:flex; justify-content:space-around; margin-bottom:15px; font-size:11px; font-weight:bold;">
-                    <label><input type="radio" name="ranked-mode-select" value="1V1" checked> 1v1 (Padrão 1000x550)</label>
-                    <label><input type="radio" name="ranked-mode-select" value="2V2"> 2v2 (Maracanã 1200x660)</label>
-                    <label><input type="radio" name="ranked-mode-select" value="3V3"> 3v3 (Titã 1400x750)</label>
-                </div>
-
-                <div id="mm-status-box" style="text-align:center;">
-                    <div id="mm-status-txt" style="font-size:15px; font-weight:900; color:#cbd5e1;">Pronto para buscar partida</div>
-                    <div id="mm-timer-txt" style="font-size:28px; font-weight:900; color:var(--primary-gold); font-family:'Rajdhani'; margin:8px 0; display:none;">00:00</div>
-                    <div id="mm-detail-txt" style="font-size:11px; color:#a7f3d0; margin-top:4px;"></div>
-                </div>
-
-                <button class="btn btn-ranked" id="btn-iniciar-mm" style="width:100%; margin-top:12px;" onclick="iniciarBuscaRanked()">🔍 BUSCAR PARTIDA</button>
-                <button class="btn btn-voltar" id="btn-cancelar-mm" style="width:100%; margin-top:12px; display:none;" onclick="cancelarBuscaRanked()">CANCELAR BUSCA</button>
-            </div>
-
-            <button class="btn btn-voltar" onclick="sairTelaMatchmaking()">⏴ VOLTAR AO MENU</button>
-        </div>
-
-        <!-- MODAL DE COMPRA DE MOEDAS COM DINHEIRO REAL (CHAVE PIX: 67981520229) -->
-        <div id="modal-comprar-moedas" class="modal-overlay">
-            <div class="modal-box" style="border-color: #00f2fe;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <h2 style="margin:0; color:#00f2fe;">🪙 BANCO IAES - COMPRAR MOEDAS</h2>
-                    <span style="font-size:11px; color:#10b981; font-weight:bold;">⚡ 1 REAL = 1.000 MOEDAS</span>
-                </div>
-                <p style="font-size:11px; color:#a7f3d0; margin:0 0 10px 0;">Faça o PIX para a chave oficial. O Administrador confirmará seu pagamento para liberar suas moedas!</p>
-
-                <!-- CHAVE PIX OFICIAL DO USUÁRIO -->
-                <div style="background:#04140b; border:1px solid #10b981; border-radius:8px; padding:10px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <div>
-                        <div style="font-size:10px; color:#a7f3d0; font-weight:bold;">CHAVE PIX OFICIAL (CELULAR):</div>
-                        <div style="font-size:16px; font-weight:900; color:var(--primary-gold); font-family:monospace; letter-spacing:1px;" id="txt-chave-pix">67981520229</div>
-                    </div>
-                    <button class="btn btn-gold" style="padding:6px 12px; font-size:10px;" onclick="copiarChavePix()">📋 COPIAR CHAVE PIX</button>
-                </div>
-
-                <div class="pix-grid">
-                    <div class="pix-card" onclick="selecionarPacoteMoedas(1000, 1.00, 'PACOTE INICIANTE')">
-                        <div style="font-size:22px;">🪙</div>
-                        <div class="pix-moedas">1.000 MOEDAS</div>
-                        <div class="pix-preco">R$ 1,00</div>
-                        <button class="btn btn-pix" style="padding:4px; font-size:9px;">SELECIONAR</button>
-                    </div>
-
-                    <div class="pix-card" onclick="selecionarPacoteMoedas(5000, 5.00, 'PACOTE CRAQUE')">
-                        <div style="font-size:22px;">🪙🪙</div>
-                        <div class="pix-moedas">5.000 MOEDAS</div>
-                        <div class="pix-preco">R$ 5,00</div>
-                        <button class="btn btn-pix" style="padding:4px; font-size:9px;">SELECIONAR</button>
-                    </div>
-
-                    <div class="pix-card" style="border-color:var(--primary-gold);" onclick="selecionarPacoteMoedas(12000, 10.00, 'PACOTE CAMPEÃO (+20% BÔNUS)')">
-                        <div style="font-size:22px;">👑</div>
-                        <div class="pix-moedas">12.000 MOEDAS</div>
-                        <div class="pix-preco">R$ 10,00 <span style="font-size:8px; color:#10b981;">(+2k BÔNUS)</span></div>
-                        <button class="btn btn-gold" style="padding:4px; font-size:9px;">POPULAR ⭐</button>
-                    </div>
-
-                    <div class="pix-card" onclick="selecionarPacoteMoedas(31000, 25.00, 'PACOTE PROFISSIONAL')">
-                        <div style="font-size:22px;">💎</div>
-                        <div class="pix-moedas">31.000 MOEDAS</div>
-                        <div class="pix-preco">R$ 25,00 <span style="font-size:8px; color:#10b981;">(+6k BÔNUS)</span></div>
-                        <button class="btn btn-pix" style="padding:4px; font-size:9px;">SELECIONAR</button>
-                    </div>
-
-                    <div class="pix-card" style="border-color:#e74c3c;" onclick="selecionarPacoteMoedas(65000, 50.00, 'PACOTE MITOLÓGICO')">
-                        <div style="font-size:22px;">🌌</div>
-                        <div class="pix-moedas">65.000 MOEDAS</div>
-                        <div class="pix-preco">R$ 50,00 <span style="font-size:8px; color:#10b981;">(+15k BÔNUS)</span></div>
-                        <button class="btn" style="background:#e74c3c; padding:4px; font-size:9px;">MEGA OFERTA 🔥</button>
-                    </div>
-
-                    <div class="pix-card" style="border-color:var(--primary-gold);" onclick="selecionarPacoteMoedas(140000, 100.00, 'PACOTE DONO DA BOLA')">
-                        <div style="font-size:22px;">🏆</div>
-                        <div class="pix-moedas">140.000 MOEDAS</div>
-                        <div class="pix-preco">R$ 100,00 <span style="font-size:8px; color:#10b981;">(+40k BÔNUS)</span></div>
-                        <button class="btn btn-gold" style="padding:4px; font-size:9px;">V.I.P 🏆</button>
-                    </div>
-                </div>
-
-                <!-- CHECKOUT COM ENVIO PARA APROVAÇÃO DO ADMIN -->
-                <div id="pix-checkout-box" style="display:none; background:#04140b; border:1px solid #10b981; border-radius:8px; padding:12px; margin-top:12px; text-align:center;">
-                    <div id="pix-checkout-title" style="font-weight:900; color:var(--primary-gold); font-size:13px;">PEDIDO SELECIONADO</div>
-                    <div style="font-size:12px; color:#a7f3d0; margin:4px 0;" id="pix-checkout-desc">Valor: R$ 1,00 | Moedas: +1.000 🪙</div>
-                    
-                    <div style="font-size:11px; color:#cbd5e1; margin:8px 0 4px 0; text-align:left;">Nome de quem fez o PIX (Opcional):</div>
-                    <input type="text" id="input-pix-nome-pagador" class="input-sala" style="width:100%; margin:0 0 8px 0; text-align:left;" placeholder="Ex: Murilo Silva (Nome no comprovante)">
-
-                    <div style="display:flex; gap:8px; justify-content:center;">
-                        <button class="btn btn-avancar" style="margin:0; padding:8px 14px; font-size:11px;" onclick="enviarPedidoPixParaAdmin()">✅ JÁ FIZ O PIX / ENVIAR PARA O ADM</button>
-                        <button class="btn btn-voltar" style="margin:0; padding:8px 14px; font-size:11px;" onclick="fecharCheckoutPix()">CANCELAR</button>
-                    </div>
-                </div>
-
-                <button class="btn btn-voltar" style="width:100%; margin-top:14px;" onclick="fecharModalComprarMoedas()">FECHAR</button>
-            </div>
-        </div>
-
-        <!-- MODAL DE RANK GLOBAL DE PDL (HALL DA FAMA) -->
-        <div id="modal-leaderboard" class="modal-overlay">
-            <div class="modal-box" style="border-color: var(--primary-gold);">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                    <h2 style="margin:0; color:var(--primary-gold);">🏆 RANKING GLOBAL DE PDL</h2>
-                    <span style="font-size:11px; color:#10b981; font-weight:bold;">TEMPORADA 1</span>
-                </div>
-                <div style="max-height:340px; overflow-y:auto; margin-bottom:12px;" id="leaderboard-table-box">
-                    <table style="width:100%; border-collapse:collapse; font-size:12px;">
-                        <thead>
-                            <tr style="background:#04140b; color:#a7f3d0; text-align:left;">
-                                <th style="padding:8px 6px;">#</th>
-                                <th style="padding:8px 6px;">Jogador</th>
-                                <th style="padding:8px 6px;">Elo / PDL</th>
-                                <th style="padding:8px 6px;">Vitórias</th>
-                                <th style="padding:8px 6px;">Nível</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leaderboard-tbody"></tbody>
-                    </table>
-                </div>
-                <button class="btn btn-voltar" style="width:100%; margin:0;" onclick="fecharLeaderboardGlobal()">FECHAR</button>
-            </div>
-        </div>
-
-        <!-- HAXBALL ROOM LIST SCREEN -->
-        <div id="screen-online-rooms" class="screen">
-            <div class="hax-roomlist-window">
-                <div class="hax-header">
-                    <div class="hax-header-title">Room list</div>
-                    <div class="hax-header-counter" id="hax-counter">0 salas abertas</div>
-                </div>
-                <div class="hax-tip">
-                    <span>Tip: Join rooms near you to reduce lag.</span>
-                    <div style="display:flex; gap:6px; align-items:center;">
-                        <input type="text" id="input-entrar-codigo" placeholder="Código (ex: IAES_ABC)" style="padding:4px 8px; font-size:11px; background:#000; color:#fff; border:1px solid #1a4a2e; border-radius:4px; width:140px;">
-                        <button class="btn" style="padding:4px 8px; font-size:10px;" onclick="entrarPorCodigoDireto()">ENTRAR POR CÓDIGO</button>
-                    </div>
-                </div>
+            <div class="screen-card" style="max-width: 460px;">
+                <div style="font-size: 55px; margin-bottom: 6px;">🏆</div>
+                <h1 style="color: #10b981; font-size: 34px; font-family: 'Rajdhani', sans-serif;">IAES BALL PRO</h1>
+                <p style="color: #a7f3d0; font-size: 13px; margin-bottom: 24px;">Entre com seu Nickname para jogar offline ou online</p>
                 
-                <div class="hax-body">
-                    <div class="hax-table-container">
-                        <table class="hax-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 48%;">Name</th>
-                                    <th style="width: 15%;">Players</th>
-                                    <th style="width: 12%;">Pass</th>
-                                    <th style="width: 25%;">Host / Dist</th>
-                                </tr>
-                            </thead>
-                            <tbody id="hax-rooms-tbody"></tbody>
-                        </table>
+                <input type="text" id="input-nickname" class="input-iaes" placeholder="SEU NICKNAME (MÍN. 3 LETRAS)" maxlength="16">
+                <input type="password" id="input-senha" class="input-iaes" placeholder="SUA SENHA (MÍN. 6 DÍGITOS)" maxlength="32">
+
+                <div style="display:flex; gap:10px; margin-top:8px;">
+                    <button id="btn-login" class="btn btn-avancar" style="flex:1;" onclick="fazerLogin()"><span id="btn-login-txt">⚽ ENTRAR</span></button>
+                    <button id="btn-criar" class="btn" style="flex:1; background:#059669;" onclick="criarConta()"><span id="btn-criar-txt">CRIAR CONTA</span></button>
+                </div>
+                <div id="auth-status-msg" style="color:#e74c3c; margin-top:12px; font-size:12px; font-weight:bold;"></div>
+            </div>
+        </div>
+
+        <!-- 2. MENU PRINCIPAL (LOBBY HUB) -->
+        <div id="screen-home" class="screen">
+            <div class="screen-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <div style="text-align:left;">
+                        <h1 style="font-size:36px; color:#10b981; font-family:'Rajdhani', sans-serif;">SELEÇÃO DE MODOS</h1>
+                        <p style="font-size:12px; color:#a7f3d0;">Escolha uma modalidade e entre em campo agora mesmo</p>
+                    </div>
+                    <button class="btn btn-pix" onclick="abrirModalComprarMoedasPix()">🪙 COMPRAR MOEDAS VIA PIX</button>
+                </div>
+
+                <!-- CARDS PRINCIPAIS DE JOGO -->
+                <div class="main-modes-grid">
+                    <!-- RANKED MATCHMAKING -->
+                    <div class="mode-hero-card" style="border-color: rgba(155, 89, 182, 0.8);" onclick="abrirMatchmakingRanked()">
+                        <div>
+                            <div class="mode-hero-title" style="color:#d2a8ff;">⚔️ BUSCAR RANKED</div>
+                            <div class="mode-hero-desc">1v1 (Padrão), 2v2 (Maracanã) e 3v3 (Titã) valendo PDL na classificação!</div>
+                        </div>
+                        <div class="mode-hero-badge" style="background: rgba(142, 68, 173, 0.4); color:#d2a8ff;">MATCHMAKING • PDL</div>
                     </div>
 
-                    <div class="hax-side-actions">
-                        <div style="display:flex; flex-direction:column; gap:6px;">
-                            <button class="hax-side-btn" onclick="carregarSalasOnline()">🔄 Refresh</button>
-                            <button class="hax-side-btn primary" onclick="conectarSalaSelecionada()">➡️ Join Room</button>
-                            <button class="hax-side-btn primary" style="background:#10b981; border-color:#059669; color:#000;" onclick="abrirModalCriarSala()">➕ Create Room</button>
+                    <!-- JOGO RÁPIDO LOCAL -->
+                    <div class="mode-hero-card" onclick="irParaModo(false)">
+                        <div>
+                            <div class="mode-hero-title">⚽ JOGO RÁPIDO</div>
+                            <div class="mode-hero-desc">1v1 a 5v5 com 2 tempos de 1m30s e troca de lados no intervalo!</div>
                         </div>
-                        <div style="display:flex; flex-direction:column; gap:6px;">
-                            <button class="hax-side-btn" onclick="abrirLeaderboardGlobal()">🏆 Rank</button>
-                            <button class="hax-side-btn" onclick="abrirModalConfiguracoes()">⚙️ Settings</button>
+                        <div class="mode-hero-badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">OFFLINE • 2 TEMPOS</div>
+                    </div>
+
+                    <!-- DISPUTA DE PÊNALTIS -->
+                    <div class="mode-hero-card" style="border-color: rgba(230, 126, 34, 0.8);" onclick="iniciarModoPenaltis()">
+                        <div>
+                            <div class="mode-hero-title" style="color: #f39c12;">🎯 PÊNALTIS</div>
+                            <div class="mode-hero-desc">Disputa eletrizante de 5 cobranças alternadas contra o goleiro!</div>
+                        </div>
+                        <div class="mode-hero-badge" style="background: rgba(230, 126, 34, 0.3); color:#f39c12;">DISPUTA 5 CHUTES</div>
+                    </div>
+
+                    <!-- SALAS HAXBALL -->
+                    <div class="mode-hero-card" onclick="irParaModo(true)">
+                        <div>
+                            <div class="mode-hero-title" style="color: #00f2fe;">🌐 SALAS ONLINE</div>
+                            <div class="mode-hero-desc">Navegador oficial estilo HaxBall com lista de salas em tempo real!</div>
+                        </div>
+                        <div class="mode-hero-badge" style="background: rgba(0, 242, 254, 0.2); color:#00f2fe;">ROOM LIST OFICIAL</div>
+                    </div>
+                </div>
+
+                <!-- SUB-MENU (PASSE, MERCADO, AMIGOS, RANK) -->
+                <div class="sub-features-grid">
+                    <div class="sub-feature-btn" onclick="abrirModalAmigos()" style="border-color: rgba(0,242,254,0.4);">
+                        <span>👥</span><div>AMIGOS/GRUPO</div>
+                    </div>
+                    <div class="sub-feature-btn" onclick="abrirLeaderboardGlobal()" style="border-color: rgba(241,196,15,0.4);">
+                        <span>🏆</span><div>RANK GLOBAL</div>
+                    </div>
+                    <div class="sub-feature-btn" onclick="abrirModalComprarMoedasPix()" style="border-color: rgba(0, 180, 216, 0.6); background: rgba(0,180,216,0.15);">
+                        <span>🪙</span><div style="color:#00f2fe;">LOJA PIX</div>
+                    </div>
+                    <div class="sub-feature-btn" onclick="abrirPasseBatalha()" style="border-color: rgba(16,185,129,0.5);">
+                        <span>🎫</span><div>PASSE (20)</div>
+                    </div>
+                    <div class="sub-feature-btn" onclick="abrirLoja()">
+                        <span>🛒</span><div>MERCADO</div>
+                    </div>
+                    <div class="sub-feature-btn" onclick="abrirEstatisticas()">
+                        <span>📊</span><div>ESTATÍSTICAS</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. TELA DE FILA RANKED COMPETITIVA -->
+        <div id="screen-matchmaking" class="screen">
+            <div class="screen-card" style="max-width: 600px;">
+                <h1 style="color: #d2a8ff; font-family:'Rajdhani';">⚔️ FILA RANKED COMPETITIVA</h1>
+                <p style="color:#a7f3d0; font-size:12px; margin-bottom:20px;">Partidas competitivas valendo PDL nos mapas oficiais</p>
+
+                <div style="background: #082012; border: 2px solid #8e44ad; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+                    <div style="display:flex; justify-content:space-around; margin-bottom:15px; font-size:12px; font-weight:bold;">
+                        <label><input type="radio" name="ranked-mode-select" value="1V1" checked> 1v1 (Padrão 1000x550)</label>
+                        <label><input type="radio" name="ranked-mode-select" value="2V2"> 2v2 (Maracanã 1200x660)</label>
+                        <label><input type="radio" name="ranked-mode-select" value="3V3"> 3v3 (Titã 1400x750)</label>
+                    </div>
+
+                    <div id="mm-status-box" style="text-align:center;">
+                        <div id="mm-status-txt" style="font-size:16px; font-weight:900; color:#cbd5e1;">Pronto para buscar partida</div>
+                        <div id="mm-timer-txt" style="font-size:32px; font-weight:900; color:var(--primary-gold); font-family:'Rajdhani'; margin:10px 0; display:none;">00:00</div>
+                        <div id="mm-detail-txt" style="font-size:12px; color:#a7f3d0;"></div>
+                    </div>
+
+                    <button class="btn btn-ranked" id="btn-iniciar-mm" style="width:100%; margin-top:15px;" onclick="iniciarBuscaRanked()">🔍 BUSCAR PARTIDA</button>
+                    <button class="btn btn-voltar" id="btn-cancelar-mm" style="width:100%; margin-top:15px; display:none;" onclick="cancelarBuscaRanked()">CANCELAR BUSCA</button>
+                </div>
+
+                <button class="btn btn-voltar" onclick="sairTelaMatchmaking()">⏴ VOLTAR AO MENU</button>
+            </div>
+        </div>
+
+        <!-- 4. TELA DE MODO DE JOGO RÁPIDO (1V1 A 5V5) -->
+        <div id="screen-mode" class="screen">
+            <div class="screen-card" style="max-width: 700px;">
+                <h1 style="color:#10b981; font-family:'Rajdhani';">MODALIDADE DE JOGO</h1>
+                <p style="color:#a7f3d0; font-size:12px; margin-bottom:20px;">Escolha a quantidade de jogadores em campo</p>
+                <div class="main-modes-grid" style="grid-template-columns: repeat(2, 1fr); gap: 14px;">
+                    <button class="btn" style="padding:18px; font-size:14px;" onclick="escolherModo('CLASSICO')">⚽ 1v1 Duelo</button>
+                    <button class="btn" style="padding:18px; font-size:14px; background:#165b33;" onclick="escolherModo('CLASSICO_2V2')">⚽ 2v2 Duplas</button>
+                    <button class="btn" style="padding:18px; font-size:14px; background:#0d3820;" onclick="escolherModo('CLASSICO_3V3')">⚽ 3v3 Trio</button>
+                    <button class="btn btn-gold" style="padding:18px; font-size:14px;" onclick="escolherModo('CLASSICO_5V5')">👑 5v5 Society</button>
+                </div>
+                <button class="btn btn-voltar" style="margin-top:20px;" onclick="showScreen('screen-home')">⏴ VOLTAR</button>
+            </div>
+        </div>
+
+        <!-- 5. ESCOLHA DE TAMANHO DE CAMPO -->
+        <div id="screen-field" class="screen">
+            <div class="screen-card" style="max-width: 800px;">
+                <h1 style="color:#10b981; font-family:'Rajdhani';">TAMANHO DO ESTÁDIO</h1>
+                <p style="color:#a7f3d0; font-size:12px; margin-bottom:20px;">Dimensões do gramado oficial</p>
+                <div class="main-modes-grid" style="grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                    <button class="btn" onclick="escolherCampo(800, 440)">Arena (Pequeno - 800x440)</button>
+                    <button class="btn" onclick="escolherCampo(1000, 550)">Padrão (Médio - 1000x550)</button>
+                    <button class="btn" onclick="escolherCampo(1200, 660)">Maracanã (Grande - 1200x660)</button>
+                </div>
+                <div class="main-modes-grid" style="grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px;">
+                    <button class="btn btn-ranked" onclick="escolherCampo(1400, 750)">Titã (Gigante 3v3 - 1400x750)</button>
+                    <button class="btn btn-gold" onclick="escolherCampo(1600, 850)">Colosso (Mega 5v5 - 1600x850)</button>
+                </div>
+                <button class="btn btn-voltar" style="margin-top: 20px;" onclick="showScreen('screen-mode')">⏴ VOLTAR</button>
+            </div>
+        </div>
+
+        <!-- 6. ESCOLHA DE TIME -->
+        <div id="screen-team" class="screen">
+            <div class="screen-card">
+                <h1 id="title-jogador-team" style="color:var(--primary-gold); font-family:'Rajdhani';">CAPITÃO: ESCOLHA SEU TIME</h1>
+                <p style="color:#a7f3d0; font-size:12px;">Selecione o escudo do seu clube</p>
+                <div class="grid-times" id="grid-times"></div>
+                <button class="btn btn-voltar" style="margin-top: 20px;" onclick="voltarDeTimes()">⏴ VOLTAR</button>
+            </div>
+        </div>
+
+        <!-- 7. ESCOLHA DE UNIFORME -->
+        <div id="screen-uniform" class="screen">
+            <div class="screen-card" style="max-width: 500px;">
+                <h2 id="title-jogador-uniform" style="color:var(--primary-gold);">CAPITÃO: UNIFORME OFICIAL</h2>
+                <h1 id="nome-time-escolhido" style="color: #fff; margin-bottom: 0;">TIME</h1>
+                <div class="uniforme-container">
+                    <div class="camisa-preview">
+                        <div class="camisa-manga-esq" id="manga-esq"></div>
+                        <div class="camisa-manga-dir" id="manga-dir"></div>
+                        <div class="camisa-corpo" id="camisa-corpo">10</div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:10px; font-weight:bold; font-size:13px;">
+                        <label><input type="radio" name="uni-select" value="1" checked onchange="atualizarPreview()"> Uniforme 1 Titular</label>
+                        <label><input type="radio" name="uni-select" value="2" onchange="atualizarPreview()"> Uniforme 2 Reserva</label>
+                    </div>
+                </div>
+                <div style="display:flex; gap:12px; margin-top:10px;">
+                    <button class="btn btn-voltar" style="flex:1;" onclick="voltarParaEscolherOutroTime()">⏴ TROCAR TIME</button>
+                    <button class="btn btn-avancar" style="flex:1;" onclick="confirmarUniforme()">INICIAR PARTIDA ➔</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. HAXBALL ROOM LIST -->
+        <div id="screen-online-rooms" class="screen">
+            <div class="screen-card" style="max-width: 900px; padding: 15px;">
+                <div class="hax-roomlist-window">
+                    <div class="hax-header">
+                        <div style="font-size:18px; font-weight:900; color:#fff;">Room list</div>
+                        <div style="font-size:12px; color:#e74c3c; font-weight:800;" id="hax-counter">0 salas abertas</div>
+                    </div>
+                    
+                    <div class="hax-body">
+                        <div class="hax-table-container">
+                            <table class="hax-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 48%;">Name</th>
+                                        <th style="width: 15%;">Players</th>
+                                        <th style="width: 12%;">Pass</th>
+                                        <th style="width: 25%;">Host / Dist</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="hax-rooms-tbody"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="hax-side-actions">
+                            <button class="hax-side-btn" onclick="carregarSalasOnline()">🔄 Refresh</button>
+                            <button class="hax-side-btn" style="background:#10b981; color:#000;" onclick="conectarSalaSelecionada()">➡️ Join Room</button>
+                            <button class="hax-side-btn" style="background:#10b981; color:#000;" onclick="abrirModalCriarSala()">➕ Create Room</button>
                             <button class="hax-side-btn" onclick="showScreen('screen-home')">⏴ Back</button>
                         </div>
                     </div>
                 </div>
-
-                <div class="hax-footer">
-                    <label><input type="checkbox" id="chk-show-locked" checked onchange="filtrarTabelaSalas()"> Show locked</label>
-                    <label><input type="checkbox" id="chk-show-full" checked onchange="filtrarTabelaSalas()"> Show full</label>
-                    <label><input type="checkbox" id="chk-show-empty" checked onchange="filtrarTabelaSalas()"> Show empty</label>
-                </div>
             </div>
         </div>
 
-        <!-- PASSE DE BATALHA COM 20 NÍVEIS CHEIO DE COSMÉTICOS -->
-        <div id="screen-battlepass" class="screen">
-            <h1 style="color:#10b981;">🎫 PASSE DE BATALHA (20 NÍVEIS)</h1>
-            <p style="color:#a7f3d0; font-size:12px; margin-bottom:10px;">Avance de nível jogando partidas para resgatar Bolas, Rastros, Auras e Explosões exclusivas!</p>
-            <div class="pass-track-container"><div class="pass-track" id="pass-track-list"></div></div>
-            <button class="btn btn-voltar" onclick="showScreen('screen-home')">⏴ VOLTAR AO MENU</button>
-        </div>
-
-        <!-- MERCADO DA BOLA -->
-        <div id="screen-shop" class="screen">
-            <h1 style="color:var(--primary-gold);">🛒 MERCADO DA BOLA</h1>
-            <div class="shop-tabs">
-                <button class="shop-tab-btn active" onclick="filtrarLoja('bolas')">⚽ Bolas (10)</button>
-                <button class="shop-tab-btn" onclick="filtrarLoja('rastros')">✨ Rastros (8)</button>
-                <button class="shop-tab-btn" onclick="filtrarLoja('auras')">🔥 Auras (8)</button>
-                <button class="shop-tab-btn" onclick="filtrarLoja('explosoes')">💥 Explosões Gol (6)</button>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:8px;">
-                <div style="font-weight:900; color:var(--primary-gold);">SALDO: 🪙 <span id="shop-moedas-val">0</span></div>
-                <button class="btn btn-pix" style="padding:4px 10px; font-size:10px;" onclick="abrirModalComprarMoedasPix()">+ COMPRAR MAIS MOEDAS</button>
-            </div>
-            <div class="shop-grid" id="shop-items-grid"></div>
-            <button class="btn btn-voltar" style="margin-top:12px;" onclick="showScreen('screen-home')">⏴ VOLTAR AO MENU</button>
-        </div>
-
-        <!-- ESTATÍSTICAS -->
-        <div id="screen-stats" class="screen">
-            <h1>📊 PAINEL DO CRAQUE</h1>
-            <div class="menu-modes-grid" style="grid-template-columns: repeat(3, 1fr);">
-                <div class="sub-btn-card"><div style="font-size:22px; color:var(--primary-gold);" id="st-gols">0</div><div>⚽ Gols Marcados</div></div>
-                <div class="sub-btn-card"><div style="font-size:22px; color:var(--primary-gold);" id="st-assists">0</div><div>👟 Assistências</div></div>
-                <div class="sub-btn-card"><div style="font-size:22px; color:var(--primary-gold);" id="st-partidas">0</div><div>🏟️ Partidas</div></div>
-                <div class="sub-btn-card"><div style="font-size:22px; color:#2ecc71;" id="st-vitorias">0</div><div>🟢 Vitórias</div></div>
-                <div class="sub-btn-card"><div style="font-size:22px; color:#e74c3c;" id="st-derrotas">0</div><div>🔴 Derrotas</div></div>
-                <div class="sub-btn-card"><div style="font-size:22px; color:var(--accent-cyan);" id="st-winrate">0%</div><div>📈 Taxa Vitória</div></div>
-            </div>
-            <button class="btn btn-voltar" onclick="showScreen('screen-home')">⏴ VOLTAR</button>
-        </div>
-
-        <!-- LOBBY DO HOST -->
+        <!-- 9. LOBBY HOST -->
         <div id="screen-online-host" class="screen">
-            <h2>SALA DO CAPITÃO CRIADA</h2>
-            <div class="codigo-sala" id="txt-codigo-sala" style="font-size:18px; font-weight:900; color:var(--accent-cyan); padding:8px; background:#000; border-radius:6px; margin:8px 0;">GERANDO SALA...</div>
-            <div style="display:flex; justify-content:center; gap:8px; margin-bottom:8px;">
-                <button class="btn" style="padding:4px 10px; font-size:10px;" onclick="copiarCodigoSala()">📋 COPIAR CÓDIGO DA SALA</button>
-            </div>
-            <div id="host-network-status" style="font-size:11px; color:#a7f3d0; margin-bottom:8px;">Conectando ao broker WebRTC...</div>
-            
-            <div class="lobby-panel" style="display:flex; gap:10px; width:100%; margin:10px 0;">
-                <div class="lobby-team-box" style="flex:1; background:rgba(41,128,185,0.15); border:2px solid #2980b9; padding:10px; border-radius:8px;">
-                    <h3 style="color:#3498db; margin:0 0 6px 0;">TIME AZUL</h3>
-                    <div id="lobby-t1-container" style="display:flex; flex-direction:column; gap:4px;"></div>
+            <div class="screen-card" style="max-width: 650px;">
+                <h2>SALA CRIADA</h2>
+                <div id="txt-codigo-sala" style="font-size:18px; font-weight:900; color:var(--accent-cyan); padding:10px; background:#000; border-radius:6px; margin:10px 0;">GERANDO SALA...</div>
+                <button class="btn" style="padding:6px 12px; font-size:11px; margin-bottom:10px;" onclick="copiarCodigoSala()">📋 COPIAR CÓDIGO DA SALA</button>
+                <div id="host-network-status" style="font-size:12px; color:#a7f3d0; margin-bottom:10px;">Conectando ao broker WebRTC...</div>
+                
+                <div style="display:flex; gap:12px; width:100%; margin:12px 0;">
+                    <div style="flex:1; background:rgba(41,128,185,0.15); border:2px solid #2980b9; padding:10px; border-radius:8px;">
+                        <h3 style="color:#3498db; margin-bottom:6px;">TIME AZUL</h3>
+                        <div id="lobby-t1-container" style="display:flex; flex-direction:column; gap:4px;"></div>
+                    </div>
+                    <div style="flex:1; background:rgba(192,57,43,0.15); border:2px solid #c0392b; padding:10px; border-radius:8px;">
+                        <h3 style="color:#e74c3c; margin-bottom:6px;">TIME VERMELHO</h3>
+                        <div id="lobby-t2-container" style="display:flex; flex-direction:column; gap:4px;"></div>
+                    </div>
                 </div>
-                <div class="lobby-team-box" style="flex:1; background:rgba(192,57,43,0.15); border:2px solid #c0392b; padding:10px; border-radius:8px;">
-                    <h3 style="color:#e74c3c; margin:0 0 6px 0;">TIME VERMELHO</h3>
-                    <div id="lobby-t2-container" style="display:flex; flex-direction:column; gap:4px;"></div>
-                </div>
-            </div>
 
-            <button class="btn btn-avancar" id="btn-host-avancar" onclick="avancarAposLobby()" disabled>AGUARDANDO JOGADORES...</button>
-            <button class="btn btn-voltar" style="margin-top: 10px;" onclick="cancelarOnline()">CANCELAR SALA</button>
+                <button class="btn btn-avancar" id="btn-host-avancar" style="width:100%;" onclick="avancarAposLobby()" disabled>AGUARDANDO JOGADORES...</button>
+                <button class="btn btn-voltar" style="width:100%; margin-top:10px;" onclick="cancelarOnline()">CANCELAR SALA</button>
+            </div>
         </div>
 
-        <!-- CLIENT ESPERANDO -->
+        <!-- 10. CLIENT ESPERANDO -->
         <div id="screen-client-waiting" class="screen">
-            <h2 id="txt-meu-slot-client">CONECTANDO À SALA...</h2>
-            <div class="codigo-sala" style="font-size: 15px; padding:12px; background:#000; border-radius:6px; margin:10px 0; color:var(--primary-gold);" id="txt-status-client-lobby">Iniciando conexão WebRTC...</div>
-            <button class="btn btn-voltar" style="margin-top: 15px;" onclick="cancelarOnline()">DESCONECTAR</button>
-        </div>
-
-        <!-- ESCOLHA DE MODO LOCAL -->
-        <div id="screen-mode" class="screen">
-            <h1>MODALIDADE DE JOGO</h1>
-            <div class="menu-modes-grid" style="grid-template-columns: repeat(4, 1fr); gap: 8px;">
-                <button class="btn" onclick="escolherModo('CLASSICO')">1v1 Duelo</button>
-                <button class="btn" style="background: #165b33;" onclick="escolherModo('CLASSICO_2V2')">2v2 Duplas</button>
-                <button class="btn" style="background: #0d3820;" onclick="escolherModo('CLASSICO_3V3')">3v3 Trio</button>
-                <button class="btn" style="background: #10b981; color:#000;" onclick="escolherModo('CLASSICO_5V5')">⚽ 5v5 Society</button>
+            <div class="screen-card" style="max-width: 500px;">
+                <h2 id="txt-meu-slot-client">CONECTANDO À SALA...</h2>
+                <div style="font-size: 15px; padding:14px; background:#000; border-radius:8px; margin:15px 0; color:var(--primary-gold);" id="txt-status-client-lobby">Iniciando conexão WebRTC...</div>
+                <button class="btn btn-voltar" onclick="cancelarOnline()">DESCONECTAR</button>
             </div>
-            <button class="btn btn-voltar" style="margin-top: 18px;" onclick="showScreen('screen-home')">⏴ VOLTAR</button>
         </div>
 
-        <!-- ESCOLHA DO TAMANHO DE CAMPO -->
-        <div id="screen-field" class="screen">
-            <h1>TAMANHO DO ESTÁDIO</h1>
-            <div class="menu-modes-grid" style="grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                <button class="btn" onclick="escolherCampo(800, 440)">Arena (Pequeno - 800x440)</button>
-                <button class="btn" onclick="escolherCampo(1000, 550)">Padrão (Médio - 1000x550)</button>
-                <button class="btn" onclick="escolherCampo(1200, 660)">Maracanã (Grande - 1200x660)</button>
+        <!-- 11. PASSE DE BATALHA COM 20 NÍVEIS -->
+        <div id="screen-battlepass" class="screen">
+            <div class="screen-card">
+                <h1 style="color:#10b981; font-family:'Rajdhani';">🎫 PASSE DE BATALHA (20 NÍVEIS)</h1>
+                <p style="color:#a7f3d0; font-size:12px; margin-bottom:12px;">Avance de nível jogando partidas para resgatar Bolas, Rastros, Auras e Explosões exclusivas!</p>
+                <div class="pass-track-container"><div class="pass-track" id="pass-track-list"></div></div>
+                <button class="btn btn-voltar" onclick="showScreen('screen-home')">⏴ VOLTAR AO MENU</button>
             </div>
-            <div class="menu-modes-grid" style="grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 6px;">
-                <button class="btn" style="background: linear-gradient(135deg, #8e44ad, #9b59b6);" onclick="escolherCampo(1400, 750)">Titã (Gigante 3v3 - 1400x750)</button>
-                <button class="btn btn-gold" onclick="escolherCampo(1600, 850)">Colosso (Mega 5v5 - 1600x850)</button>
-            </div>
-            <button class="btn btn-voltar" style="margin-top: 18px;" onclick="showScreen('screen-mode')">⏴ VOLTAR</button>
         </div>
 
-        <!-- ESCOLHA DE TIME -->
-        <div id="screen-team" class="screen">
-            <h2 id="title-jogador-team">CAPITÃO: ESCOLHA SEU TIME</h2>
-            <div class="grid-times" id="grid-times"></div>
-            <button class="btn btn-voltar" style="margin-top: 18px;" onclick="voltarDeTimes()">⏴ VOLTAR</button>
-        </div>
-
-        <!-- ESCOLHA DE UNIFORME COM BOTÃO DE VOLTAR E TROCAR TIME -->
-        <div id="screen-uniform" class="screen">
-            <h2 id="title-jogador-uniform">CAPITÃO: UNIFORME OFICIAL</h2>
-            <h1 id="nome-time-escolhido" style="color: #fff; margin-bottom: 0;">TIME</h1>
-            <div class="uniforme-container">
-                <div class="camisa-preview">
-                    <div class="camisa-manga-esq" id="manga-esq"></div>
-                    <div class="camisa-manga-dir" id="manga-dir"></div>
-                    <div class="camisa-corpo" id="camisa-corpo">10</div>
+        <!-- 12. MERCADO DA BOLA -->
+        <div id="screen-shop" class="screen">
+            <div class="screen-card">
+                <h1 style="color:var(--primary-gold); font-family:'Rajdhani';">🛒 MERCADO DA BOLA</h1>
+                <div class="shop-tabs">
+                    <button class="shop-tab-btn active" onclick="filtrarLoja('bolas')">⚽ Bolas (10)</button>
+                    <button class="shop-tab-btn" onclick="filtrarLoja('rastros')">✨ Rastros (8)</button>
+                    <button class="shop-tab-btn" onclick="filtrarLoja('auras')">🔥 Auras (8)</button>
+                    <button class="shop-tab-btn" onclick="filtrarLoja('explosoes')">💥 Explosões Gol (6)</button>
                 </div>
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                    <label><input type="radio" name="uni-select" value="1" checked onchange="atualizarPreview()"> Uniforme 1 Titular</label>
-                    <label><input type="radio" name="uni-select" value="2" onchange="atualizarPreview()"> Uniforme 2 Reserva</label>
+                <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:10px;">
+                    <div style="font-weight:900; color:var(--primary-gold);">SALDO: 🪙 <span id="shop-moedas-val">0</span></div>
+                    <button class="btn btn-pix" style="padding:6px 12px; font-size:10px;" onclick="abrirModalComprarMoedasPix()">+ COMPRAR MAIS MOEDAS</button>
+                </div>
+                <div class="shop-grid" id="shop-items-grid"></div>
+                <button class="btn btn-voltar" style="margin-top:15px;" onclick="showScreen('screen-home')">⏴ VOLTAR AO MENU</button>
+            </div>
+        </div>
+
+        <!-- 13. ESTATÍSTICAS -->
+        <div id="screen-stats" class="screen">
+            <div class="screen-card" style="max-width: 700px;">
+                <h1 style="color:#10b981; font-family:'Rajdhani';">📊 PAINEL DO CRAQUE</h1>
+                <div class="main-modes-grid" style="grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0;">
+                    <div class="sub-feature-btn"><div style="font-size:24px; color:var(--primary-gold);" id="st-gols">0</div><div>⚽ Gols</div></div>
+                    <div class="sub-feature-btn"><div style="font-size:24px; color:var(--primary-gold);" id="st-assists">0</div><div>👟 Assistências</div></div>
+                    <div class="sub-feature-btn"><div style="font-size:24px; color:var(--primary-gold);" id="st-partidas">0</div><div>🏟️ Partidas</div></div>
+                    <div class="sub-feature-btn"><div style="font-size:24px; color:#2ecc71;" id="st-vitorias">0</div><div>🟢 Vitórias</div></div>
+                    <div class="sub-feature-btn"><div style="font-size:24px; color:#e74c3c;" id="st-derrotas">0</div><div>🔴 Derrotas</div></div>
+                    <div class="sub-feature-btn"><div style="font-size:24px; color:var(--accent-cyan);" id="st-winrate">0%</div><div>📈 Win Rate</div></div>
+                </div>
+                <button class="btn btn-voltar" onclick="showScreen('screen-home')">⏴ VOLTAR</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL DE COMPRA DE MOEDAS VIA PIX (CHAVE: 67981520229) -->
+    <div id="modal-comprar-moedas" class="modal-overlay">
+        <div class="modal-box" style="border-color: #00f2fe;">
+            <div class="modal-header">
+                <h2 style="color:#00f2fe; margin:0;">🪙 BANCO IAES - COMPRAR MOEDAS</h2>
+                <span style="font-size:11px; color:#10b981; font-weight:bold;">⚡ 1 REAL = 1.000 MOEDAS</span>
+            </div>
+            <p style="font-size:12px; color:#a7f3d0; margin-bottom:12px;">Faça o PIX para a chave oficial. O Administrador confirmará seu pagamento para liberar suas moedas!</p>
+
+            <div style="background:#04140b; border:1.5px solid #10b981; border-radius:10px; padding:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div>
+                    <div style="font-size:10px; color:#a7f3d0; font-weight:bold;">CHAVE PIX OFICIAL (CELULAR):</div>
+                    <div style="font-size:18px; font-weight:900; color:var(--primary-gold); font-family:monospace; letter-spacing:1px;" id="txt-chave-pix">67981520229</div>
+                </div>
+                <button class="btn btn-gold" style="padding:8px 14px; font-size:11px;" onclick="copiarChavePix()">📋 COPIAR CHAVE PIX</button>
+            </div>
+
+            <div class="pix-grid">
+                <div class="pix-card" onclick="selecionarPacoteMoedas(1000, 1.00, 'PACOTE INICIANTE')">
+                    <div style="font-size:22px;">🪙</div>
+                    <div class="pix-moedas">1.000 MOEDAS</div>
+                    <div class="pix-preco">R$ 1,00</div>
+                    <button class="btn btn-pix" style="padding:4px; font-size:9px;">SELECIONAR</button>
+                </div>
+
+                <div class="pix-card" onclick="selecionarPacoteMoedas(5000, 5.00, 'PACOTE CRAQUE')">
+                    <div style="font-size:22px;">🪙🪙</div>
+                    <div class="pix-moedas">5.000 MOEDAS</div>
+                    <div class="pix-preco">R$ 5,00</div>
+                    <button class="btn btn-pix" style="padding:4px; font-size:9px;">SELECIONAR</button>
+                </div>
+
+                <div class="pix-card" style="border-color:var(--primary-gold);" onclick="selecionarPacoteMoedas(12000, 10.00, 'PACOTE CAMPEÃO (+20% BÔNUS)')">
+                    <div style="font-size:22px;">👑</div>
+                    <div class="pix-moedas">12.000 MOEDAS</div>
+                    <div class="pix-preco">R$ 10,00 <span style="font-size:9px; color:#10b981;">(+2k BÔNUS)</span></div>
+                    <button class="btn btn-gold" style="padding:4px; font-size:9px;">POPULAR ⭐</button>
+                </div>
+
+                <div class="pix-card" onclick="selecionarPacoteMoedas(31000, 25.00, 'PACOTE PROFISSIONAL')">
+                    <div style="font-size:22px;">💎</div>
+                    <div class="pix-moedas">31.000 MOEDAS</div>
+                    <div class="pix-preco">R$ 25,00 <span style="font-size:9px; color:#10b981;">(+6k BÔNUS)</span></div>
+                    <button class="btn btn-pix" style="padding:4px; font-size:9px;">SELECIONAR</button>
+                </div>
+
+                <div class="pix-card" style="border-color:#e74c3c;" onclick="selecionarPacoteMoedas(65000, 50.00, 'PACOTE MITOLÓGICO')">
+                    <div style="font-size:22px;">🌌</div>
+                    <div class="pix-moedas">65.000 MOEDAS</div>
+                    <div class="pix-preco">R$ 50,00 <span style="font-size:9px; color:#10b981;">(+15k BÔNUS)</span></div>
+                    <button class="btn" style="background:#e74c3c; padding:4px; font-size:9px;">MEGA OFERTA 🔥</button>
+                </div>
+
+                <div class="pix-card" style="border-color:var(--primary-gold);" onclick="selecionarPacoteMoedas(140000, 100.00, 'PACOTE DONO DA BOLA')">
+                    <div style="font-size:22px;">🏆</div>
+                    <div class="pix-moedas">140.000 MOEDAS</div>
+                    <div class="pix-preco">R$ 100,00 <span style="font-size:9px; color:#10b981;">(+40k BÔNUS)</span></div>
+                    <button class="btn btn-gold" style="padding:4px; font-size:9px;">V.I.P 🏆</button>
                 </div>
             </div>
-            <div style="display:flex; gap:12px; width:80%; max-width:400px; margin-top:10px;">
-                <button class="btn btn-voltar" style="flex:1; margin:0;" onclick="voltarParaEscolherOutroTime()">⏴ TROCAR TIME</button>
-                <button class="btn btn-avancar" style="flex:1; margin:0;" onclick="confirmarUniforme()">JOGAR ➔</button>
+
+            <!-- CHECKOUT PIX -->
+            <div id="pix-checkout-box" style="display:none; background:#04140b; border:1.5px solid #10b981; border-radius:10px; padding:14px; margin-top:12px; text-align:center;">
+                <div id="pix-checkout-title" style="font-weight:900; color:var(--primary-gold); font-size:14px;">PEDIDO SELECIONADO</div>
+                <div style="font-size:13px; color:#a7f3d0; margin:6px 0;" id="pix-checkout-desc">Valor: R$ 1,00 | Moedas: +1.000 🪙</div>
+                
+                <div style="font-size:11px; color:#cbd5e1; margin:10px 0 4px 0; text-align:left;">Nome de quem fez o PIX (Para o Admin identificar):</div>
+                <input type="text" id="input-pix-nome-pagador" class="input-iaes" style="text-align:left; margin-bottom:10px;" placeholder="Ex: Murilo Silva (Nome no comprovante)">
+
+                <div style="display:flex; gap:10px; justify-content:center;">
+                    <button class="btn btn-avancar" style="flex:1;" onclick="enviarPedidoPixParaAdmin()">✅ JÁ FIZ O PIX / ENVIAR AO ADM</button>
+                    <button class="btn btn-voltar" style="flex:1;" onclick="fecharCheckoutPix()">CANCELAR</button>
+                </div>
             </div>
+
+            <button class="btn btn-voltar" style="width:100%; margin-top:15px;" onclick="fecharModalComprarMoedas()">FECHAR</button>
         </div>
     </div>
 
-    <!-- MODAL DO PAINEL DE ADMINISTRAÇÃO EXCLUSIVO COM GESTÃO DE PIX -->
+    <!-- MODAL DO PAINEL DE ADMINISTRAÇÃO MASTER -->
     <div id="modal-admin" class="modal-overlay">
         <div class="modal-box" style="border-color: #e67e22;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h2 style="margin:0; color:#f39c12;">👑 PAINEL MASTER ADMIN</h2>
-                <span style="font-size:10px; background:#e74c3c; padding:2px 6px; border-radius:4px; font-weight:bold;">AUTORIZADO</span>
+            <div class="modal-header">
+                <h2 style="color:#f39c12; margin:0;">👑 PAINEL MASTER ADMIN</h2>
+                <span style="font-size:10px; background:#e74c3c; padding:3px 8px; border-radius:4px; font-weight:bold;">AUTORIZADO</span>
             </div>
 
-            <!-- SEÇÃO DE APROVAÇÃO DE PEDIDOS PIX -->
+            <!-- SEÇÃO DE APROVAÇÃO PIX -->
             <div class="admin-section" style="border-color:#00f2fe;">
                 <div class="admin-section-title" style="color:#00f2fe; display:flex; justify-content:space-between;">
                     <span>💳 Pedidos de PIX Pendentes (Chave: 67981520229)</span>
-                    <button class="btn" style="padding:2px 6px; font-size:9px;" onclick="carregarPedidosPixAdmin()">🔄 Atualizar</button>
+                    <button class="btn" style="padding:2px 8px; font-size:9px;" onclick="carregarPedidosPixAdmin()">🔄 Atualizar</button>
                 </div>
                 <div id="admin-pix-pedidos-container" style="max-height:160px; overflow-y:auto; margin-top:6px;">
                     <div style="font-size:11px; color:#a7f3d0; padding:6px;">Nenhum pedido de PIX pendente no momento.</div>
                 </div>
             </div>
 
-            <!-- ECONOMIA & RECURSOS -->
+            <!-- ECONOMIA & MOEDAS -->
             <div class="admin-section">
                 <div class="admin-section-title">🪙 Economia & Moedas</div>
                 <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px;">
@@ -820,13 +793,13 @@
                 </div>
             </div>
 
-            <!-- MODIFICAÇÃO DE FÍSICA IN-GAME -->
+            <!-- MODIFICADORES IN-GAME -->
             <div class="admin-section">
                 <div class="admin-section-title">⚡ Modificadores de Partida & Física</div>
                 <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px;">
                     <button class="btn" style="padding:6px; font-size:10px;" onclick="adminToggleVelocidade(1.0)">Velocidade 1x</button>
                     <button class="btn" style="padding:6px; font-size:10px;" onclick="adminToggleVelocidade(1.5)">⚡ Turbo 1.5x</button>
-                    <button class="btn btn-admin" style="padding:6px; font-size:10px;" onclick="adminToggleVelocidade(2.2)">🔥 Flash 2.2x</button>
+                    <button class="btn btn-voltar" style="padding:6px; font-size:10px;" onclick="adminToggleVelocidade(2.2)">🔥 Flash 2.2x</button>
                 </div>
                 <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:6px; margin-top:6px;">
                     <button class="btn" style="padding:6px; font-size:10px;" onclick="adminZerarPlacar()">🔄 Zerar Placar (0x0)</button>
@@ -843,30 +816,56 @@
                 </div>
             </div>
 
-            <button class="btn btn-avancar" style="margin:0; padding:10px;" onclick="fecharModalAdmin()">FECHAR PAINEL ADM</button>
+            <button class="btn btn-avancar" style="width:100%; padding:10px;" onclick="fecharModalAdmin()">FECHAR PAINEL ADM</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE RANK GLOBAL -->
+    <div id="modal-leaderboard" class="modal-overlay">
+        <div class="modal-box" style="border-color: var(--primary-gold);">
+            <div class="modal-header">
+                <h2 style="margin:0; color:var(--primary-gold);">🏆 RANKING GLOBAL DE PDL</h2>
+                <span style="font-size:11px; color:#10b981; font-weight:bold;">TEMPORADA 1</span>
+            </div>
+            <div style="max-height:360px; overflow-y:auto; margin-bottom:14px;">
+                <table style="width:100%; border-collapse:collapse; font-size:12px;">
+                    <thead>
+                        <tr style="background:#04140b; color:#a7f3d0; text-align:left;">
+                            <th style="padding:10px 8px;">#</th>
+                            <th style="padding:10px 8px;">Jogador</th>
+                            <th style="padding:10px 8px;">Elo / PDL</th>
+                            <th style="padding:10px 8px;">Vitórias</th>
+                            <th style="padding:10px 8px;">Nível</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-tbody"></tbody>
+                </table>
+            </div>
+            <button class="btn btn-voltar" style="width:100%; margin:0;" onclick="fecharLeaderboardGlobal()">FECHAR</button>
         </div>
     </div>
 
     <!-- MODAL DE AMIGOS & GRUPO -->
     <div id="modal-amigos" class="modal-overlay">
         <div class="modal-box">
-            <h2 style="margin-top:0; color:var(--accent-cyan);">👥 AMIGOS & GRUPO 2V2/3V3</h2>
+            <div class="modal-header">
+                <h2 style="margin:0; color:var(--accent-cyan);">👥 AMIGOS & GRUPO 2V2/3V3</h2>
+            </div>
             
-            <div style="display:flex; gap:8px; margin-bottom:12px;">
-                <input type="text" id="input-add-amigo" class="input-sala" style="margin:0; width:100%; text-align:left;" placeholder="Digite o nickname exato..." maxlength="16">
-                <button class="btn" style="padding:8px 14px;" onclick="adicionarAmigoPorNick()">ADICIONAR</button>
+            <div style="display:flex; gap:8px; margin-bottom:14px;">
+                <input type="text" id="input-add-amigo" class="input-iaes" style="margin:0; text-align:left;" placeholder="Digite o nickname exato..." maxlength="16">
+                <button class="btn" style="padding:10px 16px;" onclick="adicionarAmigoPorNick()">ADICIONAR</button>
             </div>
 
-            <!-- GRUPO ATUAL -->
-            <div style="background: rgba(0, 242, 254, 0.08); border: 2px solid #00f2fe; border-radius: 8px; padding: 10px; margin-bottom: 12px;">
+            <div style="background: rgba(0, 242, 254, 0.08); border: 2px solid #00f2fe; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
                 <div style="font-size:11px; font-weight:900; color:#00f2fe; margin-bottom:6px;">LOBBY DO GRUPO (RANKED)</div>
-                <div id="grupo-membros-list" style="font-size:12px; font-weight:bold;">Carregando grupo...</div>
-                <div id="grupo-acoes-box" style="margin-top:8px; display:flex; gap:6px;"></div>
+                <div id="grupo-membros-list" style="font-size:13px; font-weight:bold;">Carregando grupo...</div>
+                <div id="grupo-acoes-box" style="margin-top:10px; display:flex; gap:8px;"></div>
             </div>
 
-            <div style="font-size:11px; font-weight:bold; color:#cbd5e1; margin-bottom:6px;">MEUS AMIGOS:</div>
-            <div id="lista-amigos-container" style="max-height:180px; overflow-y:auto; margin-bottom:12px;">
-                <div style="font-size:11px; color:#a7f3d0;">Nenhum amigo adicionado ainda.</div>
+            <div style="font-size:12px; font-weight:bold; color:#cbd5e1; margin-bottom:8px;">MEUS AMIGOS:</div>
+            <div id="lista-amigos-container" style="max-height:180px; overflow-y:auto; margin-bottom:14px;">
+                <div style="font-size:12px; color:#a7f3d0;">Nenhum amigo adicionado ainda.</div>
             </div>
 
             <button class="btn btn-voltar" style="width:100%; margin:0;" onclick="fecharModalAmigos()">FECHAR</button>
@@ -876,12 +875,14 @@
     <!-- MODAL DE CRIAR SALA -->
     <div id="modal-criar-sala" class="modal-overlay">
         <div class="modal-box">
-            <h2 style="margin-top:0;">➕ CRIAR NOVA SALA</h2>
+            <div class="modal-header">
+                <h2 style="margin:0;">➕ CRIAR NOVA SALA</h2>
+            </div>
             <label style="font-size:12px; font-weight:bold; color:#cbd5e1;">Nome da Sala:</label>
-            <input type="text" id="modal-input-nome" class="input-sala" style="width:100%; text-align:left; margin-top:4px;" value="⚡ SALA OFICIAL IAES" maxlength="30">
+            <input type="text" id="modal-input-nome" class="input-iaes" style="text-align:left; margin-top:4px;" value="⚡ SALA OFICIAL IAES" maxlength="30">
 
             <label style="font-size:12px; font-weight:bold; color:#cbd5e1; margin-top:8px; display:block;">Modalidade:</label>
-            <select id="modal-select-modo" style="width:100%; padding:10px; background:#04140b; color:#fff; border:2px solid #10b981; border-radius:6px; font-weight:bold; margin-top:4px;">
+            <select id="modal-select-modo" style="width:100%; padding:12px; background:#04140b; color:#fff; border:2px solid #10b981; border-radius:8px; font-weight:bold; margin-top:4px; outline:none;">
                 <option value="CLASSICO">1v1 Duelo</option>
                 <option value="CLASSICO_2V2">2v2 Duplas</option>
                 <option value="CLASSICO_3V3">3v3 Trio</option>
@@ -889,7 +890,7 @@
             </select>
 
             <label style="font-size:12px; font-weight:bold; color:#cbd5e1; margin-top:8px; display:block;">Estádio:</label>
-            <select id="modal-select-estadio" style="width:100%; padding:10px; background:#04140b; color:#fff; border:2px solid #10b981; border-radius:6px; font-weight:bold; margin-top:4px;">
+            <select id="modal-select-estadio" style="width:100%; padding:12px; background:#04140b; color:#fff; border:2px solid #10b981; border-radius:8px; font-weight:bold; margin-top:4px; outline:none;">
                 <option value="800,440">Arena (Pequeno - 800x440)</option>
                 <option value="1000,550">Padrão (Médio - 1000x550)</option>
                 <option value="1200,660">Maracanã (Grande - 1200x660)</option>
@@ -898,11 +899,11 @@
             </select>
 
             <label style="font-size:12px; font-weight:bold; color:#cbd5e1; margin-top:8px; display:block;">Senha (Opcional):</label>
-            <input type="text" id="modal-input-pass" class="input-sala" style="width:100%; text-align:left; margin-top:4px;" placeholder="Deixe em branco para pública" maxlength="15">
+            <input type="text" id="modal-input-pass" class="input-iaes" style="text-align:left; margin-top:4px;" placeholder="Deixe em branco para pública" maxlength="15">
 
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <button class="btn btn-avancar" style="margin:0;" onclick="confirmarCriacaoSala()">CRIAR E ABRIR LOBBY</button>
-                <button class="btn btn-voltar" style="margin:0;" onclick="fecharModalCriarSala()">CANCELAR</button>
+            <div style="display:flex; gap:10px; margin-top:18px;">
+                <button class="btn btn-avancar" style="flex:1;" onclick="confirmarCriacaoSala()">CRIAR SALA</button>
+                <button class="btn btn-voltar" style="flex:1;" onclick="fecharModalCriarSala()">CANCELAR</button>
             </div>
         </div>
     </div>
@@ -910,21 +911,29 @@
     <!-- MODAL DE CONFIGURAÇÕES DE ÁUDIO -->
     <div id="modal-configuracoes" class="modal-overlay">
         <div class="modal-box">
-            <h2 style="margin-top:0; color:var(--primary-gold);">⚙️ CONFIGURAÇÕES DE ÁUDIO</h2>
+            <div class="modal-header">
+                <h2 style="margin:0; color:var(--primary-gold);">⚙️ CONFIGURAÇÕES DE ÁUDIO</h2>
+            </div>
             
-            <div class="config-row">
-                <label><span>🔊 Volume Geral</span><span id="txt-vol-master">80%</span></label>
-                <input type="range" id="slider-vol-master" class="config-slider" min="0" max="100" value="80" oninput="ajustarVolumes()">
+            <div style="margin-bottom:14px;">
+                <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:800; color:#cbd5e1; margin-bottom:4px;">
+                    <span>🔊 Volume Geral</span><span id="txt-vol-master">80%</span>
+                </div>
+                <input type="range" id="slider-vol-master" style="width:100%; accent-color:#10b981;" min="0" max="100" value="80" oninput="ajustarVolumes()">
             </div>
 
-            <div class="config-row">
-                <label><span>⚽ Efeitos Sonoros (SFX)</span><span id="txt-vol-sfx">80%</span></label>
-                <input type="range" id="slider-vol-sfx" class="config-slider" min="0" max="100" value="80" oninput="ajustarVolumes()">
+            <div style="margin-bottom:14px;">
+                <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:800; color:#cbd5e1; margin-bottom:4px;">
+                    <span>⚽ Efeitos Sonoros (SFX)</span><span id="txt-vol-sfx">80%</span>
+                </div>
+                <input type="range" id="slider-vol-sfx" style="width:100%; accent-color:#10b981;" min="0" max="100" value="80" oninput="ajustarVolumes()">
             </div>
 
-            <div class="config-row">
-                <label><span>🎵 Música de Fundo</span><span id="txt-vol-music">50%</span></label>
-                <input type="range" id="slider-vol-music" class="config-slider" min="0" max="100" value="50" oninput="ajustarVolumes()">
+            <div style="margin-bottom:14px;">
+                <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:800; color:#cbd5e1; margin-bottom:4px;">
+                    <span>🎵 Música de Fundo</span><span id="txt-vol-music">50%</span>
+                </div>
+                <input type="range" id="slider-vol-music" style="width:100%; accent-color:#10b981;" min="0" max="100" value="50" oninput="ajustarVolumes()">
             </div>
 
             <div style="margin: 15px 0;">
@@ -933,55 +942,54 @@
                 </label>
             </div>
 
-            <div style="display:flex; gap:10px; margin-top:18px;">
-                <button class="btn btn-avancar" style="margin:0;" onclick="fecharModalConfiguracoes()">SALVAR E FECHAR</button>
+            <button class="btn btn-avancar" style="width:100%; margin-top:15px;" onclick="fecharModalConfiguracoes()">SALVAR E FECHAR</button>
+        </div>
+    </div>
+
+    <!-- TELA IN-GAME COMPLETA (CANVAS & HUD) -->
+    <div id="game-screen-container">
+        <button id="btn-voltar-partida" class="btn-ingame" onclick="voltarMenu()">🚪 SAIR</button>
+        <button id="btn-config-ingame" class="btn-ingame" onclick="abrirModalConfiguracoes()">⚙️ SOM</button>
+        <button id="btn-admin-ingame" class="btn-ingame" onclick="abrirModalAdmin()">👑 ADM</button>
+
+        <div id="top-bar">
+            <div class="tv-scoreboard-badge" id="tv-badge-status">1º TEMPO • IAES CUP</div>
+            <div class="team-box-broadcast t1">
+                <div class="team-flag-color" id="badge-color-p1"></div>
+                <div class="time-nome-tv" id="nome-p1">PAL</div>
+                <div class="score-box-tv" id="score1">0</div>
+                <div class="penalty-dots-box" id="p1-dots" style="display:none;"></div>
+            </div>
+            <div class="match-timer-tv" id="timer">1º T • 01:30</div>
+            <div class="team-box-broadcast t2">
+                <div class="penalty-dots-box" id="p2-dots" style="display:none;"></div>
+                <div class="score-box-tv" id="score2">0</div>
+                <div class="time-nome-tv" id="nome-p2">COR</div>
+                <div class="team-flag-color" id="badge-color-p2"></div>
             </div>
         </div>
-    </div>
 
-    <!-- HUD DA PARTIDA - PLACAR TV -->
-    <button id="btn-voltar-partida" class="btn-ingame" onclick="voltarMenu()">🚪 SAIR</button>
-    <button id="btn-config-ingame" class="btn-ingame" onclick="abrirModalConfiguracoes()">⚙️ SOM</button>
-    <button id="btn-admin-ingame" class="btn-ingame" onclick="abrirModalAdmin()">👑 ADM</button>
-
-    <div id="top-bar">
-        <div class="tv-scoreboard-badge" id="tv-badge-status">1º TEMPO • IAES CUP</div>
-        <div class="team-box-broadcast t1">
-            <div class="team-flag-color" id="badge-color-p1"></div>
-            <div class="time-nome-tv" id="nome-p1">PAL</div>
-            <div class="score-box-tv" id="score1">0</div>
-            <div class="penalty-dots-box" id="p1-dots" style="display:none;"></div>
-        </div>
-        <div class="match-timer-tv" id="timer">1º T • 01:30</div>
-        <div class="team-box-broadcast t2">
-            <div class="penalty-dots-box" id="p2-dots" style="display:none;"></div>
-            <div class="score-box-tv" id="score2">0</div>
-            <div class="time-nome-tv" id="nome-p2">COR</div>
-            <div class="team-flag-color" id="badge-color-p2"></div>
-        </div>
-    </div>
-
-    <!-- ÁREA DE JOGO -->
-    <div id="game-wrapper" tabindex="0">
-        <canvas id="field-canvas"></canvas>
-        <div id="matter-container"></div>
-        <div id="bar-top" class="cine-bar"></div>
-        <div id="bar-bottom" class="cine-bar"></div>
-        
-        <div id="mensagem-overlay">
-            <div id="texto-gol">GOL!</div>
-            <div id="texto-assist"></div>
-            <div id="texto-estado"></div>
-            <div id="recompensas-partida"></div>
+        <div id="game-wrapper" tabindex="0">
+            <canvas id="field-canvas"></canvas>
+            <div id="matter-container"></div>
+            <div id="bar-top" class="cine-bar"></div>
+            <div id="bar-bottom" class="cine-bar"></div>
             
-            <div id="botoes-fim-jogo" style="display: none; gap: 12px; margin-top: 18px; flex-direction: row; z-index: 50;">
-                <button class="btn btn-avancar" style="margin-top:0;" onclick="jogarNovamente()">JOGAR NOVAMENTE</button>
-                <button class="btn btn-voltar" style="margin-top:0;" onclick="voltarMenu()">VOLTAR AO MENU</button>
+            <div id="mensagem-overlay">
+                <div id="texto-gol">GOL!</div>
+                <div id="texto-assist"></div>
+                <div id="texto-estado"></div>
+                <div id="recompensas-partida"></div>
+                
+                <div id="botoes-fim-jogo" style="display: none; gap: 12px; margin-top: 18px; flex-direction: row; z-index: 50;">
+                    <button class="btn btn-avancar" onclick="jogarNovamente()">JOGAR NOVAMENTE</button>
+                    <button class="btn btn-voltar" onclick="voltarMenu()">VOLTAR AO MENU</button>
+                </div>
             </div>
+            
+            <div id="indicador-replay">🔴 REPLAY OFICIAL</div>
+            <button id="btn-skip-replay" class="btn-ingame" onclick="votarPular()">PULAR ⏭</button>
         </div>
-        
-        <div id="indicador-replay">🔴 REPLAY OFICIAL</div>
-        <button id="btn-skip-replay" class="btn-ingame" onclick="votarPular()">PULAR ⏭</button>
     </div>
 
     <script>
@@ -1222,7 +1230,7 @@
             AudioEngine.salvarPreferencias();
         }
 
-        // --- PAINEL DE ADMINISTRAÇÃO MASTER (EXCLUSIVO PARA QUEM LOGAR COMO ADMIN) ---
+        // --- PAINEL DE ADMINISTRAÇÃO MASTER ---
         let adminVelocidadeMultiplicador = 1.0;
 
         function verificarAdminAutorizado() {
@@ -1259,8 +1267,7 @@
         function adminDefinirNivelMax() {
             if (!verificarAdminAutorizado()) return;
             AudioEngine.playVictoryFanfare();
-            meuPerfil.nivel = 20;
-            meuPerfil.xp = 0;
+            meuPerfil.nivel = 20; meuPerfil.xp = 0;
             salvarPerfil(); atualizarPerfilUI();
             mostrarToast("👑 ADM: Nível 20 Definido! Todos os prêmios do Passe desbloqueados!");
         }
@@ -1384,7 +1391,6 @@
                         criadoEm: firebase.firestore.FieldValue.serverTimestamp()
                     });
 
-                    // Notifica o admin
                     await db.collection("notificacoes").add({
                         tipo: 'pix_pendente',
                         remetenteUid: auth.currentUser.uid,
@@ -1396,7 +1402,6 @@
                         criadoEm: firebase.firestore.FieldValue.serverTimestamp()
                     }).catch(()=>{});
 
-                    // Escuta aprovação do pedido em tempo real para o jogador
                     db.collection("pedidos_pix").doc(pedidoId).onSnapshot(doc => {
                         if (doc.exists) {
                             const d = doc.data();
@@ -1405,7 +1410,7 @@
                                 meuPerfil.moedas = (meuPerfil.moedas || 0) + d.moedas;
                                 salvarPerfil();
                                 atualizarPerfilUI();
-                                mostrarToast(`🎉 SEU PIX FOI APROVADO PELO ADMIN! +${d.moedas.toLocaleString()} 🪙 adicionadas!`);
+                                mostrarToast(`🎉 SEU PIX FOI APROVADO PELO ADMIN! +${d.moedas.toLocaleString()} 🪙 creditadas!`);
                             }
                         }
                     });
@@ -1462,13 +1467,11 @@
                 if (db) {
                     await db.collection("pedidos_pix").doc(docId).update({ status: 'aprovado' });
 
-                    // Se for o próprio perfil do admin logado
                     if (meuPerfil.uid === jogadorUid) {
                         meuPerfil.moedas = (meuPerfil.moedas || 0) + moedas;
                         salvarPerfil();
                         atualizarPerfilUI();
                     } else {
-                        // Atualiza o documento do jogador no Firestore
                         try {
                             const userRef = db.collection("jogadores").doc(jogadorUid);
                             const userDoc = await userRef.get();
@@ -1495,7 +1498,7 @@
             carregarPedidosPixAdmin();
         }
 
-        // --- SISTEMA DE LEADERBOARD GLOBAL DE PDL (HALL DA FAMA) ---
+        // --- SISTEMA DE LEADERBOARD GLOBAL DE PDL ---
         async function abrirLeaderboardGlobal() {
             AudioEngine.playClick();
             uiShow('modal-leaderboard', 'flex');
@@ -1538,11 +1541,11 @@
                 if (idx === 2) rankIcon = '🥉 3º';
 
                 tr.innerHTML = `
-                    <td style="padding:7px 6px; font-weight:900; color:${idx < 3 ? 'var(--primary-gold)' : '#fff'};">${rankIcon}</td>
-                    <td style="padding:7px 6px; font-weight:bold; color:#fff;">${p.nome} ${isMe ? '<span style="color:#10b981;">(VOCÊ)</span>' : ''}</td>
-                    <td style="padding:7px 6px; font-weight:900; color:var(--primary-gold);">${p.elo || 1000} PDL</td>
-                    <td style="padding:7px 6px; color:#10b981; font-weight:bold;">${p.vitorias || 0}</td>
-                    <td style="padding:7px 6px; color:#a7f3d0;">Nvl ${p.nivel || 1}</td>
+                    <td style="padding:8px; font-weight:900; color:${idx < 3 ? 'var(--primary-gold)' : '#fff'};">${rankIcon}</td>
+                    <td style="padding:8px; font-weight:bold; color:#fff;">${p.nome} ${isMe ? '<span style="color:#10b981;">(VOCÊ)</span>' : ''}</td>
+                    <td style="padding:8px; font-weight:900; color:var(--primary-gold);">${p.elo || 1000} PDL</td>
+                    <td style="padding:8px; color:#10b981; font-weight:bold;">${p.vitorias || 0}</td>
+                    <td style="padding:8px; color:#a7f3d0;">Nvl ${p.nivel || 1}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1610,7 +1613,7 @@
             ]
         };
 
-        // --- 20 NÍVEIS DO PASSE DE BATALHA COM COSMÉTICOS EXCLUSIVOS ---
+        // --- 20 NÍVEIS DO PASSE DE BATALHA ---
         const PASSE_TIERS = [
             { tier: 1, recompensa: '🪙 150 Moedas', tipo: 'moedas', qtd: 150, icon: '🪙', nome: 'Estreia no Campo' },
             { tier: 2, recompensa: '✨ Rastro de Ouro', tipo: 'item', id: 'rastro_ouro', cat: 'rastros', icon: '✨', nome: 'Toque Dourado' },
@@ -1634,7 +1637,7 @@
             { tier: 20, recompensa: '🌌 Bola Cósmica + 3.000 🪙', tipo: 'combo', id: 'bola_arcoiris', qtd: 3000, icon: '🌌', nome: 'Lenda Suprema' }
         ];
 
-        // --- VARIÁVEIS GLOBAIS DE PARTIDA COM 2 TEMPOS & PÊNALTIS ---
+        // --- VARIÁVEIS GLOBAIS DE PARTIDA ---
         let engine, render, runner, bola;
         let estadoJogo = 'MENU';
         let delayTimer = 0;
@@ -1651,7 +1654,6 @@
         let modoDeJogo = 'CLASSICO';
         let isRanked = false;
 
-        // ESTADO DO MODO DE PÊNALTIS
         let isPenaltiesMode = false;
         let penaltyRound = 1;
         let penaltyTurn = 1;
@@ -1674,9 +1676,8 @@
             passeResgatados: [], amigos: []
         };
 
-        // --- SISTEMA DE MATCHMAKING & GRUPOS (PARTY) ---
+        // --- MATCHMAKING & GRUPOS ---
         let matchmakingInterval = null, matchmakingSeconds = 0, myMatchTicketId = null;
-        let mmPollInterval = null;
         let meuGrupo = { id: null, lider: null, membros: [] };
         let convitePendente = null;
 
@@ -1708,7 +1709,7 @@
             if (myMatchTicketId && db) db.collection("matchmaking").doc(myMatchTicketId).delete().catch(() => {});
         });
 
-        // --- CONTROLES DE TECLADO ---
+        // --- TECLADO ---
         const keys = {};
         function handleKeyDown(e) {
             AudioEngine.init();
@@ -1738,7 +1739,7 @@
             if (wrapper) wrapper.focus();
         }
 
-        // --- FIREBASE AUTH ---
+        // --- AUTH ---
         function emailFromNick(nick) {
             return `player_${nick.toLowerCase().replace(/[^a-z0-9]/g, '')}@iaesball.app`;
         }
@@ -1840,10 +1841,7 @@
             AudioEngine.playClick();
             if(auth) await auth.signOut().catch(()=>{});
             meuPerfil.isAdmin = false;
-            uiHide('perfil-ui'); 
-            uiHide('btn-menu-admin');
-            uiHide('perfil-admin-badge');
-            uiHide('btn-admin-ingame');
+            uiHide('top-nav-bar');
             showScreen('screen-login');
         }
 
@@ -1860,29 +1858,23 @@
         function adicionarMoedas(qtd) { meuPerfil.moedas += qtd; salvarPerfil(); atualizarPerfilUI(); }
 
         function atualizarPerfilUI() {
-            uiShow('perfil-ui'); uiText('perfil-nome', meuPerfil.nome);
-            uiText('perfil-nivel-badge', `NVL ${meuPerfil.nivel}`);
-            uiText('perfil-rank', `RANKED (${meuPerfil.elo || 1000} PDL)`);
-            uiText('perfil-moedas-val', (meuPerfil.moedas || 0).toLocaleString());
+            uiShow('top-nav-bar', 'flex');
+            uiText('nav-nome-txt', meuPerfil.nome);
+            uiText('nav-nivel-badge', `NVL ${meuPerfil.nivel}`);
+            uiText('nav-rank-txt', `${meuPerfil.elo || 1000} PDL`);
+            uiText('nav-moedas-txt', (meuPerfil.moedas || 0).toLocaleString());
 
             const isAdm = verificarAdminAutorizado();
             if (isAdm) {
-                uiShow('perfil-admin-badge', 'inline-block');
-                uiShow('btn-menu-admin', 'flex');
+                uiShow('nav-btn-admin', 'flex');
                 uiShow('btn-admin-ingame', 'block');
-                document.getElementById('menu-sub-botoes').style.gridTemplateColumns = 'repeat(7, 1fr)';
             } else {
-                uiHide('perfil-admin-badge');
-                uiHide('btn-menu-admin');
+                uiHide('nav-btn-admin');
                 uiHide('btn-admin-ingame');
-                document.getElementById('menu-sub-botoes').style.gridTemplateColumns = 'repeat(6, 1fr)';
             }
-
-            const perc = Math.min(100, Math.floor((meuPerfil.xp / (meuPerfil.nivel * 500)) * 100));
-            const bar = document.getElementById('perfil-xp-bar'); if(bar) bar.style.width = perc + '%';
         }
 
-        // --- SISTEMA DE AMIGOS E GRUPOS (PARTY) ---
+        // --- SISTEMA DE AMIGOS E GRUPOS ---
         function escutarNotificacoesUsuario() {
             if (!db || !auth || !auth.currentUser) return;
             try {
@@ -1948,20 +1940,20 @@
             cont.innerHTML = '';
             const amigos = meuPerfil.amigos || [];
             if (amigos.length === 0) {
-                cont.innerHTML = '<div style="font-size:11px; color:#a7f3d0; padding:10px;">Nenhum amigo adicionado. Digite o nick acima!</div>';
+                cont.innerHTML = '<div style="font-size:12px; color:#a7f3d0; padding:10px;">Nenhum amigo adicionado. Digite o nick acima!</div>';
                 return;
             }
 
             amigos.forEach(a => {
                 const card = document.createElement('div');
-                card.className = 'amigo-card';
+                card.style.cssText = 'background:#0a2817; border:1px solid #1a4a2e; border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;';
                 card.innerHTML = `
                     <div>
-                        <div style="font-weight:900; font-size:12px; color:#fff;">${a.nome}</div>
-                        <div style="font-size:10px; color:var(--primary-gold);">${a.elo || 1000} PDL</div>
+                        <div style="font-weight:900; font-size:13px; color:#fff;">${a.nome}</div>
+                        <div style="font-size:11px; color:var(--primary-gold);">${a.elo || 1000} PDL</div>
                     </div>
                     <div style="display:flex; gap:6px;">
-                        <button class="btn btn-ranked" style="padding:4px 8px; font-size:10px;" onclick="convidarAmigoGrupo('${a.uid}', '${a.nome}')">CONVIDAR GRUPO</button>
+                        <button class="btn btn-ranked" style="padding:6px 10px; font-size:10px;" onclick="convidarAmigoGrupo('${a.uid}', '${a.nome}')">CONVIDAR GRUPO</button>
                     </div>
                 `;
                 cont.appendChild(card);
@@ -2013,12 +2005,12 @@
 
             if (!meuGrupo.id || meuGrupo.membros.length === 0) {
                 list.innerHTML = `<span>Solo (Sem Grupo Ativo)</span>`;
-                acoes.innerHTML = `<button class="btn btn-avancar" style="margin:0; padding:6px 12px; font-size:10px;" onclick="criarNovoGrupo()">CRIAR GRUPO 2V2/3V3</button>`;
+                acoes.innerHTML = `<button class="btn btn-avancar" style="padding:6px 14px; font-size:11px;" onclick="criarNovoGrupo()">CRIAR GRUPO 2V2/3V3</button>`;
             } else {
                 list.innerHTML = `👑 Líder: ${meuGrupo.lider} | Membros (${meuGrupo.membros.length}/3): <b>${meuGrupo.membros.join(', ')}</b>`;
                 acoes.innerHTML = `
-                    <button class="btn btn-ranked" style="margin:0; padding:6px 12px; font-size:10px;" onclick="puxarRankedEmGrupo()">⚔️ PUXAR RANKED COM GRUPO</button>
-                    <button class="btn btn-voltar" style="margin:0; padding:6px 12px; font-size:10px;" onclick="sairDoGrupo()">SAIR</button>
+                    <button class="btn btn-ranked" style="padding:6px 14px; font-size:11px;" onclick="puxarRankedEmGrupo()">⚔️ PUXAR RANKED COM GRUPO</button>
+                    <button class="btn btn-voltar" style="padding:6px 14px; font-size:11px;" onclick="sairDoGrupo()">SAIR</button>
                 `;
             }
         }
@@ -2042,7 +2034,7 @@
             iniciarBuscaRanked();
         }
 
-        // --- SISTEMA DE MATCHMAKING RANKED (1V1 PADRÃO, 2V2 MARACANÃ, 3V3 TITÃ) ---
+        // --- SISTEMA DE MATCHMAKING RANKED ---
         function abrirMatchmakingRanked() {
             AudioEngine.playClick();
             showScreen('screen-matchmaking');
@@ -2070,13 +2062,13 @@
 
             if (mode === '1V1') {
                 modoDeJogo = 'CLASSICO';
-                selCampoW = 1000; selCampoH = 550; // Padrão
+                selCampoW = 1000; selCampoH = 550;
             } else if (mode === '2V2') {
                 modoDeJogo = 'CLASSICO_2V2';
-                selCampoW = 1200; selCampoH = 660; // Maracanã
+                selCampoW = 1200; selCampoH = 660;
             } else if (mode === '3V3') {
                 modoDeJogo = 'CLASSICO_3V3';
-                selCampoW = 1400; selCampoH = 750; // Titã
+                selCampoW = 1400; selCampoH = 750;
             }
 
             const nomeMapa = mode === '1V1' ? 'Padrão (1000x550)' : (mode === '2V2' ? 'Maracanã (1200x660)' : 'Titã (1400x750)');
@@ -2143,7 +2135,6 @@
         function cancelarBuscaRanked() {
             isMatchmakingActive = false;
             if (matchmakingInterval) { clearInterval(matchmakingInterval); matchmakingInterval = null; }
-            if (mmPollInterval) { clearInterval(mmPollInterval); mmPollInterval = null; }
             if (myMatchTicketId && db) { db.collection("matchmaking").doc(myMatchTicketId).delete().catch(()=>{}); myMatchTicketId = null; }
             if (peer) { peer.destroy(); peer = null; }
             uiText('mm-status-txt', 'Busca cancelada');
@@ -2198,19 +2189,15 @@
                 });
 
                 conn.on('data', (d) => {
-                    if (d.type === 'identify') {
-                        playerNames[2] = d.nome || "P2";
-                    }
-                    if (d.type === 'input') {
-                        remoteInputs[d.slot] = d.keys;
-                    }
+                    if (d.type === 'identify') playerNames[2] = d.nome || "P2";
+                    if (d.type === 'input') remoteInputs[d.slot] = d.keys;
                     if (d.type === 'ready_start') {
                         if (matchmakingInterval) clearInterval(matchmakingInterval);
                         if (myMatchTicketId && db) db.collection("matchmaking").doc(myMatchTicketId).delete().catch(()=>{});
 
                         cfgP1 = { time: "Palmeiras", uni: 1, cores: TIMES["Palmeiras"].cor1 };
                         cfgP2 = { time: "Corinthians", uni: 1, cores: TIMES["Corinthians"].cor1 };
-                        uiHide('menu-container');
+                        uiHide('main-content-wrapper');
                         broadcast({ type: 'start', cfgP1: cfgP1, cfgP2: cfgP2, w: selCampoW, h: selCampoH, modo: modoDeJogo, names: playerNames });
                         iniciarEngineJogo();
                     }
@@ -2255,7 +2242,7 @@
                         selCampoH = d.h;
                         modoDeJogo = d.modo;
                         playerNames = d.names;
-                        uiHide('menu-container');
+                        uiHide('main-content-wrapper');
                         iniciarEngineJogo();
                     }
                     if (d.type === 'sync' && estadoJogo !== 'MENU') {
@@ -2267,16 +2254,12 @@
                     alert("A partida foi encerrada pelo adversário.");
                     voltarMenu();
                 });
-
-                myConn.on('error', () => {
-                    uiText('mm-status-txt', 'Tentando reconectar...');
-                });
             });
 
             peer.on('error', () => {});
         }
 
-        // --- MODO DE PÊNALTIS OFICIAL (5 COBRANÇAS ALTERNADAS) ---
+        // --- MODO DE PÊNALTIS OFICIAL ---
         function iniciarModoPenaltis() {
             AudioEngine.playClick();
             isPenaltiesMode = true;
@@ -2328,16 +2311,13 @@
             uiShow('texto-estado');
             setTimeout(() => uiHide('texto-estado'), 1500);
 
-            // Bola na marca da cal
             Body.setVelocity(bola, { x: 0, y: 0 });
             Body.setPosition(bola, { x: selCampoW * 0.45, y: selCampoH / 2 });
 
-            // Batedor posicionado atrás da bola
             const kicker = window.player1;
             Body.setVelocity(kicker, { x: 0, y: 0 });
             Body.setPosition(kicker, { x: selCampoW * 0.35, y: selCampoH / 2 });
 
-            // Goleiro em cima da linha do gol direito
             const keeper = window.player2;
             Body.setVelocity(keeper, { x: 0, y: 0 });
             Body.setPosition(keeper, { x: selCampoW - PITCH_INSET_X - 15, y: selCampoH / 2 });
@@ -2378,7 +2358,7 @@
             delayTimer = 90;
         }
 
-        // --- SISTEMA DE SALAS REAIS DO HAXBALL ---
+        // --- SISTEMA DE SALAS HAXBALL ---
         function abrirNavegadorSalas() { AudioEngine.playClick(); isRanked = false; isPenaltiesMode = false; showScreen('screen-online-rooms'); carregarSalasOnline(); }
 
         async function carregarSalasOnline() {
@@ -2400,29 +2380,18 @@
 
         function filtrarTabelaSalas() {
             const tbody = document.getElementById('hax-rooms-tbody'); tbody.innerHTML = '';
-            const showLocked = document.getElementById('chk-show-locked').checked;
-            const showFull = document.getElementById('chk-show-full').checked;
-            const showEmpty = document.getElementById('chk-show-empty').checked;
-
-            const filtradas = salasOnlineCache.filter(s => {
-                if (!showLocked && s.temSenha) return false;
-                if (!showFull && s.jogadores >= s.max) return false;
-                if (!showEmpty && s.jogadores === 0) return false;
-                return true;
-            });
-
-            if (filtradas.length === 0) {
+            if (salasOnlineCache.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="4" style="text-align:center; padding:35px 20px; color:#a7f3d0;">
                             <div style="font-size:13px; margin-bottom:12px;">Nenhuma sala aberta no momento.</div>
-                            <button class="hax-side-btn primary" style="margin: 0 auto; display: inline-flex;" onclick="abrirModalCriarSala()">➕ Criar Primeira Sala</button>
+                            <button class="btn btn-avancar" style="margin: 0 auto; display: inline-flex;" onclick="abrirModalCriarSala()">➕ Criar Primeira Sala</button>
                         </td>
                     </tr>`;
                 return;
             }
 
-            filtradas.forEach(s => {
+            salasOnlineCache.forEach(s => {
                 const tr = document.createElement('tr'); tr.className = 'hax-row';
                 tr.onclick = () => selecionarLinhaSala(s, tr);
                 tr.ondblclick = () => { selecionarLinhaSala(s, tr); conectarSalaSelecionada(); };
@@ -2477,14 +2446,6 @@
             }
         }
 
-        function entrarPorCodigoDireto() {
-            const input = document.getElementById('input-entrar-codigo');
-            const code = input.value.trim();
-            if (!code) { alert("Digite o código da sala!"); return; }
-            AudioEngine.playClick();
-            conectarSalaPorIdDireto(code);
-        }
-
         function iniciarPeerHost() {
             clientConnections = [];
             playerNames[mySlot] = meuPerfil.nome || "P1";
@@ -2528,7 +2489,7 @@
                 conn.on('data', (d) => {
                     if (d.type === 'identify') { playerNames[conn.playerSlot] = d.nome || `P${conn.playerSlot}`; playerNumbers[conn.playerSlot] = d.numero || 10; renderLobbySlotsHost(); }
                     if (d.type === 'input') remoteInputs[d.slot] = d.keys;
-                    if (d.type === 'p2_ready') { cfgP2 = d.cfgP2; uiHide('menu-container'); broadcast({ type: 'start', cfgP1: cfgP1, cfgP2: cfgP2, w: selCampoW, h: selCampoH, modo: modoDeJogo, names: playerNames }); iniciarEngineJogo(); }
+                    if (d.type === 'p2_ready') { cfgP2 = d.cfgP2; uiHide('main-content-wrapper'); broadcast({ type: 'start', cfgP1: cfgP1, cfgP2: cfgP2, w: selCampoW, h: selCampoH, modo: modoDeJogo, names: playerNames }); iniciarEngineJogo(); }
                 });
 
                 conn.on('close', () => { 
@@ -2574,7 +2535,7 @@
                 myConn.on('data', (d) => {
                     if (d.type === 'welcome') { mySlot = d.slot; modoDeJogo = d.modo; if(d.w) selCampoW = d.w; if(d.h) selCampoH = d.h; uiText('txt-meu-slot-client', `CONECTADO COMO P${mySlot}!`); }
                     if (d.type === 'your_turn') { cfgP1 = d.cfgP1; modoDeJogo = d.modo; selCampoW = d.w; selCampoH = d.h; currPlayer = 2; prepararTelaTime(); showScreen('screen-team'); }
-                    if (d.type === 'start') { cfgP1 = d.cfgP1; cfgP2 = d.cfgP2; selCampoW = d.w; selCampoH = d.h; modoDeJogo = d.modo; playerNames = d.names; uiHide('menu-container'); iniciarEngineJogo(); }
+                    if (d.type === 'start') { cfgP1 = d.cfgP1; cfgP2 = d.cfgP2; selCampoW = d.w; selCampoH = d.h; modoDeJogo = d.modo; playerNames = d.names; uiHide('main-content-wrapper'); iniciarEngineJogo(); }
                     if (d.type === 'sync' && estadoJogo !== 'MENU') sincronizarJogoCliente(d);
                 });
 
@@ -2585,7 +2546,7 @@
             });
 
             peer.on('error', (err) => {
-                uiText('txt-status-client-lobby', `Não foi possível conectar (${err.type}). Verifique o código da sala.`);
+                uiText('txt-status-client-lobby', `Não foi possível conectar (${err.type}).`);
             });
         }
 
@@ -2638,7 +2599,7 @@
             isOnline = false; isHost = true; showScreen('screen-home');
         }
 
-        // --- NAVEGAÇÃO & MODOS ---
+        // --- NAVEGAÇÃO ENTRE TELAS ---
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
             const sc = document.getElementById(id); if(sc) sc.classList.add('active-screen');
@@ -2661,7 +2622,7 @@
             currPlayer = 1; prepararTelaTime(); showScreen('screen-team');
         }
 
-        // --- TIMES & UNIFORMES COM BOTÃO DE VOLTAR E TROCAR TIME ---
+        // --- TIMES & UNIFORMES ---
         const TIMES = {
             "Palmeiras":   { bg: "#006437", fg: "#fff", detail: "#10b981", cor1: { bg: "#006437", line: "#ffffff", num: "#fff" }, cor2: { bg: "#e0e0e0", line: "#006437", num: "#006437" } },
             "Corinthians": { bg: "#000000", fg: "#fff", detail: "#ffffff", cor1: { bg: "#ffffff", line: "#000000", num: "#000" }, cor2: { bg: "#111111", line: "#ffffff", num: "#fff" } },
@@ -2676,7 +2637,7 @@
         };
 
         function prepararTelaTime() {
-            uiText('title-jogador-team', `CAPITÃO ${currPlayer}: ESCOLHA O TIME`);
+            uiText('title-jogador-team', `CAPITÃO ${currPlayer}: ESCOLHA SEU TIME`);
             const grid = document.getElementById('grid-times'); grid.innerHTML = '';
             Object.keys(TIMES).forEach(time => {
                 const t = TIMES[time];
@@ -2727,7 +2688,7 @@
                 cfgP2 = { time: timeTemporario, uni: uniValue, cores: coresFinal };
                 timeTemporario = "";
                 if (isOnline) { if (!isHost && myConn) myConn.send({ type: 'p2_ready', cfgP2: cfgP2 }); }
-                else { uiHide('menu-container'); iniciarEngineJogo(); }
+                else { uiHide('main-content-wrapper'); iniciarEngineJogo(); }
             }
         }
 
@@ -2776,7 +2737,7 @@
             PASSE_TIERS.forEach(t => {
                 const unl = meuPerfil.nivel >= t.tier;
                 const clm = (meuPerfil.passeResgatados || []).includes(t.tier);
-                let btn = clm ? '<button class="shop-item-btn" style="background:#475569;" disabled>RESGATADO</button>' : (unl ? `<button class="shop-item-btn btn-avancar" style="margin:0; padding:4px;" onclick="resgatarPasse(${t.tier})">RESGATAR</button>` : `<button class="shop-item-btn" style="background:#0d3820;" disabled>NVL ${t.tier}</button>`);
+                let btn = clm ? '<button class="shop-item-btn" style="background:#475569;" disabled>RESGATADO</button>' : (unl ? `<button class="shop-item-btn btn-avancar" style="padding:6px;" onclick="resgatarPasse(${t.tier})">RESGATAR</button>` : `<button class="shop-item-btn" style="background:#0d3820;" disabled>NVL ${t.tier}</button>`);
                 list.innerHTML += `<div class="pass-tier-card ${unl?'unlocked':''} ${clm?'claimed':''}"><div class="pass-tier-num">NÍVEL ${t.tier}</div><div class="pass-tier-icon">${t.icon}</div><div class="pass-tier-name">${t.nome}</div><div class="pass-tier-reward">${t.recompensa}</div>${btn}</div>`;
             });
             showScreen('screen-battlepass');
@@ -2802,7 +2763,7 @@
             showScreen('screen-stats');
         }
 
-        // --- UI UTILS ---
+        // --- UI HELPERS ---
         function uiShow(id, d = 'block') { const el = document.getElementById(id); if(el) el.style.display = d; }
         function uiHide(id) { const el = document.getElementById(id); if(el) el.style.display = 'none'; }
         function uiText(id, t) { const el = document.getElementById(id); if(el) el.innerText = t; }
@@ -2845,7 +2806,7 @@
             return { up: p1.w || p2.up, down: p1.s || p2.down, left: p1.a || p2.left, right: p1.d || p2.right, shoot: p1.shoot || p2.shoot, dash: p1.dash || p2.dash };
         }
 
-        // --- RENDER DO GRAMADO VERDE REALISTA COM GOLS PROFUNDOS ---
+        // --- RENDER DO GRAMADO VERDE REALISTA ---
         const GOAL_DEPTH = 55;
         const PITCH_INSET_X = 65;
 
@@ -2905,9 +2866,6 @@
 
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.88)';
             ctx.lineWidth = 3;
-            ctx.shadowColor = 'rgba(255, 255, 255, 0.35)';
-            ctx.shadowBlur = 4;
-
             ctx.strokeRect(PITCH_INSET_X, 20, selCampoW - (PITCH_INSET_X * 2), selCampoH - 40);
 
             ctx.beginPath(); ctx.moveTo(selCampoW / 2, 20); ctx.lineTo(selCampoW / 2, selCampoH - 20); ctx.stroke();
@@ -2928,11 +2886,8 @@
 
             ctx.beginPath(); ctx.arc(pDist, selCampoH / 2, areaH * 0.32, -0.65, 0.65); ctx.stroke();
             ctx.beginPath(); ctx.arc(selCampoW - pDist, selCampoH / 2, areaH * 0.32, Math.PI - 0.65, Math.PI + 0.65); ctx.stroke();
-
-            ctx.shadowBlur = 0;
         }
 
-        // --- TORCIDA CLÁSSICA ---
         function desenharTorcida(ctx) {
             const time = Date.now() / 150, size = 18;
             const halfW = selCampoW / 2;
@@ -2983,8 +2938,8 @@
                     uiText('tv-badge-status', isRanked ? `⚔️ RANKED ${modoDeJogo.replace('CLASSICO_','').replace('CLASSICO','1V1')} • 1º TEMPO` : "1º TEMPO • IAES CUP");
                 }
                 
-                uiShow('btn-voltar-partida'); uiShow('btn-config-ingame'); uiShow('top-bar', 'flex'); 
-                if (verificarAdminAutorizado()) uiShow('btn-admin-ingame', 'block'); else uiHide('btn-admin-ingame');
+                uiShow('top-nav-bar', 'flex');
+                uiShow('game-screen-container', 'flex');
                 document.getElementById('top-bar').style.maxWidth = selCampoW + 'px';
                 
                 uiText('nome-p1', cfgP1.time.substring(0, 3).toUpperCase());
@@ -3111,9 +3066,7 @@
                         const spd = Math.hypot(bola.velocity.x, bola.velocity.y) + Math.hypot(jog.velocity.x, jog.velocity.y);
                         AudioEngine.playBallTouch(spd);
 
-                        if (isPenaltiesMode && slotNum === 1) {
-                            penaltyKicked = true;
-                        }
+                        if (isPenaltiesMode && slotNum === 1) penaltyKicked = true;
                     }
 
                     if ((bodyA.label === 'bola' && bodyB.label === 'trave') || (bodyB.label === 'bola' && bodyA.label === 'trave')) {
@@ -3126,7 +3079,6 @@
                 const ctx = render.context;
                 desenharTorcida(ctx);
 
-                // Rastro da Bola
                 const rastroEquip = meuPerfil.equipados.rastro || 'rastro_nenhum';
                 if (rastroEquip !== 'rastro_nenhum' && Math.hypot(bola.velocity.x, bola.velocity.y) > 2) {
                     particulas.push({
@@ -3136,7 +3088,6 @@
                     });
                 }
 
-                // Render Jogadores
                 const auraEquipada = LOJA_ITENS.auras.find(a => a.id === meuPerfil.equipados.aura);
                 const maxRender = isPenaltiesMode ? 2 : max;
 
@@ -3447,7 +3398,7 @@
             }
         }
 
-        // --- CONTROLES FLUIDOS ESTILO HAXBALL ---
+        // --- CONTROLES HAXBALL ---
         function processarControles() {
             let inputs = {};
             if (isOnline && isHost) {
@@ -3539,9 +3490,7 @@
                 Body.setVelocity(bola, { x: dirX * kickSpeed, y: dirY * kickSpeed });
                 AudioEngine.playKick(1.1);
 
-                if (isPenaltiesMode) {
-                    penaltyKicked = true;
-                }
+                if (isPenaltiesMode) penaltyKicked = true;
             }
         }
 
@@ -3553,9 +3502,9 @@
         function voltarMenu() {
             AudioEngine.playClick(); estadoJogo = 'MENU'; limparMotorFisico();
             isPenaltiesMode = false;
-            uiHide('game-wrapper'); uiHide('top-bar'); uiHide('btn-voltar-partida'); uiHide('btn-config-ingame'); uiHide('btn-admin-ingame');
+            uiHide('game-screen-container');
             resetarUICompleta(); if(isOnline) cancelarOnline();
-            uiShow('menu-container'); showScreen('screen-home');
+            uiShow('main-content-wrapper'); showScreen('screen-home');
         }
     </script>
 </body>
