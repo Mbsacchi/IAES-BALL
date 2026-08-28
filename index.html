@@ -389,13 +389,13 @@
                 <div style="font-size: 55px; margin-bottom: 6px;">🏆</div>
                 <h1 style="color: #2ecc71; font-size: 34px; font-family: 'Fredoka', sans-serif;">IAES BALL PRO</h1>
                 <p style="font-size: 13px; margin-bottom: 20px;">Entre com seu Nickname para jogar offline ou online</p>
-                <input type="text" id="input-nickname" class="input-cartoon" placeholder="SEU NICKNAME (MÍN. 3 LETRAS)" maxlength="16">
-                <input type="password" id="input-senha" class="input-cartoon" placeholder="SUA SENHA (MÍN. 6 DÍGITOS)" maxlength="32">
+                <input type="text" id="input-nickname" class="input-cartoon" placeholder="SEU NICKNAME (EX: CRAQUE)" maxlength="16" onkeydown="if(event.key==='Enter') fazerLogin()">
+                <input type="password" id="input-senha" class="input-cartoon" placeholder="SUA SENHA (OPCIONAL)" maxlength="32" onkeydown="if(event.key==='Enter') fazerLogin()">
                 <div style="display:flex; gap:10px; margin-top:8px;">
                     <button id="btn-login" class="btn-cartoon" style="flex:1;" onclick="fazerLogin()"><span id="btn-login-txt">⚽ ENTRAR</span></button>
-                    <button id="btn-criar" class="btn-cartoon cyan" style="flex:1;" onclick="criarConta()"><span id="btn-criar-txt">CRIAR CONTA</span></button>
+                    <button id="btn-criar" class="btn-cartoon cyan" style="flex:1;" onclick="criarConta()"><span id="btn-criar-txt">✨ CRIAR CONTA</span></button>
                 </div>
-                <div id="auth-status-msg" style="color:#ff4757; margin-top:12px; font-size:13px; font-weight:bold;"></div>
+                <div id="auth-status-msg" style="color:#2ecc71; margin-top:12px; font-size:13px; font-weight:bold;"></div>
             </div>
         </div>
 
@@ -886,14 +886,17 @@
 
     <!-- MODAL AMIGOS -->
     <div id="modal-amigos" class="modal-overlay">
-        <div class="modal-box-cartoon">
-            <div class="modal-header-cartoon"><h2 style="margin:0; color:#00d2d3;">👥 AMIGOS & GRUPO</h2></div>
-            <div style="display:flex; gap:10px; margin-bottom:12px;">
-                <input type="text" id="input-add-amigo" class="input-cartoon" style="margin:0; text-align:left;" placeholder="Nickname exato..." maxlength="16">
-                <button class="btn-cartoon" style="padding:8px 16px;" onclick="adicionarAmigoPorNick()">ADICIONAR</button>
+        <div class="modal-box-cartoon" style="border-color: #00d2d3; max-width: 520px;">
+            <div class="modal-header-cartoon">
+                <h2 style="margin:0; color:#00d2d3; font-size:24px;">👥 AMIGOS & DUPLAS</h2>
+                <span style="font-size:12px; color:#2ecc71; font-weight:900;">ONLINE</span>
             </div>
-            <div id="lista-amigos-container" style="max-height:160px; overflow-y:auto; margin-bottom:12px;"></div>
-            <button class="btn-cartoon red" style="width:100%;" onclick="fecharModalAmigos()">FECHAR</button>
+            <div style="display:flex; gap:10px; margin-bottom:14px;">
+                <input type="text" id="input-add-amigo" class="input-cartoon" style="margin:0; text-align:left; flex:1;" placeholder="Nickname do amigo..." maxlength="16" onkeydown="if(event.key==='Enter') adicionarAmigoPorNick()">
+                <button class="btn-cartoon cyan" style="padding:10px 18px;" onclick="adicionarAmigoPorNick()">➕ ADICIONAR</button>
+            </div>
+            <div id="lista-amigos-container" style="max-height:260px; overflow-y:auto; margin-bottom:16px; display:flex; flex-direction:column; gap:8px;"></div>
+            <button class="btn-cartoon red" style="width:100%; margin:0;" onclick="fecharModalAmigos()">FECHAR</button>
         </div>
     </div>
 
@@ -1099,8 +1102,8 @@
                     // 2. Hi-Hat nos contra-tempos
                     if (step % 2 === 1) {
                         const hatOsc = this.ctx.createOscillator(), hatGain = this.ctx.createGain();
-                        hatOsc.type = 'highpass'; hatOsc.frequency.setValueAtTime(8000, now);
-                        hatGain.gain.setValueAtTime(0.06, now); hatGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+                        hatOsc.type = 'square'; hatOsc.frequency.setValueAtTime(6000, now);
+                        hatGain.gain.setValueAtTime(0.04, now); hatGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
                         hatOsc.connect(hatGain); hatGain.connect(this.musicGain);
                         hatOsc.start(now); hatOsc.stop(now + 0.05);
                     }
@@ -1421,6 +1424,7 @@
         let penaltyCountdownFrames = 0;
 
         let historicoPosicoes = [], particulas = [];
+        let replayBuffer = [], replayIndex = 0, replaySpeedTick = 0;
         const DASH_COOLDOWN = 180;
         let currentStatusMsg = "";
         let historicoToques = [];
@@ -1508,9 +1512,13 @@
             if (wrapper) wrapper.focus();
         }
 
-        window.onload = async () => {
-            carregarSalasLocais();
-            carregarPerfilLocal();
+        window.onload = () => {
+            try { carregarSalasLocais(); } catch(e) {}
+            try { carregarPerfilLocal(); } catch(e) {}
+            const btnLog = document.getElementById('btn-login');
+            if (btnLog) btnLog.onclick = fazerLogin;
+            const btnCriar = document.getElementById('btn-criar');
+            if (btnCriar) btnCriar.onclick = criarConta;
         };
 
         function carregarPerfilLocal() {
@@ -1521,6 +1529,8 @@
                     meuPerfil.isAdmin = verificarAdminAutorizado();
                 }
             } catch(e) {}
+            const inputNick = document.getElementById('input-nickname');
+            if (inputNick && meuPerfil.nome) inputNick.value = meuPerfil.nome;
             atualizarPerfilUI();
         }
 
@@ -1528,26 +1538,40 @@
             try { localStorage.setItem('iaes_perfil_user', JSON.stringify(meuPerfil)); } catch(e) {}
         }
 
-        async function fazerLogin() {
-            AudioEngine.playClick();
-            const nick = document.getElementById('input-nickname').value.trim().toUpperCase();
-            const senha = document.getElementById('input-senha').value;
-            uiText('auth-status-msg', '');
-            if(nick.length < 3) { uiText('auth-status-msg', 'Nickname mín. 3 letras'); return; }
-            if(senha.length < 6) { uiText('auth-status-msg', 'Senha mín. 6 caracteres'); return; }
+        function fazerLogin() {
+            try { AudioEngine.init(); AudioEngine.playClick(); } catch(e) {}
+            const inputNick = document.getElementById('input-nickname');
+            const nick = (inputNick && inputNick.value.trim().toUpperCase()) || meuPerfil.nome || 'CRAQUE';
 
             meuPerfil.nome = nick;
             meuPerfil.isAdmin = (nick.startsWith('ADM_') || nick === 'ADMIN');
-            meuPerfil.uid = 'usr_' + nick.toLowerCase();
+            meuPerfil.uid = 'usr_' + nick.toLowerCase().replace(/[^a-z0-9_]/g, '');
             salvarPerfil();
             atualizarPerfilUI();
             showScreen('screen-home');
+            mostrarToast(`⚽ Bem-vindo, ${nick}!`);
         }
 
-        async function criarConta() { fazerLogin(); }
+        function criarConta() {
+            try { AudioEngine.init(); AudioEngine.playVictoryFanfare(); } catch(e) {}
+            const inputNick = document.getElementById('input-nickname');
+            let nick = (inputNick && inputNick.value.trim().toUpperCase()) || '';
+            if (!nick || nick.length < 2) {
+                nick = 'CRAQUE_' + Math.floor(Math.random() * 900 + 100);
+            }
 
-        async function deslogar() {
-            AudioEngine.playClick();
+            meuPerfil.nome = nick;
+            meuPerfil.isAdmin = (nick.startsWith('ADM_') || nick === 'ADMIN');
+            meuPerfil.uid = 'usr_' + nick.toLowerCase().replace(/[^a-z0-9_]/g, '');
+            meuPerfil.moedas = Math.max(meuPerfil.moedas || 0, 500);
+            salvarPerfil();
+            atualizarPerfilUI();
+            showScreen('screen-home');
+            mostrarToast(`🎉 Conta criada com sucesso! Bem-vindo, ${nick}! (+500 🪙)`);
+        }
+
+        function deslogar() {
+            try { AudioEngine.playClick(); } catch(e) {}
             meuPerfil.isAdmin = false;
             uiHide('top-nav-bar');
             showScreen('screen-login');
@@ -1805,6 +1829,7 @@
                             });
                         }
                         if (e.data.type === 'client_input') remoteInputs[2] = e.data.keys;
+                        if (e.data.type === 'client_skip_replay') finalizarReplay();
                     }
                 };
             }
@@ -1823,25 +1848,37 @@
             conectarSalaPorIdDireto(salaSelecionada.id);
         }
 
+        let clientJoinTimer = null;
         function conectarSalaPorIdDireto(targetRoomId) {
             isOnline = true; isHost = false; isRanked = false; isPenaltiesMode = false; mySlot = 2;
             myRoomID = targetRoomId;
             showScreen('screen-client-waiting');
             uiText('txt-status-client-lobby', `Conectando à sala ${targetRoomId}...`);
 
-            if (roomBroadcastChannel) {
-                roomBroadcastChannel.postMessage({
-                    type: 'client_join', targetRoom: targetRoomId,
-                    nome: meuPerfil.nome || 'JOGADOR 2', numero: meuPerfil.numero || 7
-                });
+            if (clientJoinTimer) clearInterval(clientJoinTimer);
 
+            const enviarTentativaJoin = () => {
+                if (roomBroadcastChannel) {
+                    roomBroadcastChannel.postMessage({
+                        type: 'client_join', targetRoom: targetRoomId,
+                        nome: meuPerfil.nome || 'JOGADOR 2', numero: meuPerfil.numero || 7
+                    });
+                }
+            };
+
+            enviarTentativaJoin();
+            clientJoinTimer = setInterval(enviarTentativaJoin, 600);
+
+            if (roomBroadcastChannel) {
                 roomBroadcastChannel.onmessage = (e) => {
                     if (e.data && e.data.targetRoom === targetRoomId) {
                         if (e.data.type === 'host_ack') {
+                            if (clientJoinTimer) { clearInterval(clientJoinTimer); clientJoinTimer = null; }
                             modoDeJogo = e.data.modo; selCampoW = e.data.w; selCampoH = e.data.h;
                             uiText('txt-status-client-lobby', `🟢 Conectado ao Host (${e.data.hostName})! Aguardando início...`);
                         }
                         if (e.data.type === 'start_match') {
+                            if (clientJoinTimer) { clearInterval(clientJoinTimer); clientJoinTimer = null; }
                             cfgP1 = e.data.cfgP1; cfgP2 = e.data.cfgP2;
                             selCampoW = e.data.w; selCampoH = e.data.h; modoDeJogo = e.data.modo;
                             playerNames = e.data.names; playerNumbers = e.data.nums;
@@ -1873,18 +1910,28 @@
         }
 
         function sincronizarJogoCliente(data) {
-            Body.setPosition(bola, data.b);
+            if (bola && data.b) Body.setPosition(bola, data.b);
             if (window.player1 && data.p1) Body.setPosition(window.player1, data.p1);
             if (window.player2 && data.p2) Body.setPosition(window.player2, data.p2);
-            if(placar1 !== data.s1) { placar1 = data.s1; uiText('score1', placar1); }
-            if(placar2 !== data.s2) { placar2 = data.s2; uiText('score2', placar2); }
-            uiText('timer', data.timeStr);
-            periodoJogo = data.periodo; ladosInvertidos = data.ladosInvertidos;
+            for (let i = 3; i <= 10; i++) {
+                if (window['player' + i] && data['p' + i]) Body.setPosition(window['player' + i], data['p' + i]);
+            }
+            if (placar1 !== data.s1) { placar1 = data.s1; uiText('score1', placar1); }
+            if (placar2 !== data.s2) { placar2 = data.s2; uiText('score2', placar2); }
+            if (data.timeStr) uiText('timer', data.timeStr);
+            if (data.periodo) periodoJogo = data.periodo;
+            if (data.ladosInvertidos !== undefined) ladosInvertidos = data.ladosInvertidos;
 
-            if (data.st !== estadoJogo) {
-                estadoJogo = data.st;
-                if(estadoJogo === 'GOL_CELEBRATION') { AudioEngine.playConfetti(); uiText('texto-gol', data.msg); uiShow('mensagem-overlay', 'flex'); }
-                else if(estadoJogo === 'JOGANDO') resetarUICompleta();
+            if (data.st === 'REPLAY' && estadoJogo !== 'REPLAY') {
+                estadoJogo = 'REPLAY';
+                AudioEngine.playConfetti();
+                uiText('tv-badge-status', `🔴 REPLAY (0.5x) • ${data.msg || 'GOL!'}`);
+                uiShow('btn-skip-replay', 'block');
+            } else if (data.st === 'JOGANDO' && estadoJogo !== 'JOGANDO') {
+                estadoJogo = 'JOGANDO';
+                uiHide('btn-skip-replay');
+                uiText('tv-badge-status', `${periodoJogo}º TEMPO • IAES CUP`);
+                resetarUICompleta();
             }
         }
 
@@ -2074,6 +2121,98 @@
             showScreen('screen-stats');
         }
 
+        // --- SISTEMA DE AMIGOS ---
+        function abrirModalAmigos() {
+            try { AudioEngine.init(); AudioEngine.playClick(); } catch(e) {}
+            renderListaAmigos();
+            uiShow('modal-amigos', 'flex');
+        }
+
+        function fecharModalAmigos() {
+            try { AudioEngine.playClick(); } catch(e) {}
+            uiHide('modal-amigos');
+        }
+
+        function renderListaAmigos() {
+            const container = document.getElementById('lista-amigos-container');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            if (!meuPerfil.amigos || meuPerfil.amigos.length === 0) {
+                if (!meuPerfil.amigos) meuPerfil.amigos = [];
+                if (meuPerfil.amigos.length === 0) {
+                    meuPerfil.amigos = [
+                        { nome: 'NEYMAR_JR', elo: 1450, nivel: 8, status: 'online' },
+                        { nome: 'MESSI_10', elo: 2100, nivel: 15, status: 'online' }
+                    ];
+                    salvarPerfil();
+                }
+            }
+
+            meuPerfil.amigos.forEach((amigo, idx) => {
+                const pat = obterPatentePorPDL(amigo.elo || 1000);
+                const item = document.createElement('div');
+                item.style.cssText = 'background:#04140b; border:2px solid #10b981; border-radius:12px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;';
+                item.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="width:10px; height:10px; border-radius:50%; background:${amigo.status==='online'?'#2ecc71':'#95a5a6'}; box-shadow:0 0 6px ${amigo.status==='online'?'#2ecc71':'#000'};"></div>
+                        <div style="text-align:left;">
+                            <div style="font-weight:900; color:#fff; font-size:14px;">${amigo.nome} <span style="font-size:11px; color:#10b981;">(NVL ${amigo.nivel||1})</span></div>
+                            <div style="font-size:11px; font-weight:800; color:${pat.cor};">${amigo.elo||1000} PDL • ${pat.nome}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn-cartoon cyan" style="padding:6px 10px; font-size:11px;" onclick="convidarAmigoParaJogo('${amigo.nome}')">⚔️ DESAFIAR</button>
+                        <button class="btn-cartoon red" style="padding:6px 8px; font-size:11px;" onclick="removerAmigo(${idx})">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function adicionarAmigoPorNick() {
+            try { AudioEngine.init(); AudioEngine.playClick(); } catch(e) {}
+            const input = document.getElementById('input-add-amigo');
+            const nick = input ? input.value.trim().toUpperCase() : '';
+            if (!nick || nick.length < 2) { mostrarToast("⚠️ Digite o Nickname do amigo."); return; }
+            if (nick === (meuPerfil.nome || 'CRAQUE').toUpperCase()) { mostrarToast("⚠️ Você não pode adicionar a si mesmo."); return; }
+            
+            if (!meuPerfil.amigos) meuPerfil.amigos = [];
+            if (meuPerfil.amigos.some(a => a.nome.toUpperCase() === nick)) {
+                mostrarToast("⚠️ Este amigo já está na sua lista.");
+                return;
+            }
+
+            const novoAmigo = {
+                nome: nick,
+                elo: Math.floor(Math.random() * 800 + 800),
+                nivel: Math.floor(Math.random() * 10 + 1),
+                status: 'online'
+            };
+            meuPerfil.amigos.push(novoAmigo);
+            salvarPerfil();
+            renderListaAmigos();
+            if (input) input.value = '';
+            mostrarToast(`🎉 ${nick} adicionado à sua lista de amigos!`);
+        }
+
+        function removerAmigo(idx) {
+            try { AudioEngine.init(); AudioEngine.playClick(); } catch(e) {}
+            if (meuPerfil.amigos && meuPerfil.amigos[idx]) {
+                const removido = meuPerfil.amigos.splice(idx, 1)[0];
+                salvarPerfil();
+                renderListaAmigos();
+                mostrarToast(`🗑️ ${removido.nome} removido dos amigos.`);
+            }
+        }
+
+        function convidarAmigoParaJogo(nick) {
+            try { AudioEngine.init(); AudioEngine.playClick(); } catch(e) {}
+            mostrarToast(`📨 Convite enviado para ${nick}! Criando sala...`);
+            fecharModalAmigos();
+            irParaModo(true);
+        }
+
         function uiShow(id, d = 'block') { const el = document.getElementById(id); if(el) el.style.display = d; }
         function uiHide(id) { const el = document.getElementById(id); if(el) el.style.display = 'none'; }
         function uiText(id, t) { const el = document.getElementById(id); if(el) el.innerText = t; }
@@ -2092,16 +2231,19 @@
             } catch(e) {}
         }
 
+        // P1: EXCLUSIVAMENTE W, A, S, D + ESPAÇO/X/K + SHIFT
         function getLocalInputsP1() {
             return {
-                w: !!(keys['keyw'] || keys['w']),
-                s: !!(keys['keys'] || keys['s']),
-                a: !!(keys['keya'] || keys['a']),
-                d: !!(keys['keyd'] || keys['d']),
+                up: !!(keys['keyw'] || keys['w']),
+                down: !!(keys['keys'] || keys['s']),
+                left: !!(keys['keya'] || keys['a']),
+                right: !!(keys['keyd'] || keys['d']),
                 shoot: !!(keys['space'] || keys[' '] || keys['keyx'] || keys['x'] || keys['keyk'] || keys['k']),
                 dash: !!(keys['shiftleft'] || keys['shiftright'] || keys['shift'])
             };
         }
+
+        // P2: EXCLUSIVAMENTE SETAS + ENTER/NUMPAD0/L + CTRL/NUMPAD1
         function getLocalInputsP2() {
             return {
                 up: !!(keys['arrowup'] || keys['up']),
@@ -2113,36 +2255,33 @@
             };
         }
 
+        // CLIENT ONLINE: PODE USAR WASD OU SETAS NO SEU PRÓPRIO COMPUTADOR
+        function getOnlineClientInputs() {
+            return {
+                up: !!(keys['keyw'] || keys['w'] || keys['arrowup'] || keys['up']),
+                down: !!(keys['keys'] || keys['s'] || keys['arrowdown'] || keys['down']),
+                left: !!(keys['keya'] || keys['a'] || keys['arrowleft'] || keys['left']),
+                right: !!(keys['keyd'] || keys['d'] || keys['arrowright'] || keys['right']),
+                shoot: !!(keys['space'] || keys[' '] || keys['keyx'] || keys['x'] || keys['keyk'] || keys['k'] || keys['enter'] || keys['numpad0'] || keys['keyl']),
+                dash: !!(keys['shiftleft'] || keys['shiftright'] || keys['shift'] || keys['controlleft'] || keys['controlright'] || keys['control'] || keys['numpad1'])
+            };
+        }
+
         const GOAL_DEPTH = 55;
         const PITCH_INSET_X = 65;
 
-        // --- CAMPO REALISTA COM ARQUIBANCADA & ESTRUTURA PROFISSIONAL DE ESTÁDIO ---
+        // --- CAMPO REALISTA E DETALHADO ---
         function desenharCampoRealista() {
             const bgCanvas = document.getElementById('field-canvas'); if (!bgCanvas) return;
             bgCanvas.width = selCampoW; bgCanvas.height = selCampoH;
             const ctx = bgCanvas.getContext('2d');
             const stripeWidth = 50;
 
-            // 1. Gramado Listrado
+            // 1. Gramado Listrado Realista
             for (let i = 0; i < selCampoW; i += stripeWidth) {
                 ctx.fillStyle = (i / stripeWidth) % 2 === 0 ? '#1b5e20' : '#2e7d32';
                 ctx.fillRect(i, 0, stripeWidth, selCampoH);
             }
-
-            // 2. Arquibancadas de Concreto & Painéis de LED nos contornos
-            const bleacherH = 18;
-            
-            // Arquibancada Topo
-            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, selCampoW, bleacherH);
-            ctx.fillStyle = '#1e293b'; ctx.fillRect(0, bleacherH - 4, selCampoW, 4);
-            // Painel LED Topo
-            ctx.fillStyle = '#062313'; ctx.fillRect(PITCH_INSET_X, bleacherH - 3, selCampoW - (PITCH_INSET_X * 2), 3);
-
-            // Arquibancada Rodapé
-            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, selCampoH - bleacherH, selCampoW, bleacherH);
-            ctx.fillStyle = '#1e293b'; ctx.fillRect(0, selCampoH - bleacherH, selCampoW, 4);
-            // Painel LED Rodapé
-            ctx.fillStyle = '#062313'; ctx.fillRect(PITCH_INSET_X, selCampoH - bleacherH, selCampoW - (PITCH_INSET_X * 2), 3);
 
             const golSize = selCampoH * 0.44;
             const yTop = (selCampoH - golSize) / 2, yBottom = (selCampoH + golSize) / 2;
@@ -2333,78 +2472,54 @@
                 });
             });
 
-            // --- RENDERIZADOR: ARQUIBANCADA VIBRANTE, TORCIDA ORGANIZADA & JOGADORES CARTOON ---
+            // --- RENDERIZADOR: TORCIDA DE BOLINHAS CARTOON & JOGADORES ---
             Events.on(render, 'afterRender', () => {
                 const ctx = render.context;
                 const timeNow = Date.now();
                 const isCelebrando = (estadoJogo === 'GOL_CELEBRATION');
 
-                // --- 1. TORCIDA ORGANIZADA NAS ARQUIBANCADAS (DESIGN ELEGANTE E EM BLOCOS) ---
-                const numBlocos = Math.floor(selCampoW / 48);
+                // --- 1. TORCIDA CLÁSSICA: BOLAS PULANDO COM CORES INTERCALADAS DOS 2 UNIFORMES ---
+                const spacing = 22;
+                const rTorcedor = 6;
 
-                for (let i = 0; i < numBlocos; i++) {
-                    const x = 32 + (i * 48);
-                    const isTime1 = x < selCampoW / 2;
-                    const corTorcida = isTime1 ? (cfgP1 ? cfgP1.cores.bg : '#008542') : (cfgP2 ? cfgP2.cores.bg : '#ffffff');
-                    const corBandeira = isTime1 ? (cfgP1 ? cfgP1.cores.line : '#ffffff') : (cfgP2 ? cfgP2.cores.line : '#000000');
-                    
-                    const onda = Math.sin(timeNow / 180 + i * 0.45) * (isCelebrando ? 4 : 2);
+                for (let x = 20, idx = 0; x <= selCampoW - 20; x += spacing, idx++) {
+                    const corBola = (idx % 2 === 0) ? (cfgP1 ? cfgP1.cores.bg : '#006437') : (cfgP2 ? cfgP2.cores.bg : '#ffffff');
+                    const pulo = Math.sin(timeNow / 150 + idx * 0.45) * (isCelebrando ? 5.5 : 2.5);
 
-                    // --- TORCIDA TOPO ---
+                    // Bolinha Topo (y ~ 9)
                     ctx.save();
-                    // Corpo / Camisa da Torcida
-                    ctx.fillStyle = corTorcida;
-                    ctx.fillRect(x - 10, 4 + onda, 20, 9);
-                    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.2;
-                    ctx.strokeRect(x - 10, 4 + onda, 20, 9);
+                    ctx.beginPath();
+                    ctx.arc(x, 9 + pulo, rTorcedor, 0, 2 * Math.PI);
+                    ctx.fillStyle = corBola;
+                    ctx.fill();
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
 
-                    // Cabeça
-                    ctx.beginPath(); ctx.arc(x, 4 + onda, 4.5, 0, 2 * Math.PI);
-                    ctx.fillStyle = (i % 2 === 0) ? '#f5cd79' : '#e77f67'; ctx.fill(); ctx.stroke();
-
-                    // Boné
-                    ctx.beginPath(); ctx.arc(x, 2 + onda, 4.5, Math.PI, 2 * Math.PI);
-                    ctx.fillStyle = corBandeira; ctx.fill(); ctx.stroke();
-
-                    // Bandeirões a cada 3 blocos
-                    if (i % 3 === 0) {
-                        ctx.fillStyle = corTorcida;
-                        ctx.beginPath();
-                        ctx.moveTo(x + 12, 1); ctx.lineTo(x + 24, 4 + Math.sin(timeNow / 120 + i) * 3); ctx.lineTo(x + 12, 8);
-                        ctx.closePath(); ctx.fill(); ctx.stroke();
-                    }
+                    // Brilho pop
+                    ctx.beginPath();
+                    ctx.arc(x - 2, 7.5 + pulo, 1.8, 0, 2 * Math.PI);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                    ctx.fill();
                     ctx.restore();
 
-                    // --- TORCIDA RODAPÉ ---
+                    // Bolinha Rodapé (y ~ selCampoH - 9)
                     ctx.save();
-                    ctx.fillStyle = corTorcida;
-                    ctx.fillRect(x - 10, selCampoH - 13 - onda, 20, 9);
-                    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.2;
-                    ctx.strokeRect(x - 10, selCampoH - 13 - onda, 20, 9);
+                    ctx.beginPath();
+                    ctx.arc(x, selCampoH - 9 - pulo, rTorcedor, 0, 2 * Math.PI);
+                    ctx.fillStyle = corBola;
+                    ctx.fill();
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
 
-                    ctx.beginPath(); ctx.arc(x, selCampoH - 13 - onda, 4.5, 0, 2 * Math.PI);
-                    ctx.fillStyle = (i % 2 === 0) ? '#f5cd79' : '#e77f67'; ctx.fill(); ctx.stroke();
-
-                    ctx.beginPath(); ctx.arc(x, selCampoH - 15 - onda, 4.5, Math.PI, 2 * Math.PI);
-                    ctx.fillStyle = corBandeira; ctx.fill(); ctx.stroke();
-
-                    if (i % 3 === 1) {
-                        ctx.fillStyle = corTorcida;
-                        ctx.beginPath();
-                        ctx.moveTo(x + 12, selCampoH - 8); ctx.lineTo(x + 24, selCampoH - 11 + Math.sin(timeNow / 120 + i) * 3); ctx.lineTo(x + 12, selCampoH - 2);
-                        ctx.closePath(); ctx.fill(); ctx.stroke();
-                    }
+                    // Brilho pop
+                    ctx.beginPath();
+                    ctx.arc(x - 2, selCampoH - 10.5 - pulo, 1.8, 0, 2 * Math.PI);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                    ctx.fill();
                     ctx.restore();
                 }
-
-                // --- 2. REFLETORES DE ESTÁDIO NOS 4 CANTOS ---
-                ctx.save();
-                const glow = ctx.createRadialGradient(PITCH_INSET_X, 20, 10, PITCH_INSET_X, 20, 180);
-                glow.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
-                glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
-                ctx.fillStyle = glow;
-                ctx.fillRect(0, 0, selCampoW, selCampoH);
-                ctx.restore();
 
                 // --- 3. JOGADORES CARTOON ---
                 const maxRender = isPenaltiesMode ? 2 : (modoDeJogo.includes('5V5') ? 10 : (modoDeJogo.includes('3V3') ? 6 : (modoDeJogo.includes('2V2') ? 4 : 2)));
@@ -2484,7 +2599,42 @@
             Events.on(engine, 'beforeUpdate', () => {
                 if (isOnline && !isHost) {
                     if (roomBroadcastChannel && myRoomID) {
-                        roomBroadcastChannel.postMessage({ type: 'client_input', targetRoom: myRoomID, keys: getLocalInputsP1() });
+                        roomBroadcastChannel.postMessage({ type: 'client_input', targetRoom: myRoomID, keys: getOnlineClientInputs() });
+                    }
+                    return;
+                }
+
+                // 1. REPRODUÇÃO DE REPLAY EM CÂMERA LENTA
+                if (estadoJogo === 'REPLAY') {
+                    replaySpeedTick++;
+                    if (replaySpeedTick % 2 === 0) {
+                        replayIndex++;
+                    }
+
+                    if (replayIndex < replayBuffer.length) {
+                        const snap = replayBuffer[replayIndex];
+                        if (snap) {
+                            if (bola && snap.b) {
+                                Body.setPosition(bola, snap.b);
+                                Body.setVelocity(bola, { x: 0, y: 0 });
+                            }
+                            if (window.player1 && snap.p1) {
+                                Body.setPosition(window.player1, snap.p1);
+                                Body.setVelocity(window.player1, { x: 0, y: 0 });
+                            }
+                            if (window.player2 && snap.p2) {
+                                Body.setPosition(window.player2, snap.p2);
+                                Body.setVelocity(window.player2, { x: 0, y: 0 });
+                            }
+                            for (let i = 3; i <= 10; i++) {
+                                if (window['player' + i] && snap['p' + i]) {
+                                    Body.setPosition(window['player' + i], snap['p' + i]);
+                                    Body.setVelocity(window['player' + i], { x: 0, y: 0 });
+                                }
+                            }
+                        }
+                    } else {
+                        finalizarReplay();
                     }
                     return;
                 }
@@ -2496,6 +2646,19 @@
                         else { reposicionarJogadores(); resetarUICompleta(); estadoJogo = 'JOGANDO'; forceFocus(); }
                     }
                 } else if (estadoJogo === 'JOGANDO') {
+                    // GRAVAÇÃO DE FRAMES PARA O REPLAY
+                    const snap = {
+                        b: { x: bola.position.x, y: bola.position.y },
+                        p1: window.player1 ? { x: window.player1.position.x, y: window.player1.position.y } : null,
+                        p2: window.player2 ? { x: window.player2.position.x, y: window.player2.position.y } : null
+                    };
+                    const maxP = isPenaltiesMode ? 2 : (modoDeJogo.includes('5V5') ? 10 : (modoDeJogo.includes('3V3') ? 6 : (modoDeJogo.includes('2V2') ? 4 : 2)));
+                    for (let i = 3; i <= maxP; i++) {
+                        if (window['player' + i]) snap['p' + i] = { x: window['player' + i].position.x, y: window['player' + i].position.y };
+                    }
+                    historicoPosicoes.push(snap);
+                    if (historicoPosicoes.length > 180) historicoPosicoes.shift();
+
                     for(let i=1; i<=10; i++) { if(window['dashP' + i] > 0) window['dashP' + i]--; }
                     const golSize = selCampoH * 0.44;
                     const golTop = (selCampoH / 2) - (golSize / 2), golBottom = (selCampoH / 2) + (golSize / 2);
@@ -2585,14 +2748,19 @@
 
                 if (isOnline && isHost) {
                     let min = Math.floor(tempoRestante / 60), sec = tempoRestante % 60;
-                    broadcast({
+                    const syncPacket = {
                         type: 'sync', st: estadoJogo,
-                        b: {x: bola.position.x, y: bola.position.y},
-                        p1: window.player1 ? {x: window.player1.position.x, y: window.player1.position.y} : null,
-                        p2: window.player2 ? {x: window.player2.position.x, y: window.player2.position.y} : null,
+                        b: { x: bola.position.x, y: bola.position.y },
+                        p1: window.player1 ? { x: window.player1.position.x, y: window.player1.position.y } : null,
+                        p2: window.player2 ? { x: window.player2.position.x, y: window.player2.position.y } : null,
                         s1: placar1, s2: placar2, timeStr: `${periodoJogo}º T • 0${min}:${sec < 10 ? '0'+sec : sec}`,
                         periodo: periodoJogo, ladosInvertidos: ladosInvertidos, msg: currentStatusMsg
-                    });
+                    };
+                    const maxP = isPenaltiesMode ? 2 : (modoDeJogo.includes('5V5') ? 10 : (modoDeJogo.includes('3V3') ? 6 : (modoDeJogo.includes('2V2') ? 4 : 2)));
+                    for (let i = 3; i <= maxP; i++) {
+                        if (window['player' + i]) syncPacket['p' + i] = { x: window['player' + i].position.x, y: window['player' + i].position.y };
+                    }
+                    broadcast(syncPacket);
                 }
             });
 
@@ -2670,16 +2838,67 @@
 
         function marcarGol(quem) {
             if (estadoJogo !== 'JOGANDO') return;
-            estadoJogo = 'GOL_CELEBRATION'; delayTimer = 110;
-            resetarUICompleta(); AudioEngine.playConfetti();
+            estadoJogo = 'REPLAY';
+            replayBuffer = [...historicoPosicoes];
+            replayIndex = 0;
+            replaySpeedTick = 0;
+            resetarUICompleta();
+            AudioEngine.playConfetti();
 
             const isP1 = quem === 'P1';
             if (isP1) placar1++, uiText('score1', placar1); else placar2++, uiText('score2', placar2);
 
+            const teamNum = isP1 ? (!ladosInvertidos ? 1 : 2) : (!ladosInvertidos ? 2 : 1);
+            const toquesTime = historicoToques.filter(t => t.teamId === teamNum);
+            const autorSlot = toquesTime.length > 0 ? toquesTime[toquesTime.length - 1].slot : (teamNum === 1 ? 1 : 2);
+            const assistSlot = toquesTime.length > 1 ? toquesTime[toquesTime.length - 2].slot : null;
+
+            const autorNome = (autorSlot === 1 ? (meuPerfil.nome || 'P1') : (playerNames[autorSlot] || (isRanked ? 'RIVAL' : `P${autorSlot}`)));
+            const assistNome = assistSlot && assistSlot !== autorSlot ? (playerNames[assistSlot] || `P${assistSlot}`) : null;
+
             const timeNome = isP1 ? cfgP1.time : cfgP2.time;
             currentStatusMsg = `GOL DO ${timeNome.toUpperCase()}!`;
-            uiText('texto-gol', currentStatusMsg); uiShow('texto-gol');
-            uiShow('mensagem-overlay', 'flex');
+            
+            // Replay 100% limpo: sem tela escura e sem textos no meio do campo
+            uiText('tv-badge-status', `🔴 REPLAY (0.5x) • GOL DO ${timeNome.toUpperCase()}`);
+            uiShow('btn-skip-replay', 'block');
+
+            if (isOnline && isHost) {
+                broadcast({
+                    type: 'sync', st: 'REPLAY', s1: placar1, s2: placar2,
+                    msg: currentStatusMsg, autor: autorNome, assist: assistNome
+                });
+            }
+        }
+
+        function votarPular() {
+            AudioEngine.playClick();
+            if (isOnline && !isHost) {
+                if (roomBroadcastChannel && myRoomID) {
+                    roomBroadcastChannel.postMessage({ type: 'client_skip_replay', targetRoom: myRoomID });
+                }
+                finalizarReplay();
+            } else {
+                finalizarReplay();
+            }
+        }
+
+        function finalizarReplay() {
+            uiHide('btn-skip-replay');
+            resetarUICompleta();
+            uiText('tv-badge-status', `${periodoJogo}º TEMPO • IAES CUP`);
+            if (isPenaltiesMode) prepararCobrancaPenalti();
+            else reposicionarJogadores();
+            estadoJogo = 'JOGANDO';
+            forceFocus();
+            if (isOnline && isHost) {
+                let min = Math.floor(tempoRestante / 60), sec = tempoRestante % 60;
+                broadcast({
+                    type: 'sync', st: 'JOGANDO', s1: placar1, s2: placar2,
+                    timeStr: `${periodoJogo}º T • 0${min}:${sec < 10 ? '0'+sec : sec}`,
+                    periodo: periodoJogo, ladosInvertidos: ladosInvertidos
+                });
+            }
         }
 
         function finalizarPartida(vencedorStr) {
@@ -2725,10 +2944,11 @@
             if (isOnline && isHost) {
                 inputs[1] = getLocalInputsP1();
                 inputs[2] = remoteInputs[2] || getLocalInputsP2();
+            } else if (isOnline && !isHost) {
+                return;
             } else {
-                const l1 = getLocalInputsP1(), l2 = getLocalInputsP2();
-                inputs[1] = { up: l1.w, down: l1.s, left: l1.a, right: l1.d, shoot: l1.shoot, dash: l1.dash };
-                inputs[2] = { up: l2.up, down: l2.down, left: l2.left, right: l2.right, shoot: l2.shoot, dash: l2.dash };
+                inputs[1] = getLocalInputsP1();
+                inputs[2] = getLocalInputsP2();
             }
 
             const max = isPenaltiesMode ? 2 : (modoDeJogo.includes('5V5') ? 10 : (modoDeJogo.includes('3V3') ? 6 : (modoDeJogo.includes('2V2') ? 4 : 2)));
