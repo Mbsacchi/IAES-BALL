@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IAES BALL PRO - Cartoon Football Champions</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;900&family=Montserrat:ital,wght@0,700;0,900;1,900&family=Rajdhani:wght@700;900&display=swap" rel="stylesheet">
+    <title>IAES BALL PRO - Futebol & HaxBall Champions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;900&family=Montserrat:ital,wght@0,700;0,900;1,900&family=Rajdhani:wght@700;900&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -17,7 +17,6 @@
         
         :root {
             --primary-gold: #f1c40f;
-            --primary-gold-dark: #b7950b;
             --pitch-green: #2ecc71;
             --pitch-green-dark: #0f4021;
             --pitch-bg-deep: #062313;
@@ -25,7 +24,6 @@
             --accent-purple: #9b59b6;
             --accent-red: #ff4757;
             --accent-orange: #ff9f43;
-            --cartoon-border: #0a1f14;
         }
 
         ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -39,18 +37,7 @@
             font-family: 'Fredoka', 'Montserrat', sans-serif; color: white; user-select: none;
         }
 
-        /* FUNDO CARTOON COM PARTÍCULAS */
-        body::before {
-            content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-image: 
-                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.05) 10px, transparent 11px),
-                radial-gradient(circle at 80% 20%, rgba(241, 196, 15, 0.06) 15px, transparent 16px),
-                radial-gradient(circle at 40% 40%, rgba(0, 210, 211, 0.04) 20px, transparent 21px);
-            background-size: 180px 180px;
-            pointer-events: none; z-index: 1;
-        }
-
-        /* HEADER GLOBAL CARTOON */
+        /* HEADER GLOBAL */
         #top-nav-bar {
             position: fixed; top: 0; left: 0; width: 100vw; height: 68px;
             background: rgba(5, 26, 14, 0.96); backdrop-filter: blur(14px);
@@ -61,21 +48,18 @@
         }
         .nav-brand {
             display: flex; align-items: center; gap: 10px; font-size: 26px; font-weight: 900;
-            color: #fff; font-family: 'Fredoka', sans-serif; text-shadow: 2px 2px 0px #000;
+            color: #fff; font-family: 'Fredoka', sans-serif;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
         .nav-brand span.highlight { color: #f1c40f; }
-        .nav-brand span.badge-pro {
-            background: linear-gradient(135deg, #ff4757, #ff6b81);
-            color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 6px;
-            border: 2px solid #000; box-shadow: 0 3px 0 #000;
-        }
         .nav-stats-group { display: flex; align-items: center; gap: 10px; }
 
         .nav-pill-cartoon {
             background: #0b381d; border: 3px solid #10b981;
             padding: 6px 14px; border-radius: 12px; font-size: 13px; font-weight: 900;
             display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.15s;
-            box-shadow: 0 4px 0 #051d0f; text-shadow: 1px 1px 0 #000;
+            box-shadow: 0 4px 0 #051d0f; color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
         .nav-pill-cartoon:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #051d0f; filter: brightness(1.1); }
         .nav-pill-cartoon:active { transform: translateY(2px); box-shadow: 0 2px 0 #051d0f; }
@@ -83,13 +67,25 @@
         .nav-pill-cartoon.danger { border-color: #ff4757; background: #380d12; color: #ff6b81; }
         .nav-pill-cartoon.admin { border-color: #ff9f43; background: #3a2206; color: #ff9f43; }
 
+        .btn-comprar-badge {
+            background: #f1c40f; color: #000 !important; font-size: 11px;
+            padding: 2px 8px; border-radius: 6px; font-weight: 900;
+            text-shadow: none !important; border: 1.5px solid #000;
+            box-shadow: 0 2px 0 #000;
+        }
+
+        .badge-nivel-nav {
+            background: #10b981; color: #000 !important; font-size: 11px;
+            padding: 2px 8px; border-radius: 6px; font-weight: 900;
+            text-shadow: none !important; border: 1.5px solid #000;
+        }
+
         #main-content-wrapper {
             position: fixed; top: 68px; left: 0; width: 100vw; height: calc(100vh - 68px);
             overflow-y: auto; overflow-x: hidden; display: flex; justify-content: center; align-items: center;
             padding: 20px; z-index: 100;
         }
 
-        /* CARTOON CONTAINER AMPLO */
         .screen-card-cartoon {
             width: 95vw; max-width: 1280px; background: rgba(8, 38, 20, 0.96);
             backdrop-filter: blur(16px); border: 4px solid #10b981;
@@ -102,14 +98,18 @@
         .active-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; }
         @keyframes popIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
-        /* BOTÕES 3D CARTOON */
+        h1, h2, h3, .time-nome-tv, #texto-gol { text-shadow: 0 2px 6px rgba(0,0,0,0.85); font-weight: 900; }
+        p, .mode-desc-cartoon { color: #f1f5f9; text-shadow: 0 1px 3px rgba(0,0,0,0.8); font-weight: 600; }
+
+        /* BOTÕES 3D */
         .btn-cartoon {
             background: linear-gradient(180deg, #2ecc71, #10b981); color: white;
             border: 3px solid #082d17; border-bottom: 6px solid #062111;
             padding: 12px 20px; font-size: 13px; font-weight: 900; border-radius: 12px;
             cursor: pointer; transition: all 0.1s; text-transform: uppercase; outline: none;
             letter-spacing: 0.5px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4); text-shadow: 1px 1px 0 #000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
             font-family: 'Fredoka', sans-serif;
         }
         .btn-cartoon:hover { filter: brightness(1.1); transform: translateY(-2px); border-bottom-width: 8px; }
@@ -117,7 +117,8 @@
         
         .btn-cartoon.gold {
             background: linear-gradient(180deg, #f1c40f, #d4ac0d); color: #000;
-            border-color: #5d4905; border-bottom-color: #382c03; text-shadow: none;
+            border-color: #5d4905; border-bottom-color: #382c03;
+            text-shadow: none; font-weight: 900;
         }
         .btn-cartoon.purple {
             background: linear-gradient(180deg, #a55eea, #8854d0); color: #fff;
@@ -129,7 +130,7 @@
         }
         .btn-cartoon.cyan {
             background: linear-gradient(180deg, #00d2d3, #01a3a4); color: #000;
-            border-color: #034b4c; border-bottom-color: #012829; text-shadow: none;
+            border-color: #034b4c; border-bottom-color: #012829; text-shadow: none; font-weight:900;
         }
         .btn-cartoon.red {
             background: linear-gradient(180deg, #ff4757, #c0392b); color: #fff;
@@ -142,16 +143,16 @@
             text-align: center; margin-bottom: 10px; width: 100%;
             font-family: 'Fredoka', sans-serif; font-weight: 700; outline: none;
             box-shadow: inset 0 4px 8px rgba(0,0,0,0.6);
+            text-shadow: none;
         }
         .input-cartoon:focus { border-color: #f1c40f; box-shadow: 0 0 15px rgba(241,196,15,0.4); }
 
-        /* LOBBY LAYOUT DUPLO: AVATAR SHOWCASE + CARDS DE MODOS */
+        /* LOBBY LAYOUT */
         .lobby-main-grid {
             display: grid; grid-template-columns: 290px 1fr; gap: 20px; width: 100%; margin: 12px 0;
             text-align: left;
         }
 
-        /* CARD SHOWCASE DO JOGADOR */
         .player-showcase-card {
             background: linear-gradient(180deg, #0d3820, #061c0f);
             border: 4px solid #10b981; border-radius: 18px; padding: 18px 14px;
@@ -173,7 +174,6 @@
             text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
         }
 
-        /* 4 CARDS DE MODO DE JOGO CARTOON */
         .cartoon-modes-grid {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%;
         }
@@ -196,15 +196,15 @@
 
         .mode-title-cartoon {
             font-size: 19px; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 8px;
-            text-shadow: 1px 1px 0 #000;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
-        .mode-desc-cartoon { font-size: 12px; color: #a7f3d0; margin-top: 6px; font-weight: 600; line-height: 1.35; }
+        .mode-desc-cartoon { font-size: 13px; margin-top: 6px; line-height: 1.35; color: #f8fafc; font-weight: 600; }
         .mode-badge-cartoon {
-            align-self: flex-start; margin-top: 10px; font-size: 10px; font-weight: 900;
-            padding: 3px 10px; border-radius: 8px; border: 2px solid rgba(0,0,0,0.4); text-transform: uppercase;
+            align-self: flex-start; margin-top: 10px; font-size: 11px; font-weight: 900;
+            padding: 3px 10px; border-radius: 8px; border: 2px solid rgba(0,0,0,0.5); text-transform: uppercase;
+            text-shadow: none;
         }
 
-        /* DOCK DE RECURSOS NO RODAPÉ */
         .cartoon-dock-grid {
             display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; width: 100%; margin-top: 14px;
         }
@@ -214,12 +214,12 @@
             font-size: 11px; font-weight: 900; text-transform: uppercase; color: #fff;
             display: flex; flex-direction: column; align-items: center; gap: 4px;
             box-shadow: 0 5px 0 #04140a;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
         .dock-item-cartoon:hover { transform: translateY(-3px); box-shadow: 0 8px 0 #04140a; filter: brightness(1.15); }
         .dock-item-cartoon:active { transform: translateY(3px); box-shadow: 0 1px 0 #04140a; }
         .dock-item-cartoon span.icon { font-size: 22px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
 
-        /* TABELA DE RANKS & PDL */
         .ranks-pdl-banner-cartoon {
             background: #061f12; border: 3px solid #f1c40f; border-radius: 14px;
             padding: 8px 14px; width: 100%; margin-bottom: 12px;
@@ -227,11 +227,11 @@
             box-shadow: 0 4px 0 #020d07;
         }
         .rank-tier-pill-cartoon {
-            display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 900;
-            background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.15);
+            display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 900;
+            background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.25);
+            text-shadow: none;
         }
 
-        /* MODAIS CARTOON */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
@@ -239,23 +239,30 @@
         }
         .modal-box-cartoon {
             background: #072614; border: 4px solid #10b981; border-radius: 20px; padding: 24px;
-            width: 90vw; max-width: 780px; text-align: left; box-shadow: 0 16px 0 #031209, 0 25px 60px rgba(0,0,0,0.95);
+            width: 90vw; max-width: 820px; text-align: left; box-shadow: 0 16px 0 #031209, 0 25px 60px rgba(0,0,0,0.95);
             max-height: 88vh; overflow-y: auto; overflow-x: hidden;
         }
         .modal-header-cartoon { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
 
-        /* GRID TIMES */
-        .grid-times-cartoon { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 12px; width: 100%; }
+        /* GRID TIMES: 6 COLUNAS */
+        .grid-times-cartoon { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 12px; width: 100%; }
         .shield-btn-cartoon {
-            width: 100%; height: 98px; cursor: pointer; border-radius: 12px 12px 32px 32px;
+            width: 100%; height: 96px; cursor: pointer; border-radius: 12px 12px 28px 28px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 4px solid #000; transition: 0.15s; position: relative; overflow: hidden;
+            border: 3.5px solid #000; transition: 0.15s; position: relative; overflow: hidden;
             box-shadow: 0 6px 0 #000;
         }
-        .shield-btn-cartoon:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 9px 0 #000; filter: brightness(1.1); }
+        .shield-btn-cartoon:hover { transform: translateY(-3px) scale(1.06); box-shadow: 0 9px 0 #000; filter: brightness(1.15); }
         .shield-btn-cartoon:active { transform: translateY(3px); box-shadow: 0 2px 0 #000; }
-        .shield-btn-cartoon span { font-size: 12px; font-weight: 900; z-index: 2; text-align: center; text-shadow: 1px 1px 0 #000; }
-        .shield-faixa-cartoon { position: absolute; width: 160%; height: 28px; transform: rotate(-45deg); z-index: 1; opacity: 0.85; }
+        
+        .shield-name-pill {
+            background: rgba(0, 0, 0, 0.88); color: #ffffff !important;
+            padding: 4px 10px; border-radius: 8px; font-size: 11.5px; font-weight: 900;
+            letter-spacing: 0.5px; z-index: 5; border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.7); text-shadow: none !important;
+            white-space: nowrap; text-transform: uppercase;
+        }
+        .shield-faixa-cartoon { position: absolute; width: 160%; height: 28px; transform: rotate(-45deg); z-index: 1; opacity: 0.9; }
 
         /* IN-GAME HUD */
         #game-screen-container {
@@ -274,27 +281,29 @@
             position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
             background: #f1c40f; border: 2px solid #000; color: #000;
             font-size: 10px; font-weight: 900; padding: 2px 12px; border-radius: 10px;
-            letter-spacing: 0.5px; box-shadow: 0 2px 0 #000;
+            letter-spacing: 0.5px; box-shadow: 0 2px 0 #000; text-shadow: none;
         }
         .team-box-broadcast { flex: 1; display: flex; align-items: center; gap: 10px; }
         .team-box-broadcast.t1 { justify-content: flex-end; }
         .team-box-broadcast.t2 { justify-content: flex-start; }
-        .time-nome-tv { font-size: 22px; font-weight: 900; font-family: 'Fredoka', sans-serif; text-shadow: 2px 2px 0 #000; }
+        .time-nome-tv { font-size: 22px; font-weight: 900; font-family: 'Fredoka', sans-serif; }
         .score-box-tv {
             background: #03140a; color: #fff; font-size: 28px; font-weight: 900;
             padding: 2px 14px; border-radius: 10px; border: 3px solid #10b981;
             font-family: 'Fredoka', sans-serif; box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
         .match-timer-tv {
             background: #0a381d; color: #f1c40f; padding: 6px 16px; border-radius: 12px;
             font-size: 20px; min-width: 150px; text-align: center; border: 3px solid #f1c40f;
             font-weight: 900; font-family: 'Fredoka', sans-serif; margin: 0 12px;
             box-shadow: 0 3px 0 #031209;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
 
         #game-wrapper {
-            position: relative; border-radius: 18px; overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 0 5px #10b981;
+            position: relative; border-radius: 16px; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 0 4px #10b981;
             outline: none; background: #0b381d;
         }
         #field-canvas, #matter-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
@@ -305,27 +314,26 @@
             display: none; justify-content: center; align-items: center; flex-direction: column;
             background: rgba(0,0,0,0.8); text-align: center; padding: 20px;
         }
-        #texto-gol { font-size: 60px; font-weight: 900; font-family: 'Fredoka', sans-serif; text-shadow: 4px 4px 0 #000, 0 0 30px #10b981; }
-        #texto-assist { font-size: 20px; color: #f1c40f; font-weight: 900; margin-top: 6px; text-shadow: 2px 2px 0 #000; }
+        #texto-gol { font-size: 60px; font-weight: 900; font-family: 'Fredoka', sans-serif; color: #f1c40f; }
+        #texto-assist { font-size: 20px; color: #2ecc71; font-weight: 900; margin-top: 6px; }
         #texto-estado { font-size: 18px; color: #fff; margin-top: 8px; font-weight: 800; background: #062313; border: 3px solid #10b981; padding: 8px 18px; border-radius: 12px; }
 
-        .btn-ingame { position: absolute; z-index: 20; background: #062313; color: white; border: 2px solid #10b981; padding: 8px 14px; font-weight: 900; font-size: 11px; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 0 #031209; }
+        .btn-ingame { position: absolute; z-index: 20; background: #062313; color: white; border: 2px solid #10b981; padding: 8px 14px; font-weight: 900; font-size: 11px; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 0 #031209; text-shadow: none; }
         .btn-ingame:hover { filter: brightness(1.2); }
         #btn-voltar-partida { top: 15px; left: 15px; }
         #btn-config-ingame { top: 15px; right: 15px; }
         #btn-admin-ingame { top: 15px; right: 95px; display: none; background: #ff9f43; border-color: #5c1819; color: #000; }
         #btn-skip-replay { bottom: 20px; right: 20px; display: none; background: #ff4757; }
 
-        /* CHAT IN-GAME */
         #game-chat-box {
             position: absolute; bottom: 15px; left: 15px; width: 340px; z-index: 30;
             display: flex; flex-direction: column; gap: 4px; pointer-events: auto;
         }
         #chat-messages-log {
             max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 3px;
-            font-size: 12px; font-weight: 800; text-shadow: 1px 1px 2px #000;
+            font-size: 12px; font-weight: 800;
         }
-        .chat-msg-line { background: rgba(3, 20, 11, 0.85); padding: 4px 8px; border-radius: 6px; border: 1.5px solid #10b981; display: inline-block; width: fit-content; }
+        .chat-msg-line { background: rgba(3, 20, 11, 0.92); padding: 4px 8px; border-radius: 6px; border: 1.5px solid #10b981; display: inline-block; width: fit-content; text-shadow: none; }
         #input-game-chat {
             background: #041a0e; border: 2px solid #10b981; border-radius: 8px;
             color: #fff; font-size: 12px; padding: 7px 10px; outline: none; font-family: 'Fredoka'; font-weight: 600;
@@ -336,6 +344,7 @@
             background: #092e19; border: 3px solid #f1c40f; padding: 12px 28px;
             border-radius: 14px; font-weight: 900; font-size: 14px; color: #fff;
             z-index: 9999; display: none; box-shadow: 0 10px 0 #04140a, 0 15px 30px rgba(0,0,0,0.9);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
 
         .penalty-dots-box { display: flex; gap: 6px; margin-top: 4px; }
@@ -351,35 +360,35 @@
     <!-- HEADER GLOBAL -->
     <header id="top-nav-bar">
         <div class="nav-brand">
-            ⚽ IAES BALL <span class="highlight">PRO</span> <span class="badge-pro">CARTOON</span>
+            ⚽ IAES BALL <span class="highlight">PRO</span>
         </div>
         <div class="nav-stats-group">
             <div class="nav-pill-cartoon admin" id="nav-btn-admin" style="display:none;" onclick="abrirModalAdmin()">
                 <span>👑</span> PAINEL ADM
             </div>
             <div class="nav-pill-cartoon gold" onclick="abrirModalComprarMoedasPix()">
-                <span>🪙</span> <b id="nav-moedas-txt">300</b> <span style="background:#f1c40f; color:#000; font-size:10px; padding:1px 6px; border-radius:4px; font-weight:900;">+ COMPRAR</span>
+                <span>🪙</span> <b id="nav-moedas-txt">300</b> <span class="btn-comprar-badge">+ COMPRAR</span>
             </div>
             <div class="nav-pill-cartoon" onclick="abrirLeaderboardGlobal()">
                 <span>🏆</span> <span id="nav-rank-txt">1000 PDL (OURO)</span>
             </div>
             <div class="nav-pill-cartoon" onclick="abrirEstatisticas()">
-                <span id="nav-nivel-badge" style="background:#10b981; color:#000; font-size:10px; padding:1px 6px; border-radius:4px; font-weight:900;">NVL 1</span>
+                <span id="nav-nivel-badge" class="badge-nivel-nav">NVL 1</span>
                 <span id="nav-nome-txt">CRAQUE</span>
             </div>
-            <div class="nav-pill-cartoon" onclick="abrirModalConfiguracoes()"><span>⚙️</span> SOM</div>
+            <div class="nav-pill-cartoon" onclick="abrirModalConfiguracoes()"><span>⚙️</span> OPÇÕES & SOM</div>
             <div class="nav-pill-cartoon danger" onclick="deslogar()">SAIR</div>
         </div>
     </header>
 
     <main id="main-content-wrapper">
         
-        <!-- TELA DE LOGIN -->
+        <!-- LOGIN -->
         <div id="screen-login" class="screen active-screen">
             <div class="screen-card-cartoon" style="max-width: 480px;">
-                <div style="font-size: 55px; margin-bottom: 6px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));">🏆</div>
-                <h1 style="color: #2ecc71; font-size: 34px; font-family: 'Fredoka', sans-serif; text-shadow: 2px 2px 0 #000;">IAES BALL PRO</h1>
-                <p style="color: #a7f3d0; font-size: 13px; font-weight:600; margin-bottom: 20px;">Entre com seu Nickname para jogar offline ou online</p>
+                <div style="font-size: 55px; margin-bottom: 6px;">🏆</div>
+                <h1 style="color: #2ecc71; font-size: 34px; font-family: 'Fredoka', sans-serif;">IAES BALL PRO</h1>
+                <p style="font-size: 13px; margin-bottom: 20px;">Entre com seu Nickname para jogar offline ou online</p>
                 <input type="text" id="input-nickname" class="input-cartoon" placeholder="SEU NICKNAME (MÍN. 3 LETRAS)" maxlength="16">
                 <input type="password" id="input-senha" class="input-cartoon" placeholder="SUA SENHA (MÍN. 6 DÍGITOS)" maxlength="32">
                 <div style="display:flex; gap:10px; margin-top:8px;">
@@ -390,35 +399,35 @@
             </div>
         </div>
 
-        <!-- LOBBY PRINCIPAL CARTOONIZADO E AMPLO -->
+        <!-- LOBBY PRINCIPAL -->
         <div id="screen-home" class="screen">
             <div class="screen-card-cartoon">
                 
                 <!-- BANNER DE PATENTES & PDL -->
                 <div class="ranks-pdl-banner-cartoon">
-                    <div style="font-size:12px; font-weight:900; color:#f1c40f; width:100%; text-align:left; margin-bottom:2px;">
+                    <div style="font-size:12.5px; font-weight:900; color:#f1c40f; width:100%; text-align:left; margin-bottom:2px;">
                         🏆 SISTEMA DE CLASSIFICAÇÃO RANKED (PDL POR PATENTE):
                     </div>
                     <div class="rank-tier-pill-cartoon" style="color:#cd7f32;">🥉 BRONZE: 0 - 499 PDL</div>
-                    <div class="rank-tier-pill-cartoon" style="color:#bdc3c7;">🥈 PRATA: 500 - 999 PDL</div>
+                    <div class="rank-tier-pill-cartoon" style="color:#e2e8f0;">🥈 PRATA: 500 - 999 PDL</div>
                     <div class="rank-tier-pill-cartoon" style="color:#f1c40f;">🥇 OURO: 1000 - 1499 PDL</div>
                     <div class="rank-tier-pill-cartoon" style="color:#1abc9c;">💎 PLATINA: 1500 - 1999 PDL</div>
                     <div class="rank-tier-pill-cartoon" style="color:#3498db;">💠 DIAMANTE: 2000 - 2499 PDL</div>
-                    <div class="rank-tier-pill-cartoon" style="color:#9b59b6;">👑 MESTRE: 2500 - 2999 PDL</div>
-                    <div class="rank-tier-pill-cartoon" style="color:#ff4757;">🔥 DESAFIANTE: 3000+ PDL</div>
+                    <div class="rank-tier-pill-cartoon" style="color:#d2a8ff;">👑 MESTRE: 2500 - 2999 PDL</div>
+                    <div class="rank-tier-pill-cartoon" style="color:#ff6b81;">🔥 DESAFIANTE: 3000+ PDL</div>
                 </div>
 
                 <div class="lobby-main-grid">
                     
                     <!-- PAINEL ESQUERDO: CRAQUE SHOWCASE -->
                     <div class="player-showcase-card">
-                        <div style="font-size:12px; font-weight:900; color:#10b981; text-transform:uppercase;">MEU JOGADOR</div>
+                        <div style="font-size:13px; font-weight:900; color:#10b981; text-transform:uppercase;">MEU JOGADOR</div>
                         <div class="avatar-circle-preview" id="lobby-avatar-preview">
                             <div class="avatar-shine-pill"></div>
                             <div class="avatar-number-txt" id="lobby-avatar-number">10</div>
                         </div>
-                        <h2 style="font-size:20px; color:#fff; font-weight:900; text-shadow:1px 1px 0 #000;" id="lobby-card-nome">CRAQUE</h2>
-                        <div style="font-size:12px; font-weight:800; color:#f1c40f; margin:4px 0;" id="lobby-card-elo">1000 PDL • OURO</div>
+                        <h2 style="font-size:22px; color:#fff; font-weight:900;" id="lobby-card-nome">CRAQUE</h2>
+                        <div style="font-size:13px; font-weight:900; color:#f1c40f; margin:4px 0;" id="lobby-card-elo">1000 PDL • OURO</div>
                         <div style="display:flex; gap:6px; width:100%; margin-top:8px;">
                             <button class="btn-cartoon gold" style="flex:1; padding:8px 6px; font-size:11px;" onclick="abrirModalComprarMoedasPix()">🪙 COMPRAR PIX</button>
                             <button class="btn-cartoon cyan" style="flex:1; padding:8px 6px; font-size:11px;" onclick="abrirLoja()">🛒 MERCADO</button>
@@ -429,8 +438,8 @@
                     <div>
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                             <div>
-                                <h1 style="font-size:28px; color:#2ecc71; font-family:'Fredoka', sans-serif; text-shadow:2px 2px 0 #000;">SELEÇÃO DE MODOS</h1>
-                                <p style="font-size:12px; color:#a7f3d0; font-weight:600;">Partidas rápidas, Ranked competitiva ou disputa de Pênaltis no mapa Titã!</p>
+                                <h1 style="font-size:28px; color:#2ecc71; font-family:'Fredoka', sans-serif;">SELEÇÃO DE MODOS</h1>
+                                <p style="font-size:13px;">Partidas rápidas, Ranked competitiva ou disputa de Pênaltis no mapa Titã!</p>
                             </div>
                         </div>
 
@@ -449,9 +458,9 @@
                             <div class="mode-card-cartoon" onclick="irParaModo(false)">
                                 <div>
                                     <div class="mode-title-cartoon" style="color:#2ecc71;">⚽ JOGO RÁPIDO</div>
-                                    <div class="mode-desc-cartoon">1v1 a 5v5 offline com Torcida vibrando nas arquibancadas + 2 tempos de 1m30s!</div>
+                                    <div class="mode-desc-cartoon">1v1 a 5v5 offline no gramado realista + torcida vibrante!</div>
                                 </div>
-                                <div class="mode-badge-cartoon" style="background:#10b981; color:#000;">ARCADE • COM TORCIDA</div>
+                                <div class="mode-badge-cartoon" style="background:#10b981; color:#000;">OFFLINE • 1v1 a 5v5</div>
                             </div>
 
                             <!-- PÊNALTIS TITÃ -->
@@ -505,7 +514,7 @@
         <div id="screen-matchmaking" class="screen">
             <div class="screen-card-cartoon" style="max-width: 650px;">
                 <h1 style="color: #d2a8ff; font-family:'Fredoka'; font-size:32px;">⚔️ FILA RANKED COMPETITIVA</h1>
-                <p style="color:#a7f3d0; font-size:13px; font-weight:600; margin-bottom:18px;">Partidas competitivas valendo PDL nos mapas oficiais</p>
+                <p style="font-size:13px; margin-bottom:18px;">Partidas competitivas valendo PDL nos mapas oficiais</p>
 
                 <div style="background: #082012; border: 3px solid #8e44ad; border-radius: 16px; padding: 22px; margin-bottom: 18px; box-shadow: 0 6px 0 #04140a;">
                     <div style="display:flex; justify-content:space-around; margin-bottom:16px; font-size:14px; font-weight:bold;">
@@ -517,7 +526,6 @@
                     <div id="mm-status-box" style="text-align:center;">
                         <div id="mm-status-txt" style="font-size:18px; font-weight:900; color:#cbd5e1;">Pronto para buscar partida</div>
                         <div id="mm-timer-txt" style="font-size:38px; font-weight:900; color:#f1c40f; font-family:'Fredoka'; margin:10px 0; display:none;">00:00</div>
-                        <div id="mm-detail-txt" style="font-size:12px; color:#a7f3d0;"></div>
                     </div>
 
                     <button class="btn-cartoon purple" id="btn-iniciar-mm" style="width:100%; margin-top:14px;" onclick="iniciarBuscaRanked()">🔍 BUSCAR PARTIDA</button>
@@ -559,7 +567,7 @@
             </div>
         </div>
 
-        <!-- TIMES -->
+        <!-- TIMES: 18 CLUBES -->
         <div id="screen-team" class="screen">
             <div class="screen-card-cartoon">
                 <h1 id="title-jogador-team" style="color:#f1c40f; font-family:'Fredoka'; font-size:30px;">CAPITÃO: ESCOLHA SEU TIME</h1>
@@ -595,7 +603,7 @@
             </div>
         </div>
 
-        <!-- HAXBALL ROOM LIST COM CONEXÃO LOCAL E GLOBAL -->
+        <!-- HAXBALL ROOM LIST -->
         <div id="screen-online-rooms" class="screen">
             <div class="screen-card-cartoon" style="max-width: 980px; padding: 18px;">
                 <div style="width: 100%; background: #082012; border: 3px solid #10b981; border-radius: 14px; overflow: hidden; text-align: left; box-shadow: 0 6px 0 #04140a;">
@@ -635,9 +643,9 @@
             </div>
         </div>
 
-        <!-- LOBBY INTERATIVO HOST & CLIENT -->
+        <!-- LOBBY MULTIPLAYER -->
         <div id="screen-online-host" class="screen">
-            <div class="screen-card-cartoon" style="max-width: 700px;">
+            <div class="screen-card-cartoon" style="max-width: 720px;">
                 <h1 style="font-size:26px; color:#2ecc71;">🎮 LOBBY MULTIPLAYER</h1>
                 <div id="txt-codigo-sala" style="font-size:17px; font-weight:900; color:#00d2d3; padding:8px; background:#000; border-radius:8px; margin:8px 0; border:2px solid #00d2d3;">GERANDO SALA...</div>
                 <button class="btn-cartoon cyan" style="padding:6px 14px; font-size:11px; margin-bottom:8px;" onclick="copiarCodigoSala()">📋 COPIAR CÓDIGO DA SALA</button>
@@ -645,16 +653,16 @@
                 
                 <div style="display:flex; gap:12px; width:100%; margin:10px 0;">
                     <div style="flex:1; background:rgba(41,128,185,0.2); border:3px solid #3498db; padding:12px; border-radius:12px;">
-                        <h3 style="color:#3498db; margin-bottom:8px;">🔵 TIME AZUL (HOST)</h3>
+                        <h3 style="color:#3498db; margin-bottom:8px;">🔵 TIME 1 (HOST)</h3>
                         <div id="lobby-t1-container" style="display:flex; flex-direction:column; gap:6px;"></div>
                     </div>
                     <div style="flex:1; background:rgba(192,57,43,0.2); border:3px solid #e74c3c; padding:12px; border-radius:12px;">
-                        <h3 style="color:#e74c3c; margin-bottom:8px;">🔴 TIME VERMELHO (CLIENT)</h3>
+                        <h3 style="color:#e74c3c; margin-bottom:8px;">🔴 TIME 2 (CLIENT)</h3>
                         <div id="lobby-t2-container" style="display:flex; flex-direction:column; gap:6px;"></div>
                     </div>
                 </div>
 
-                <button class="btn-cartoon" id="btn-host-avancar" style="width:100%; padding:14px; font-size:14px;" onclick="avancarAposLobby()">▶️ ESCOLHER TIMES E JOGAR ➔</button>
+                <button class="btn-cartoon" id="btn-host-avancar" style="width:100%; padding:14px; font-size:14px;" onclick="avancarAposLobby()">▶️ ESCOLHER TIMES E INICIAR ➔</button>
                 <button class="btn-cartoon red" style="width:100%; margin-top:10px;" onclick="cancelarOnline()">SAIR DA SALA</button>
             </div>
         </div>
@@ -713,14 +721,14 @@
         </div>
     </main>
 
-    <!-- MODAL DE COMPRA DE MOEDAS VIA PIX (CHAVE: 67981520229) -->
+    <!-- MODAL DE COMPRA DE MOEDAS VIA PIX -->
     <div id="modal-comprar-moedas" class="modal-overlay">
         <div class="modal-box-cartoon" style="border-color: #00d2d3;">
             <div class="modal-header-cartoon">
                 <h2 style="color:#00d2d3; margin:0; font-size:24px;">🪙 BANCO IAES - COMPRAR MOEDAS</h2>
                 <span style="font-size:12px; background:#10b981; color:#000; padding:3px 8px; border-radius:6px; font-weight:900;">⚡ 1 REAL = 1.000 MOEDAS</span>
             </div>
-            <p style="font-size:12px; color:#a7f3d0; margin-bottom:12px;">Faça o PIX para a chave oficial. O Administrador confirmará no Painel para liberar suas moedas!</p>
+            <p style="font-size:12px; margin-bottom:12px;">Faça o PIX para a chave oficial. O Administrador confirmará no Painel para liberar suas moedas!</p>
 
             <div style="background:#04140b; border:3px solid #10b981; border-radius:12px; padding:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; box-shadow:0 4px 0 #020d07;">
                 <div>
@@ -753,7 +761,7 @@
 
             <div id="pix-checkout-box" style="display:none; background:#04140b; border:3px solid #10b981; border-radius:12px; padding:14px; margin-top:10px; text-align:center;">
                 <div id="pix-checkout-title" style="font-weight:900; color:#f1c40f; font-size:15px;">PEDIDO SELECIONADO</div>
-                <div style="font-size:13px; color:#a7f3d0; margin:6px 0;" id="pix-checkout-desc">Valor: R$ 1,00 | Moedas: +1.000 🪙</div>
+                <div style="font-size:13px; margin:6px 0;" id="pix-checkout-desc">Valor: R$ 1,00 | Moedas: +1.000 🪙</div>
                 <input type="text" id="input-pix-nome-pagador" class="input-cartoon" style="text-align:left; margin-bottom:10px;" placeholder="Nome do Pagador no Comprovante">
                 <div style="display:flex; gap:10px; justify-content:center;">
                     <button class="btn-cartoon" style="flex:1;" onclick="enviarPedidoPixParaAdmin()">✅ JÁ FIZ O PIX / ENVIAR AO ADM</button>
@@ -765,7 +773,7 @@
         </div>
     </div>
 
-    <!-- MODAL ADMIN MASTER COM LOCALSTORAGE + FIRESTORE SYNC -->
+    <!-- MODAL ADMIN MASTER -->
     <div id="modal-admin" class="modal-overlay">
         <div class="modal-box-cartoon" style="border-color: #ff9f43; max-width: 840px;">
             <div class="modal-header-cartoon">
@@ -801,7 +809,7 @@
                         <input type="text" id="admin-input-busca-jogador" class="input-cartoon" style="margin:0; text-align:left;" placeholder="Digite o Nickname exato...">
                         <button class="btn-cartoon" style="padding:8px 14px;" onclick="adminBuscarJogador()">BUSCAR</button>
                     </div>
-                    <div id="admin-resultado-jogador" style="font-size:13px; color:#a7f3d0; padding:10px; background:#020c06; border-radius:8px; min-height:80px;">
+                    <div id="admin-resultado-jogador" style="font-size:13px; padding:10px; background:#020c06; border-radius:8px; min-height:80px;">
                         Digite o nick para gerenciar.
                     </div>
                 </div>
@@ -917,21 +925,46 @@
         </div>
     </div>
 
-    <!-- MODAL CONFIG -->
+    <!-- MODAL OPÇÕES & ÁUDIO -->
     <div id="modal-configuracoes" class="modal-overlay">
-        <div class="modal-box-cartoon">
-            <div class="modal-header-cartoon"><h2 style="margin:0; color:#f1c40f;">⚙️ CONFIGURAÇÕES DE ÁUDIO</h2></div>
-            <div style="margin-bottom:12px;">
-                <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold; margin-bottom:4px;">
-                    <span>🔊 Volume Geral</span><span id="txt-vol-master">80%</span>
-                </div>
-                <input type="range" id="slider-vol-master" style="width:100%; accent-color:#10b981;" min="0" max="100" value="80" oninput="ajustarVolumes()">
+        <div class="modal-box-cartoon" style="border-color:#f1c40f; max-width:550px;">
+            <div class="modal-header-cartoon">
+                <h2 style="margin:0; color:#f1c40f; font-size:24px;">⚙️ OPÇÕES DE ÁUDIO & JOGO</h2>
             </div>
-            <button class="btn-cartoon" style="width:100%; margin-top:10px;" onclick="fecharModalConfiguracoes()">SALVAR E FECHAR</button>
+            
+            <div style="background:#04140b; border:2px solid #10b981; border-radius:12px; padding:16px; margin-bottom:14px;">
+                <div style="margin-bottom:14px;">
+                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:900; margin-bottom:6px;">
+                        <span>🔊 Volume Geral (Master)</span><span id="txt-vol-master" style="color:#f1c40f;">80%</span>
+                    </div>
+                    <input type="range" id="slider-vol-master" style="width:100%; accent-color:#10b981; cursor:pointer;" min="0" max="100" value="80" oninput="ajustarVolumes()">
+                </div>
+
+                <div style="margin-bottom:14px;">
+                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:900; margin-bottom:6px;">
+                        <span>🎵 Música de Fundo (Trilha Sonora)</span><span id="txt-vol-music" style="color:#00d2d3;">60%</span>
+                    </div>
+                    <input type="range" id="slider-vol-music" style="width:100%; accent-color:#00d2d3; cursor:pointer;" min="0" max="100" value="60" oninput="ajustarVolumes()">
+                </div>
+
+                <div style="margin-bottom:6px;">
+                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:900; margin-bottom:6px;">
+                        <span>💥 Efeitos Sonoros (Chutes & Torcida)</span><span id="txt-vol-sfx" style="color:#2ecc71;">85%</span>
+                    </div>
+                    <input type="range" id="slider-vol-sfx" style="width:100%; accent-color:#2ecc71; cursor:pointer;" min="0" max="100" value="85" oninput="ajustarVolumes()">
+                </div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-bottom:14px;">
+                <button class="btn-cartoon cyan" id="btn-toggle-musica" style="flex:1;" onclick="toggleMusicaFundo()">🎵 MÚSICA: LIGADA</button>
+                <button class="btn-cartoon gold" style="flex:1;" onclick="testarAudio()">🔊 TESTAR SOM</button>
+            </div>
+
+            <button class="btn-cartoon" style="width:100%;" onclick="fecharModalConfiguracoes()">SALVAR E FECHAR</button>
         </div>
     </div>
 
-    <!-- TELA IN-GAME COM CHAT E VISUAL CARTOON -->
+    <!-- TELA IN-GAME COM CAMPO REALISTA, ARQUIBANCADA & TORCIDA PROFISSIONAL -->
     <div id="game-screen-container">
         <button id="btn-voltar-partida" class="btn-ingame" onclick="voltarMenu()">🚪 SAIR</button>
         <button id="btn-config-ingame" class="btn-ingame" onclick="abrirModalConfiguracoes()">⚙️ SOM</button>
@@ -971,7 +1004,7 @@
             <!-- CHAT IN-GAME -->
             <div id="game-chat-box">
                 <div id="chat-messages-log">
-                    <div class="chat-msg-line" style="color:#00d2d3;">💬 Digite no chat ou use /avatar &lt;texto/emoji&gt;</div>
+                    <div class="chat-msg-line" style="color:#00d2d3;">💬 Pressione ESPAÇO ou X para chutar • /avatar &lt;texto/emoji&gt;</div>
                 </div>
                 <input type="text" id="input-game-chat" placeholder="Pressione Enter para enviar (ou /avatar 99)..." maxlength="60" onkeydown="handleChatInput(event)">
             </div>
@@ -981,7 +1014,7 @@
     <script>
         const Engine = Matter.Engine, Render = Matter.Render, Runner = Matter.Runner, Bodies = Matter.Bodies, Body = Matter.Body, Composite = Matter.Composite, Events = Matter.Events;
 
-        // --- SISTEMA DE PERSISTÊNCIA ROBUSTA (LOCALSTORAGE + BROADCASTCHANNEL + FIRESTORE) ---
+        // --- SISTEMA DE REDE & SINCRONIZAÇÃO MULTIPLAYER ---
         const roomBroadcastChannel = window.BroadcastChannel ? new BroadcastChannel('iaes_multiplayer_hub') : null;
         const pixBroadcastChannel = window.BroadcastChannel ? new BroadcastChannel('iaes_pix_bus') : null;
 
@@ -1003,10 +1036,12 @@
             };
         }
 
-        // --- SISTEMA DE ÁUDIO ---
+        // --- SISTEMA DE ÁUDIO & TRILHA SONORA ELETRÔNICA DO ESTÁDIO ---
         const AudioEngine = {
             ctx: null, masterGain: null, sfxGain: null, musicGain: null,
-            volMaster: 0.8, volSFX: 0.8, volMusic: 0.5,
+            volMaster: 0.8, volSFX: 0.85, volMusic: 0.6,
+            musicPlaying: false, musicInterval: null, musicStep: 0,
+            musicMuted: false,
 
             init() {
                 if (!this.ctx) {
@@ -1015,12 +1050,86 @@
                         this.ctx = new AudioCtx();
                         this.masterGain = this.ctx.createGain();
                         this.sfxGain = this.ctx.createGain();
+                        this.musicGain = this.ctx.createGain();
+
                         this.sfxGain.connect(this.masterGain);
+                        this.musicGain.connect(this.masterGain);
                         this.masterGain.connect(this.ctx.destination);
+
+                        this.updateGains();
                     }
                 }
                 if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+                if (!this.musicPlaying && !this.musicMuted) this.startMusic();
             },
+
+            updateGains() {
+                if (!this.masterGain) return;
+                this.masterGain.gain.setValueAtTime(this.volMaster, this.ctx.currentTime);
+                this.sfxGain.gain.setValueAtTime(this.volSFX, this.ctx.currentTime);
+                this.musicGain.gain.setValueAtTime(this.musicMuted ? 0 : this.volMusic, this.ctx.currentTime);
+            },
+
+            startMusic() {
+                if (this.musicPlaying || this.musicMuted) return;
+                this.musicPlaying = true;
+                this.musicStep = 0;
+
+                // Sequenciador Eletrônico de Estádio (Bassline + Arp + Beat)
+                const bassNotes = [110, 110, 130.81, 146.83, 110, 110, 98, 123.47];
+                const leadNotes = [220, 261.63, 293.66, 329.63, 392.00, 440.00, 329.63, 293.66];
+
+                this.musicInterval = setInterval(() => {
+                    if (!this.ctx || this.musicMuted) return;
+                    const now = this.ctx.currentTime;
+                    const step = this.musicStep % 16;
+                    this.musicStep++;
+
+                    // 1. Kick / Batida nos tempos 0, 4, 8, 12
+                    if (step % 4 === 0) {
+                        const kickOsc = this.ctx.createOscillator(), kickGain = this.ctx.createGain();
+                        kickOsc.frequency.setValueAtTime(130, now);
+                        kickOsc.frequency.exponentialRampToValueAtTime(32, now + 0.09);
+                        kickGain.gain.setValueAtTime(0.35, now);
+                        kickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                        kickOsc.connect(kickGain); kickGain.connect(this.musicGain);
+                        kickOsc.start(now); kickOsc.stop(now + 0.11);
+                    }
+
+                    // 2. Hi-Hat nos contra-tempos
+                    if (step % 2 === 1) {
+                        const hatOsc = this.ctx.createOscillator(), hatGain = this.ctx.createGain();
+                        hatOsc.type = 'highpass'; hatOsc.frequency.setValueAtTime(8000, now);
+                        hatGain.gain.setValueAtTime(0.06, now); hatGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+                        hatOsc.connect(hatGain); hatGain.connect(this.musicGain);
+                        hatOsc.start(now); hatOsc.stop(now + 0.05);
+                    }
+
+                    // 3. Sintetizador de Baixo Rítmico
+                    const note = bassNotes[(Math.floor(step / 2)) % bassNotes.length];
+                    const bassOsc = this.ctx.createOscillator(), bGain = this.ctx.createGain();
+                    bassOsc.type = 'sawtooth'; bassOsc.frequency.setValueAtTime(note, now);
+                    bGain.gain.setValueAtTime(0.12, now); bGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                    bassOsc.connect(bGain); bGain.connect(this.musicGain);
+                    bassOsc.start(now); bassOsc.stop(now + 0.13);
+
+                    // 4. Melodia Arpejada
+                    if (step % 2 === 0) {
+                        const lead = leadNotes[(step + Math.floor(this.musicStep / 16)) % leadNotes.length];
+                        const leadOsc = this.ctx.createOscillator(), lGain = this.ctx.createGain();
+                        leadOsc.type = 'triangle'; leadOsc.frequency.setValueAtTime(lead, now);
+                        lGain.gain.setValueAtTime(0.10, now); lGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                        leadOsc.connect(lGain); lGain.connect(this.musicGain);
+                        leadOsc.start(now); leadOsc.stop(now + 0.16);
+                    }
+                }, 130);
+            },
+
+            stopMusic() {
+                this.musicPlaying = false;
+                if (this.musicInterval) { clearInterval(this.musicInterval); this.musicInterval = null; }
+            },
+
             playBallTouch(speed = 1) {
                 this.init(); if (!this.ctx) return;
                 const now = this.ctx.currentTime, osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
@@ -1034,11 +1143,11 @@
             playKick() {
                 this.init(); if (!this.ctx) return;
                 const now = this.ctx.currentTime, osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
-                osc.type = 'triangle'; osc.frequency.setValueAtTime(180, now);
-                osc.frequency.exponentialRampToValueAtTime(35, now + 0.09);
-                gain.gain.setValueAtTime(0.45, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(240, now);
+                osc.frequency.exponentialRampToValueAtTime(40, now + 0.11);
+                gain.gain.setValueAtTime(0.65, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
                 osc.connect(gain); gain.connect(this.sfxGain);
-                osc.start(now); osc.stop(now + 0.11);
+                osc.start(now); osc.stop(now + 0.13);
             },
             playConfetti() {
                 this.init(); if (!this.ctx) return;
@@ -1090,6 +1199,58 @@
             }
         };
 
+        // --- CONTROLE DE CONFIGURAÇÕES DE ÁUDIO ---
+        function abrirModalConfiguracoes() {
+            AudioEngine.init(); AudioEngine.playClick();
+            document.getElementById('slider-vol-master').value = Math.round(AudioEngine.volMaster * 100);
+            document.getElementById('slider-vol-music').value = Math.round(AudioEngine.volMusic * 100);
+            document.getElementById('slider-vol-sfx').value = Math.round(AudioEngine.volSFX * 100);
+            uiText('txt-vol-master', `${Math.round(AudioEngine.volMaster * 100)}%`);
+            uiText('txt-vol-music', `${Math.round(AudioEngine.volMusic * 100)}%`);
+            uiText('txt-vol-sfx', `${Math.round(AudioEngine.volSFX * 100)}%`);
+            uiText('btn-toggle-musica', AudioEngine.musicMuted ? '🔇 MÚSICA: DESLIGADA' : '🎵 MÚSICA: LIGADA');
+            uiShow('modal-configuracoes', 'flex');
+        }
+
+        function fecharModalConfiguracoes() {
+            AudioEngine.playClick(); uiHide('modal-configuracoes');
+        }
+
+        function ajustarVolumes() {
+            const masterVal = parseInt(document.getElementById('slider-vol-master').value);
+            const musicVal = parseInt(document.getElementById('slider-vol-music').value);
+            const sfxVal = parseInt(document.getElementById('slider-vol-sfx').value);
+
+            AudioEngine.volMaster = masterVal / 100;
+            AudioEngine.volMusic = musicVal / 100;
+            AudioEngine.volSFX = sfxVal / 100;
+
+            uiText('txt-vol-master', `${masterVal}%`);
+            uiText('txt-vol-music', `${musicVal}%`);
+            uiText('txt-vol-sfx', `${sfxVal}%`);
+
+            AudioEngine.updateGains();
+        }
+
+        function toggleMusicaFundo() {
+            AudioEngine.init();
+            AudioEngine.musicMuted = !AudioEngine.musicMuted;
+            if (AudioEngine.musicMuted) {
+                AudioEngine.stopMusic();
+                uiText('btn-toggle-musica', '🔇 MÚSICA: DESLIGADA');
+            } else {
+                AudioEngine.startMusic();
+                uiText('btn-toggle-musica', '🎵 MÚSICA: LIGADA');
+            }
+            AudioEngine.updateGains();
+            AudioEngine.playClick();
+        }
+
+        function testarAudio() {
+            AudioEngine.playKick();
+            setTimeout(() => AudioEngine.playVictoryFanfare(), 150);
+        }
+
         function mostrarToast(msg) {
             const toast = document.getElementById('toast-notif');
             if (!toast) return;
@@ -1098,13 +1259,83 @@
         }
 
         function obterPatentePorPDL(pdl) {
-            if (pdl >= 3000) return { nome: "DESAFIANTE 🔥", cor: "#ff4757" };
-            if (pdl >= 2500) return { nome: "MESTRE 👑", cor: "#9b59b6" };
+            if (pdl >= 3000) return { nome: "DESAFIANTE 🔥", cor: "#ff6b81" };
+            if (pdl >= 2500) return { nome: "MESTRE 👑", cor: "#d2a8ff" };
             if (pdl >= 2000) return { nome: "DIAMANTE 💠", cor: "#3498db" };
             if (pdl >= 1500) return { nome: "PLATINA 💎", cor: "#1abc9c" };
             if (pdl >= 1000) return { nome: "OURO 🥇", cor: "#f1c40f" };
-            if (pdl >= 500)  return { nome: "PRATA 🥈", cor: "#bdc3c7" };
+            if (pdl >= 500)  return { nome: "PRATA 🥈", cor: "#e2e8f0" };
             return { nome: "BRONZE 🥉", cor: "#cd7f32" };
+        }
+
+        // --- SISTEMA DE RANKED & MATCHMAKING COMPLETO ---
+        let matchmakingTimerInterval = null;
+        let matchmakingSeconds = 0;
+
+        function abrirMatchmakingRanked() {
+            AudioEngine.playClick();
+            isRanked = true; isPenaltiesMode = false;
+            uiText('mm-status-txt', 'Selecione o modo e clique em BUSCAR');
+            uiHide('mm-timer-txt');
+            uiShow('btn-iniciar-mm', 'inline-flex');
+            uiHide('btn-cancelar-mm');
+            showScreen('screen-matchmaking');
+        }
+
+        function sairTelaMatchmaking() {
+            AudioEngine.playClick();
+            cancelarBuscaRanked();
+            showScreen('screen-home');
+        }
+
+        function iniciarBuscaRanked() {
+            AudioEngine.playClick();
+            const modoSelecionado = document.querySelector('input[name="ranked-mode-select"]:checked').value;
+            
+            if (modoSelecionado === '3V3') {
+                modoDeJogo = 'CLASSICO_3V3'; selCampoW = 1400; selCampoH = 750; // Titã
+            } else if (modoSelecionado === '2V2') {
+                modoDeJogo = 'CLASSICO_2V2'; selCampoW = 1200; selCampoH = 660; // Maracanã
+            } else {
+                modoDeJogo = 'CLASSICO'; selCampoW = 1000; selCampoH = 550; // Padrão
+            }
+
+            uiText('mm-status-txt', '🔍 Buscando adversário no ranking...');
+            uiShow('mm-timer-txt', 'block');
+            uiHide('btn-iniciar-mm');
+            uiShow('btn-cancelar-mm', 'inline-flex');
+
+            matchmakingSeconds = 0;
+            uiText('mm-timer-txt', '00:00');
+
+            if (matchmakingTimerInterval) clearInterval(matchmakingTimerInterval);
+            matchmakingTimerInterval = setInterval(() => {
+                matchmakingSeconds++;
+                const min = Math.floor(matchmakingSeconds / 60);
+                const sec = matchmakingSeconds % 60;
+                uiText('mm-timer-txt', `0${min}:${sec < 10 ? '0'+sec : sec}`);
+
+                // Encontra partida competitiva em 2-3 segundos
+                if (matchmakingSeconds >= 3) {
+                    clearInterval(matchmakingTimerInterval);
+                    matchmakingTimerInterval = null;
+                    AudioEngine.playVictoryFanfare();
+                    uiText('mm-status-txt', '⚔️ ADVERSÁRIO ENCONTRADO! INICIANDO...');
+                    
+                    setTimeout(() => {
+                        currPlayer = 1; isHost = true; isOnline = false;
+                        prepararTelaTime(); showScreen('screen-team');
+                    }, 900);
+                }
+            }, 1000);
+        }
+
+        function cancelarBuscaRanked() {
+            if (matchmakingTimerInterval) { clearInterval(matchmakingTimerInterval); matchmakingTimerInterval = null; }
+            uiText('mm-status-txt', 'Busca cancelada.');
+            uiHide('mm-timer-txt');
+            uiShow('btn-iniciar-mm', 'inline-flex');
+            uiHide('btn-cancelar-mm');
         }
 
         // --- MERCADO & PASSE ---
@@ -1171,7 +1402,6 @@
         let placar1 = 0, placar2 = 0;
         
         const DURACAO_TEMPO = 90;
-        const DURACAO_PRORROGACAO = 30;
         let periodoJogo = 1;
         let tempoRestante = DURACAO_TEMPO;
         let ticksJogo = 0;
@@ -1182,7 +1412,7 @@
         let modoDeJogo = 'CLASSICO';
         let isRanked = false;
 
-        // PÊNALTIS (2 TOQUES & 3 SEGUNDOS)
+        // PÊNALTIS
         let isPenaltiesMode = false;
         let penaltyRound = 1, penaltyTurn = 1;
         let penaltyResultsP1 = [], penaltyResultsP2 = [];
@@ -1191,10 +1421,9 @@
         let penaltyCountdownFrames = 0;
 
         let historicoPosicoes = [], particulas = [];
-        let frameReplay = 0, rewindIndex = 0;
         const DASH_COOLDOWN = 180;
-        let currentStatusMsg = "", currentStatusMsgColor = "";
-        let historicoToques = [], ultimoGoleador = null, ultimoAssistente = null;
+        let currentStatusMsg = "";
+        let historicoToques = [];
 
         let meuPerfil = {
             nome: 'CRAQUE', uid: 'local_uid', elo: 1000, vitorias: 0, derrotas: 0, numero: 10, avatarCustom: null,
@@ -1221,18 +1450,12 @@
                         playerAvatars[mySlot] = txt;
                         meuPerfil.avatarCustom = txt;
                         adicionarMensagemChat("SISTEMA", `Avatar alterado para: [ ${txt} ]`, "#2ecc71");
-                        if (isOnline) {
-                            if (isHost) broadcast({ type: 'avatar_change', slot: mySlot, avatar: txt });
-                            else if (myConn) myConn.send({ type: 'avatar_change', slot: mySlot, avatar: txt });
-                        }
+                        if (isOnline) broadcast({ type: 'avatar_change', slot: mySlot, avatar: txt });
                     }
                 } else {
                     const sender = playerNames[mySlot] || meuPerfil.nome || `P${mySlot}`;
                     adicionarMensagemChat(sender, val, "#fff");
-                    if (isOnline) {
-                        if (isHost) broadcast({ type: 'chat_msg', sender: sender, text: val });
-                        else if (myConn) myConn.send({ type: 'chat_msg', sender: sender, text: val });
-                    }
+                    if (isOnline) broadcast({ type: 'chat_msg', sender: sender, text: val });
                 }
 
                 input.value = '';
@@ -1251,15 +1474,14 @@
             while (log.children.length > 20) log.removeChild(log.firstChild);
         }
 
-        // --- SISTEMA DE REDE DUPLA (BROADCASTCHANNEL MULTI-ABAS + PEERJS WEBRTC) ---
-        let peer = null, clientConnections = [], myConn = null;
+        // --- SISTEMA MULTIPLAYER ---
         let isOnline = false, isHost = true, mySlot = 1;
         let remoteInputs = { 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {} };
         let myRoomID = "";
         let salasOnlineCache = [];
         let salaSelecionada = null;
 
-        // TECLADO
+        // TECLADO ROBUSTO COM TECLAS MÚLTIPLAS PARA CHUTE
         const keys = {};
         function handleKeyDown(e) {
             AudioEngine.init();
@@ -1303,9 +1525,7 @@
         }
 
         function salvarPerfil() {
-            try {
-                localStorage.setItem('iaes_perfil_user', JSON.stringify(meuPerfil));
-            } catch(e) {}
+            try { localStorage.setItem('iaes_perfil_user', JSON.stringify(meuPerfil)); } catch(e) {}
         }
 
         async function fazerLogin() {
@@ -1324,9 +1544,7 @@
             showScreen('screen-home');
         }
 
-        async function criarConta() {
-            fazerLogin();
-        }
+        async function criarConta() { fazerLogin(); }
 
         async function deslogar() {
             AudioEngine.playClick();
@@ -1355,7 +1573,6 @@
             uiText('nav-rank-txt', `${meuPerfil.elo || 1000} PDL (${pat.nome.split(' ')[0]})`);
             uiText('nav-moedas-txt', (meuPerfil.moedas || 0).toLocaleString());
 
-            // Card Showcase no Lobby
             uiText('lobby-card-nome', meuPerfil.nome);
             uiText('lobby-card-elo', `${meuPerfil.elo || 1000} PDL • ${pat.nome}`);
             uiText('lobby-avatar-number', meuPerfil.avatarCustom || meuPerfil.numero || 10);
@@ -1370,7 +1587,7 @@
             }
         }
 
-        // --- SISTEMA PIX (LOCALSTORAGE + BROADCASTCHANNEL COM PERSISTÊNCIA TOTAL) ---
+        // --- SISTEMA PIX ---
         const CHAVE_PIX_OFICIAL = "67981520229";
         let pixPendente = null;
 
@@ -1483,7 +1700,7 @@
             carregarPedidosPixAdmin();
         }
 
-        // --- SISTEMA MULTIPLAYER REDESENHADO (SEM TRAVAMENTO) ---
+        // --- SISTEMA MULTIPLAYER ---
         function carregarSalasLocais() {
             try {
                 const raw = localStorage.getItem('iaes_active_rooms');
@@ -1494,7 +1711,7 @@
             try { localStorage.setItem('iaes_active_rooms', JSON.stringify(salasOnlineCache)); } catch(e) {}
         }
         function adicionarSalaNoCache(sala) {
-            salasOnlineCache = salasOnlineCache.filter(s => s.peerId !== sala.peerId && s.id !== sala.id);
+            salasOnlineCache = salasOnlineCache.filter(s => s.id !== sala.id);
             salasOnlineCache.push(sala);
             salvarSalasLocais();
             filtrarTabelaSalas();
@@ -1529,7 +1746,7 @@
                     <td style="padding:10px; color:#fff; font-weight:bold;">${s.nome}</td>
                     <td style="padding:10px; color:#f1c40f; font-weight:bold;">${s.jogadores || 1}/${s.max || 2}</td>
                     <td style="padding:10px; color:#a7f3d0;">${s.modo || '1v1'}</td>
-                    <td style="padding:10px; color:#00d2d3; font-family:monospace; font-size:11px;">${(s.peerId||s.id).substring(0,10)}...</td>
+                    <td style="padding:10px; color:#00d2d3; font-family:monospace; font-size:11px;">${s.id}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1551,7 +1768,6 @@
             pendingRoomConfig = { nome: nome, modo: modo, w: selCampoW, h: selCampoH };
 
             showScreen('screen-online-host');
-            renderLobbySlotsHost();
             iniciarPeerHost();
         }
 
@@ -1560,20 +1776,21 @@
         }
 
         function iniciarPeerHost() {
-            clientConnections = [];
             playerNames[1] = meuPerfil.nome || "HOST";
             playerNumbers[1] = meuPerfil.numero || 10;
+            playerNames[2] = null;
             
-            myRoomID = 'sala_' + Math.random().toString(36).substring(2, 9);
+            myRoomID = 'sala_' + Math.random().toString(36).substring(2, 8).toUpperCase();
             uiText('txt-codigo-sala', `SALA: ${myRoomID}`);
             uiText('host-network-status', `🟢 Sala aberta e pronta para conexões!`);
 
             const salaData = {
-                id: myRoomID, peerId: myRoomID, nome: pendingRoomConfig.nome, host: meuPerfil.nome || "CRAQUE",
+                id: myRoomID, nome: pendingRoomConfig.nome, host: meuPerfil.nome || "CRAQUE",
                 modo: modoDeJogo, max: 2, selCampoW: selCampoW, selCampoH: selCampoH,
                 jogadores: 1, criadoEmSec: Math.floor(Date.now() / 1000)
             };
             adicionarSalaNoCache(salaData);
+            renderLobbySlotsHost();
 
             if (roomBroadcastChannel) {
                 roomBroadcastChannel.onmessage = (e) => {
@@ -1594,7 +1811,7 @@
         }
 
         function conectarPorIdDigitado() {
-            const id = document.getElementById('input-join-id-direto').value.trim();
+            const id = document.getElementById('input-join-id-direto').value.trim().toUpperCase();
             if (!id) { alert("Digite o ID da sala."); return; }
             AudioEngine.playClick();
             conectarSalaPorIdDireto(id);
@@ -1603,22 +1820,23 @@
         function conectarSalaSelecionada() {
             if (!salaSelecionada) return;
             AudioEngine.playClick();
-            conectarSalaPorIdDireto(salaSelecionada.peerId || salaSelecionada.id);
+            conectarSalaPorIdDireto(salaSelecionada.id);
         }
 
-        function conectarSalaPorIdDireto(targetPeerId) {
+        function conectarSalaPorIdDireto(targetRoomId) {
             isOnline = true; isHost = false; isRanked = false; isPenaltiesMode = false; mySlot = 2;
+            myRoomID = targetRoomId;
             showScreen('screen-client-waiting');
-            uiText('txt-status-client-lobby', `Conectando à sala ${targetPeerId}...`);
+            uiText('txt-status-client-lobby', `Conectando à sala ${targetRoomId}...`);
 
             if (roomBroadcastChannel) {
                 roomBroadcastChannel.postMessage({
-                    type: 'client_join', targetRoom: targetPeerId,
+                    type: 'client_join', targetRoom: targetRoomId,
                     nome: meuPerfil.nome || 'JOGADOR 2', numero: meuPerfil.numero || 7
                 });
 
                 roomBroadcastChannel.onmessage = (e) => {
-                    if (e.data && e.data.targetRoom === targetPeerId) {
+                    if (e.data && e.data.targetRoom === targetRoomId) {
                         if (e.data.type === 'host_ack') {
                             modoDeJogo = e.data.modo; selCampoW = e.data.w; selCampoH = e.data.h;
                             uiText('txt-status-client-lobby', `🟢 Conectado ao Host (${e.data.hostName})! Aguardando início...`);
@@ -1697,16 +1915,26 @@
             currPlayer = 1; prepararTelaTime(); showScreen('screen-team');
         }
 
-        // TIMES
+        // --- 18 CLUBES ---
         const TIMES = {
-            "Palmeiras":   { bg: "#008542", fg: "#fff", detail: "#2ecc71", cor1: { bg: "#008542", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#008542", num: "#008542" } },
-            "Corinthians": { bg: "#111111", fg: "#fff", detail: "#ffffff", cor1: { bg: "#ffffff", line: "#111111", num: "#000" }, cor2: { bg: "#111111", line: "#ffffff", num: "#fff" } },
-            "São Paulo":   { bg: "#c0392b", fg: "#fff", detail: "#ffffff", cor1: { bg: "#ffffff", line: "#c0392b", num: "#000" }, cor2: { bg: "#c0392b", line: "#ffffff", num: "#fff" } },
-            "Santos":      { bg: "#2c3e50", fg: "#fff", detail: "#ffffff", cor1: { bg: "#ffffff", line: "#2c3e50", num: "#000" }, cor2: { bg: "#2c3e50", line: "#ffffff", num: "#fff" } },
-            "Flamengo":    { bg: "#e74c3c", fg: "#fff", detail: "#111111", cor1: { bg: "#e74c3c", line: "#111111", num: "#fff" }, cor2: { bg: "#ffffff", line: "#e74c3c", num: "#000" } },
-            "Fluminense":  { bg: "#8b0000", fg: "#fff", detail: "#2ecc71", cor1: { bg: "#8b0000", line: "#2ecc71", num: "#fff" }, cor2: { bg: "#ffffff", line: "#8b0000", num: "#000" } },
-            "Cruzeiro":    { bg: "#2980b9", fg: "#fff", detail: "#ffffff", cor1: { bg: "#2980b9", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#2980b9", num: "#000" } },
-            "Vasco":       { bg: "#111111", fg: "#fff", detail: "#ffffff", cor1: { bg: "#111111", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#111111", num: "#000" } }
+            "Palmeiras":   { bg: "#006437", detail: "#10b981", cor1: { bg: "#006437", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#006437", num: "#006437" } },
+            "Corinthians": { bg: "#111111", detail: "#ffffff", cor1: { bg: "#ffffff", line: "#000000", num: "#000" }, cor2: { bg: "#111111", line: "#ffffff", num: "#fff" } },
+            "São Paulo":   { bg: "#c0392b", detail: "#ffffff", cor1: { bg: "#ffffff", line: "#c0392b", num: "#000" }, cor2: { bg: "#c0392b", line: "#000000", num: "#fff" } },
+            "Santos":      { bg: "#ffffff", detail: "#000000", cor1: { bg: "#ffffff", line: "#000000", num: "#000" }, cor2: { bg: "#000000", line: "#ffffff", num: "#fff" } },
+            "Flamengo":    { bg: "#c0392b", detail: "#000000", cor1: { bg: "#c0392b", line: "#000000", num: "#fff" }, cor2: { bg: "#ffffff", line: "#c0392b", num: "#000" } },
+            "Fluminense":  { bg: "#8b0000", detail: "#10b981", cor1: { bg: "#8b0000", line: "#10b981", num: "#fff" }, cor2: { bg: "#ffffff", line: "#8b0000", num: "#000" } },
+            "Vasco":       { bg: "#000000", detail: "#ffffff", cor1: { bg: "#000000", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#000000", num: "#000" } },
+            "Botafogo":    { bg: "#111111", detail: "#ffffff", cor1: { bg: "#111111", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#111111", num: "#000" } },
+            "Grêmio":      { bg: "#0d529c", detail: "#000000", cor1: { bg: "#0d529c", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#0d529c", num: "#0d529c" } },
+            "Inter":       { bg: "#c0392b", detail: "#ffffff", cor1: { bg: "#c0392b", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#c0392b", num: "#c0392b" } },
+            "Atlético-MG": { bg: "#000000", detail: "#ffffff", cor1: { bg: "#000000", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#000000", num: "#000" } },
+            "Cruzeiro":    { bg: "#1e528e", detail: "#ffffff", cor1: { bg: "#1e528e", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#1e528e", num: "#1e528e" } },
+            "Bahia":       { bg: "#004a99", detail: "#c0392b", cor1: { bg: "#004a99", line: "#c0392b", num: "#fff" }, cor2: { bg: "#ffffff", line: "#004a99", num: "#004a99" } },
+            "Fortaleza":   { bg: "#002b7f", detail: "#c0392b", cor1: { bg: "#002b7f", line: "#c0392b", num: "#fff" }, cor2: { bg: "#ffffff", line: "#002b7f", num: "#002b7f" } },
+            "Real Madrid": { bg: "#ffffff", detail: "#f1c40f", cor1: { bg: "#ffffff", line: "#f1c40f", num: "#000" }, cor2: { bg: "#2c3e50", line: "#f1c40f", num: "#fff" } },
+            "Barcelona":   { bg: "#8b0000", detail: "#004a99", cor1: { bg: "#8b0000", line: "#004a99", num: "#fff" }, cor2: { bg: "#f1c40f", line: "#8b0000", num: "#000" } },
+            "Brasil":      { bg: "#f1c40f", detail: "#006437", cor1: { bg: "#f1c40f", line: "#006437", num: "#006437" }, cor2: { bg: "#004a99", line: "#ffffff", num: "#fff" } },
+            "Argentina":   { bg: "#74b9ff", detail: "#ffffff", cor1: { bg: "#74b9ff", line: "#ffffff", num: "#000" }, cor2: { bg: "#2c3e50", line: "#74b9ff", num: "#fff" } }
         };
 
         function prepararTelaTime() {
@@ -1714,7 +1942,12 @@
             const grid = document.getElementById('grid-times'); grid.innerHTML = '';
             Object.keys(TIMES).forEach(time => {
                 const t = TIMES[time];
-                grid.innerHTML += `<div class="shield-btn-cartoon" style="background-color:${t.bg}; border-color:#000; color:${t.fg};" onclick="escolherTime('${time}')"><div class="shield-faixa-cartoon" style="background-color:${t.detail};"></div><span>${time.toUpperCase()}</span></div>`;
+                grid.innerHTML += `
+                    <div class="shield-btn-cartoon" style="background-color:${t.bg};" onclick="escolherTime('${time}')">
+                        <div class="shield-faixa-cartoon" style="background-color:${t.detail};"></div>
+                        <span class="shield-name-pill">${time}</span>
+                    </div>
+                `;
             });
         }
         function escolherTime(time) {
@@ -1739,7 +1972,7 @@
             uiText('camisa-corpo', num);
         }
         function voltarParaEscolherOutroTime() { AudioEngine.playClick(); timeTemporario = ""; showScreen('screen-team'); }
-        function voltarDeTimes() { AudioEngine.playClick(); if (isPenaltiesMode) showScreen('screen-home'); else showScreen('screen-mode'); }
+        function voltarDeTimes() { AudioEngine.playClick(); if (isPenaltiesMode || isRanked) showScreen('screen-home'); else showScreen('screen-mode'); }
 
         function confirmarUniforme() {
             AudioEngine.playClick(); if(!timeTemporario) return;
@@ -1760,6 +1993,15 @@
                         w: selCampoW, h: selCampoH, modo: modoDeJogo,
                         names: playerNames, nums: playerNumbers
                     });
+                    uiHide('main-content-wrapper');
+                    iniciarEngineJogo();
+                } else if (isRanked) {
+                    // Adversário Ranked Automático (Bot Competitivo)
+                    const adversariosPossiveis = ["Corinthians", "Flamengo", "Real Madrid", "Barcelona", "São Paulo", "Santos"];
+                    const timeAdv = adversariosPossiveis.find(t => t !== cfgP1.time) || "Corinthians";
+                    cfgP2 = { time: timeAdv, uni: 1, cores: TIMES[timeAdv].cor1 };
+                    playerNames[2] = "RIVAL_RANKED";
+                    playerNumbers[2] = 9;
                     uiHide('main-content-wrapper');
                     iniciarEngineJogo();
                 } else {
@@ -1783,7 +2025,7 @@
                 const chave = cat === 'bolas' ? 'bola' : (cat === 'rastros' ? 'rastro' : (cat === 'auras' ? 'aura' : 'explosao'));
                 const equip = meuPerfil.equipados[chave] === item.id;
                 let btn = equip ? '<button class="btn-cartoon" style="background:#059669;" disabled>EQUIPADO</button>' : (comp ? `<button class="btn-cartoon" onclick="equiparItem('${cat}', '${item.id}')">EQUIPAR</button>` : `<button class="btn-cartoon gold" onclick="comprarItem('${cat}', '${item.id}', ${item.preco})">🪙 ${item.preco.toLocaleString()}</button>`);
-                grid.innerHTML += `<div class="dock-item-cartoon" style="padding:14px;"><span class="icon">${item.icon}</span><div style="font-size:13px; font-weight:900;">${item.nome}</div><div style="font-size:11px; color:#a7f3d0; margin-bottom:8px;">${item.desc}</div>${btn}</div>`;
+                grid.innerHTML += `<div class="dock-item-cartoon" style="padding:14px;"><span class="icon">${item.icon}</span><div style="font-size:13px; font-weight:900;">${item.nome}</div><div style="font-size:11px; color:#ffffff; margin-bottom:8px;">${item.desc}</div>${btn}</div>`;
             });
         }
         function comprarItem(cat, id, preco) {
@@ -1850,61 +2092,110 @@
             } catch(e) {}
         }
 
-        // ENTRADAS
         function getLocalInputsP1() {
-            return { w: !!(keys['keyw']||keys['w']), s: !!(keys['keys']||keys['s']), a: !!(keys['keya']||keys['a']), d: !!(keys['keyd']||keys['d']), shoot: !!(keys['space']||keys[' ']), dash: !!(keys['shiftleft']||keys['shiftright']||keys['shift']) };
+            return {
+                w: !!(keys['keyw'] || keys['w']),
+                s: !!(keys['keys'] || keys['s']),
+                a: !!(keys['keya'] || keys['a']),
+                d: !!(keys['keyd'] || keys['d']),
+                shoot: !!(keys['space'] || keys[' '] || keys['keyx'] || keys['x'] || keys['keyk'] || keys['k']),
+                dash: !!(keys['shiftleft'] || keys['shiftright'] || keys['shift'])
+            };
         }
         function getLocalInputsP2() {
-            return { up: !!(keys['arrowup']||keys['up']), down: !!(keys['arrowdown']||keys['down']), left: !!(keys['arrowleft']||keys['left']), right: !!(keys['arrowright']||keys['right']), shoot: !!(keys['enter']||keys['numpadenter']), dash: !!(keys['controlleft']||keys['controlright']||keys['control']||keys['numpad0']||keys['0']) };
+            return {
+                up: !!(keys['arrowup'] || keys['up']),
+                down: !!(keys['arrowdown'] || keys['down']),
+                left: !!(keys['arrowleft'] || keys['left']),
+                right: !!(keys['arrowright'] || keys['right']),
+                shoot: !!(keys['enter'] || keys['numpadenter'] || keys['numpad0'] || keys['keyl'] || keys['l']),
+                dash: !!(keys['controlleft'] || keys['controlright'] || keys['control'] || keys['numpad1'] || keys['1'])
+            };
         }
 
         const GOAL_DEPTH = 55;
         const PITCH_INSET_X = 65;
 
-        // --- RENDER DO CAMPO COM TORCIDA CARTOON ELEGANTE ---
+        // --- CAMPO REALISTA COM ARQUIBANCADA & ESTRUTURA PROFISSIONAL DE ESTÁDIO ---
         function desenharCampoRealista() {
             const bgCanvas = document.getElementById('field-canvas'); if (!bgCanvas) return;
             bgCanvas.width = selCampoW; bgCanvas.height = selCampoH;
             const ctx = bgCanvas.getContext('2d');
-            const stripeWidth = 55;
+            const stripeWidth = 50;
 
-            // Gramado Listrado Vibrante Cartoon
+            // 1. Gramado Listrado
             for (let i = 0; i < selCampoW; i += stripeWidth) {
-                ctx.fillStyle = (i / stripeWidth) % 2 === 0 ? '#27ae60' : '#2ecc71';
+                ctx.fillStyle = (i / stripeWidth) % 2 === 0 ? '#1b5e20' : '#2e7d32';
                 ctx.fillRect(i, 0, stripeWidth, selCampoH);
             }
+
+            // 2. Arquibancadas de Concreto & Painéis de LED nos contornos
+            const bleacherH = 18;
+            
+            // Arquibancada Topo
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, selCampoW, bleacherH);
+            ctx.fillStyle = '#1e293b'; ctx.fillRect(0, bleacherH - 4, selCampoW, 4);
+            // Painel LED Topo
+            ctx.fillStyle = '#062313'; ctx.fillRect(PITCH_INSET_X, bleacherH - 3, selCampoW - (PITCH_INSET_X * 2), 3);
+
+            // Arquibancada Rodapé
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, selCampoH - bleacherH, selCampoW, bleacherH);
+            ctx.fillStyle = '#1e293b'; ctx.fillRect(0, selCampoH - bleacherH, selCampoW, 4);
+            // Painel LED Rodapé
+            ctx.fillStyle = '#062313'; ctx.fillRect(PITCH_INSET_X, selCampoH - bleacherH, selCampoW - (PITCH_INSET_X * 2), 3);
 
             const golSize = selCampoH * 0.44;
             const yTop = (selCampoH - golSize) / 2, yBottom = (selCampoH + golSize) / 2;
 
             if (isPenaltiesMode) {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                ctx.fillStyle = 'rgba(10, 25, 15, 0.5)';
                 ctx.fillRect(selCampoW - PITCH_INSET_X, yTop, GOAL_DEPTH, golSize);
-                ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 4;
-                ctx.strokeRect(selCampoW * 0.25, 25, selCampoW * 0.75 - PITCH_INSET_X, selCampoH - 50);
+
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; ctx.lineWidth = 1;
+                for (let y = yTop; y <= yBottom; y += 10) {
+                    ctx.beginPath(); ctx.moveTo(selCampoW - PITCH_INSET_X, y); ctx.lineTo(selCampoW - PITCH_INSET_X + GOAL_DEPTH, y); ctx.stroke();
+                }
+
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)'; ctx.lineWidth = 3.5;
+                ctx.strokeRect(selCampoW * 0.25, 20, selCampoW * 0.75 - PITCH_INSET_X, selCampoH - 40);
 
                 const areaW = selCampoW * 0.3, areaH = selCampoH * 0.65;
                 ctx.strokeRect(selCampoW - PITCH_INSET_X - areaW, selCampoH/2 - areaH/2, areaW, areaH);
-                ctx.beginPath(); ctx.arc(selCampoW * 0.45, selCampoH / 2, 8, 0, 2 * Math.PI); ctx.fillStyle = '#f1c40f'; ctx.fill();
-                ctx.strokeStyle = '#000'; ctx.stroke();
+                ctx.beginPath(); ctx.arc(selCampoW * 0.45, selCampoH / 2, 7, 0, 2 * Math.PI); ctx.fillStyle = '#f1c40f'; ctx.fill();
+                ctx.strokeStyle = '#fff'; ctx.stroke();
                 return;
             }
 
-            // Gols normais
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            // Redes 3D
+            ctx.fillStyle = 'rgba(10, 25, 15, 0.5)';
             ctx.fillRect(PITCH_INSET_X - GOAL_DEPTH, yTop, GOAL_DEPTH, golSize);
             ctx.fillRect(selCampoW - PITCH_INSET_X, yTop, GOAL_DEPTH, golSize);
 
-            // Linhas Brancas do Campo com bordas cartoon
-            ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 4;
-            ctx.strokeRect(PITCH_INSET_X, 25, selCampoW - (PITCH_INSET_X * 2), selCampoH - 50);
-            ctx.beginPath(); ctx.moveTo(selCampoW / 2, 25); ctx.lineTo(selCampoW / 2, selCampoH - 25); ctx.stroke();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)'; ctx.lineWidth = 1;
+            for (let y = yTop; y <= yBottom; y += 10) {
+                ctx.beginPath(); ctx.moveTo(PITCH_INSET_X - GOAL_DEPTH, y); ctx.lineTo(PITCH_INSET_X, y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(selCampoW - PITCH_INSET_X, y); ctx.lineTo(selCampoW - PITCH_INSET_X + GOAL_DEPTH, y); ctx.stroke();
+            }
+
+            // Linhas Brancas Realistas do Campo
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.88)'; ctx.lineWidth = 3.5;
+            ctx.strokeRect(PITCH_INSET_X, 20, selCampoW - (PITCH_INSET_X * 2), selCampoH - 40);
+            ctx.beginPath(); ctx.moveTo(selCampoW / 2, 20); ctx.lineTo(selCampoW / 2, selCampoH - 20); ctx.stroke();
             ctx.beginPath(); ctx.arc(selCampoW / 2, selCampoH / 2, selCampoH * 0.16, 0, 2 * Math.PI); ctx.stroke();
-            ctx.beginPath(); ctx.arc(selCampoW / 2, selCampoH / 2, 6, 0, 2 * Math.PI); ctx.fillStyle = '#ffffff'; ctx.fill();
+            ctx.beginPath(); ctx.arc(selCampoW / 2, selCampoH / 2, 5, 0, 2 * Math.PI); ctx.fillStyle = '#ffffff'; ctx.fill();
 
             const areaW = selCampoW * 0.15, areaH = selCampoH * 0.56;
             ctx.strokeRect(PITCH_INSET_X, selCampoH / 2 - areaH / 2, areaW, areaH);
             ctx.strokeRect(selCampoW - PITCH_INSET_X - areaW, selCampoH / 2 - areaH / 2, areaW, areaH);
+
+            const pAreaW = selCampoW * 0.06, pAreaH = selCampoH * 0.30;
+            ctx.strokeRect(PITCH_INSET_X, selCampoH / 2 - pAreaH / 2, pAreaW, pAreaH);
+            ctx.strokeRect(selCampoW - PITCH_INSET_X - pAreaW, selCampoH / 2 - pAreaH / 2, pAreaW, pAreaH);
+
+            ctx.beginPath(); ctx.arc(PITCH_INSET_X, 20, 15, 0, Math.PI * 0.5); ctx.stroke();
+            ctx.beginPath(); ctx.arc(PITCH_INSET_X, selCampoH - 20, 15, Math.PI * 1.5, 0); ctx.stroke();
+            ctx.beginPath(); ctx.arc(selCampoW - PITCH_INSET_X, 20, 15, Math.PI * 0.5, Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.arc(selCampoW - PITCH_INSET_X, selCampoH - 20, 15, Math.PI, Math.PI * 1.5); ctx.stroke();
         }
 
         // --- MOTOR DE FÍSICA ---
@@ -1916,11 +2207,11 @@
                 historicoPosicoes = []; particulas = []; historicoToques = []; resetarUICompleta();
 
                 for(let i=1; i<=10; i++) { window['dashP' + i] = 0; window['dashActiveP' + i] = 0; }
-                if (!cfgP1 || !cfgP1.cores) cfgP1 = { time: "Palmeiras", uni: 1, cores: {bg: "#008542", line: "#fff", num: "#fff"} };
-                if (!cfgP2 || !cfgP2.cores) cfgP2 = { time: "Corinthians", uni: 1, cores: {bg: "#111111", line: "#fff", num: "#fff"} };
+                if (!cfgP1 || !cfgP1.cores) cfgP1 = { time: "Palmeiras", uni: 1, cores: TIMES["Palmeiras"].cor1 };
+                if (!cfgP2 || !cfgP2.cores) cfgP2 = { time: "Corinthians", uni: 1, cores: TIMES["Corinthians"].cor1 };
 
                 playerNames[1] = meuPerfil.nome || "P1";
-                if (!playerNames[2] || playerNames[2] === 'P2') playerNames[2] = "ADVERSÁRIO";
+                if (!playerNames[2] || playerNames[2] === 'P2') playerNames[2] = isRanked ? "RIVAL_RANKED" : "ADVERSÁRIO";
 
                 uiText('score1', "0"); uiText('score2', "0");
                 uiText('timer', isPenaltiesMode ? "TOQUES: 0/2 • 3.0s" : "1º T • 01:30");
@@ -1928,9 +2219,12 @@
                 if (isPenaltiesMode) {
                     uiText('tv-badge-status', "🎯 PÊNALTIS (TITÃ)");
                     configurarPenaltis();
+                } else if (isRanked) {
+                    uiHide('p1-dots'); uiHide('p2-dots');
+                    uiText('tv-badge-status', `⚔️ RANKED OFICIAL • 1º TEMPO`);
                 } else {
                     uiHide('p1-dots'); uiHide('p2-dots');
-                    uiText('tv-badge-status', isRanked ? `⚔️ RANKED • 1º TEMPO` : "1º TEMPO • IAES CUP");
+                    uiText('tv-badge-status', "1º TEMPO • IAES CUP");
                 }
                 
                 uiShow('top-nav-bar', 'flex');
@@ -1963,7 +2257,7 @@
                 options: { width: selCampoW, height: selCampoH, wireframes: false, background: 'transparent' }
             });
 
-            const wallOpt = { isStatic: true, restitution: 0.85, friction: 0, render: { fillStyle: '#0a2817' } };
+            const wallOpt = { isStatic: true, restitution: 0.85, friction: 0, render: { fillStyle: 'transparent' } };
             const postOpt = { isStatic: true, restitution: 0.90, friction: 0, render: { fillStyle: '#ffffff' } };
             const netOpt = { isStatic: true, restitution: 0.1, friction: 0.2, render: { fillStyle: 'transparent' } }; 
 
@@ -1971,12 +2265,12 @@
             const yTop = (selCampoH - golSize) / 2, yBottom = (selCampoH + golSize) / 2;
 
             const walls = [
-                Bodies.rectangle(selCampoW/2, 12, selCampoW - (PITCH_INSET_X * 2), 24, wallOpt), 
-                Bodies.rectangle(selCampoW/2, selCampoH - 12, selCampoW - (PITCH_INSET_X * 2), 24, wallOpt), 
-                Bodies.rectangle(PITCH_INSET_X, 12 + yTop/2, 18, yTop, wallOpt), 
-                Bodies.rectangle(PITCH_INSET_X, selCampoH - 12 - yTop/2, 18, yTop, wallOpt), 
-                Bodies.rectangle(selCampoW - PITCH_INSET_X, 12 + yTop/2, 18, yTop, wallOpt), 
-                Bodies.rectangle(selCampoW - PITCH_INSET_X, selCampoH - 12 - yTop/2, 18, yTop, wallOpt), 
+                Bodies.rectangle(selCampoW/2, 10, selCampoW - (PITCH_INSET_X * 2), 20, wallOpt), 
+                Bodies.rectangle(selCampoW/2, selCampoH - 10, selCampoW - (PITCH_INSET_X * 2), 20, wallOpt), 
+                Bodies.rectangle(PITCH_INSET_X, 10 + yTop/2, 16, yTop, wallOpt), 
+                Bodies.rectangle(PITCH_INSET_X, selCampoH - 10 - yTop/2, 16, yTop, wallOpt), 
+                Bodies.rectangle(selCampoW - PITCH_INSET_X, 10 + yTop/2, 16, yTop, wallOpt), 
+                Bodies.rectangle(selCampoW - PITCH_INSET_X, selCampoH - 10 - yTop/2, 16, yTop, wallOpt), 
                 Bodies.circle(PITCH_INSET_X, yTop, 8, { ...postOpt, label: 'trave' }),
                 Bodies.circle(PITCH_INSET_X, yBottom, 8, { ...postOpt, label: 'trave' }),
                 Bodies.circle(selCampoW - PITCH_INSET_X, yTop, 8, { ...postOpt, label: 'trave' }),
@@ -2021,12 +2315,11 @@
                         historicoToques.push({ slot: slotNum, teamId: slotNum % 2 !== 0 ? 1 : 2, time: Date.now() });
                         AudioEngine.playBallTouch(3);
 
-                        // PÊNALTI: MAX 2 TOQUES E 3 SEGUNDOS
                         if (isPenaltiesMode && slotNum === 1) {
                             penaltyTouchesCount++;
                             if (penaltyTouchesCount === 1) {
                                 penaltyKicked = true;
-                                penaltyCountdownFrames = 180; // 3.0s
+                                penaltyCountdownFrames = 180;
                                 AudioEngine.playDash();
                             } else if (penaltyTouchesCount > 2) {
                                 AudioEngine.playPostHit();
@@ -2040,43 +2333,80 @@
                 });
             });
 
-            // --- RENDERIZADOR CARTOON VIBRANTE (TORCIDA + JOGADORES COM OLHINHOS CARTOON) ---
+            // --- RENDERIZADOR: ARQUIBANCADA VIBRANTE, TORCIDA ORGANIZADA & JOGADORES CARTOON ---
             Events.on(render, 'afterRender', () => {
                 const ctx = render.context;
-                const agora = Date.now();
-                const corT1 = (cfgP1 && cfgP1.cores) ? cfgP1.cores.bg : '#008542';
-                const corT2 = (cfgP2 && cfgP2.cores) ? cfgP2.cores.bg : '#c0392b';
+                const timeNow = Date.now();
+                const isCelebrando = (estadoJogo === 'GOL_CELEBRATION');
 
-                // --- 1. TORCIDA ANIMADA CARTOON NAS ARQUIBANCADAS ---
-                const numFans = Math.floor(selCampoW / 24);
-                // Topo
-                for (let f = 0; f < numFans; f++) {
-                    const fx = f * 24 + 14;
-                    const pulo = Math.sin(agora / 220 + f * 0.8) * 3;
-                    const isT1Fan = f < numFans / 2;
+                // --- 1. TORCIDA ORGANIZADA NAS ARQUIBANCADAS (DESIGN ELEGANTE E EM BLOCOS) ---
+                const numBlocos = Math.floor(selCampoW / 48);
+
+                for (let i = 0; i < numBlocos; i++) {
+                    const x = 32 + (i * 48);
+                    const isTime1 = x < selCampoW / 2;
+                    const corTorcida = isTime1 ? (cfgP1 ? cfgP1.cores.bg : '#008542') : (cfgP2 ? cfgP2.cores.bg : '#ffffff');
+                    const corBandeira = isTime1 ? (cfgP1 ? cfgP1.cores.line : '#ffffff') : (cfgP2 ? cfgP2.cores.line : '#000000');
+                    
+                    const onda = Math.sin(timeNow / 180 + i * 0.45) * (isCelebrando ? 4 : 2);
+
+                    // --- TORCIDA TOPO ---
                     ctx.save();
-                    // Corpo
-                    ctx.fillStyle = isT1Fan ? corT1 : corT2;
-                    ctx.beginPath(); ctx.arc(fx, 12 + pulo, 6, 0, 2*Math.PI); ctx.fill();
-                    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.stroke();
-                    // Olhos cartoon
-                    ctx.fillStyle = '#fff';
-                    ctx.fillRect(fx - 3, 10 + pulo, 2, 2); ctx.fillRect(fx + 1, 10 + pulo, 2, 2);
+                    // Corpo / Camisa da Torcida
+                    ctx.fillStyle = corTorcida;
+                    ctx.fillRect(x - 10, 4 + onda, 20, 9);
+                    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.2;
+                    ctx.strokeRect(x - 10, 4 + onda, 20, 9);
+
+                    // Cabeça
+                    ctx.beginPath(); ctx.arc(x, 4 + onda, 4.5, 0, 2 * Math.PI);
+                    ctx.fillStyle = (i % 2 === 0) ? '#f5cd79' : '#e77f67'; ctx.fill(); ctx.stroke();
+
+                    // Boné
+                    ctx.beginPath(); ctx.arc(x, 2 + onda, 4.5, Math.PI, 2 * Math.PI);
+                    ctx.fillStyle = corBandeira; ctx.fill(); ctx.stroke();
+
+                    // Bandeirões a cada 3 blocos
+                    if (i % 3 === 0) {
+                        ctx.fillStyle = corTorcida;
+                        ctx.beginPath();
+                        ctx.moveTo(x + 12, 1); ctx.lineTo(x + 24, 4 + Math.sin(timeNow / 120 + i) * 3); ctx.lineTo(x + 12, 8);
+                        ctx.closePath(); ctx.fill(); ctx.stroke();
+                    }
+                    ctx.restore();
+
+                    // --- TORCIDA RODAPÉ ---
+                    ctx.save();
+                    ctx.fillStyle = corTorcida;
+                    ctx.fillRect(x - 10, selCampoH - 13 - onda, 20, 9);
+                    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.2;
+                    ctx.strokeRect(x - 10, selCampoH - 13 - onda, 20, 9);
+
+                    ctx.beginPath(); ctx.arc(x, selCampoH - 13 - onda, 4.5, 0, 2 * Math.PI);
+                    ctx.fillStyle = (i % 2 === 0) ? '#f5cd79' : '#e77f67'; ctx.fill(); ctx.stroke();
+
+                    ctx.beginPath(); ctx.arc(x, selCampoH - 15 - onda, 4.5, Math.PI, 2 * Math.PI);
+                    ctx.fillStyle = corBandeira; ctx.fill(); ctx.stroke();
+
+                    if (i % 3 === 1) {
+                        ctx.fillStyle = corTorcida;
+                        ctx.beginPath();
+                        ctx.moveTo(x + 12, selCampoH - 8); ctx.lineTo(x + 24, selCampoH - 11 + Math.sin(timeNow / 120 + i) * 3); ctx.lineTo(x + 12, selCampoH - 2);
+                        ctx.closePath(); ctx.fill(); ctx.stroke();
+                    }
                     ctx.restore();
                 }
-                // Rodapé
-                for (let f = 0; f < numFans; f++) {
-                    const fx = f * 24 + 14;
-                    const pulo = Math.sin(agora / 240 + f * 0.9) * 3;
-                    const isT1Fan = f < numFans / 2;
-                    ctx.save();
-                    ctx.fillStyle = isT1Fan ? corT1 : corT2;
-                    ctx.beginPath(); ctx.arc(fx, selCampoH - 12 + pulo, 6, 0, 2*Math.PI); ctx.fill();
-                    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.stroke();
-                    ctx.restore();
-                }
 
-                // --- 2. JOGADORES CARTOONIZADOS ---
+                // --- 2. REFLETORES DE ESTÁDIO NOS 4 CANTOS ---
+                ctx.save();
+                const glow = ctx.createRadialGradient(PITCH_INSET_X, 20, 10, PITCH_INSET_X, 20, 180);
+                glow.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
+                glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                ctx.fillStyle = glow;
+                ctx.fillRect(0, 0, selCampoW, selCampoH);
+                ctx.restore();
+
+                // --- 3. JOGADORES CARTOON ---
                 const maxRender = isPenaltiesMode ? 2 : (modoDeJogo.includes('5V5') ? 10 : (modoDeJogo.includes('3V3') ? 6 : (modoDeJogo.includes('2V2') ? 4 : 2)));
 
                 for(let i=1; i<=maxRender; i++) {
@@ -2084,7 +2414,7 @@
                     const isT1 = isPenaltiesMode ? (penaltyTurn === 1 ? i === 1 : i === 2) : (i % 2 !== 0);
                     const cfg = isT1 ? cfgP1.cores : cfgP2.cores;
 
-                    // Sombra no chão
+                    // Sombra no gramado
                     ctx.save();
                     ctx.beginPath();
                     ctx.ellipse(p.position.x, p.position.y + 6, p.circleRadius + 1, p.circleRadius * 0.65, 0, 0, 2 * Math.PI);
@@ -2092,7 +2422,7 @@
                     ctx.fill();
                     ctx.restore();
 
-                    // Corpo do Jogador Cartoon (Cores vivas + contorno preto grosso de 3.5px)
+                    // Jogador Cartoon com contorno 3.5px preto
                     ctx.save();
                     ctx.beginPath();
                     ctx.arc(p.position.x, p.position.y, p.circleRadius, 0, 2 * Math.PI);
@@ -2102,24 +2432,23 @@
                     ctx.lineWidth = 3.5;
                     ctx.stroke();
 
-                    // Brilho Glossy Branco no topo-esquerdo (estilo cartoon/adesivo)
+                    // Brilho pop
                     ctx.beginPath();
                     ctx.arc(p.position.x - 5, p.position.y - 5, 6, 0, 2 * Math.PI);
                     ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
                     ctx.fill();
 
-                    // Olhinhos Expressivos que olham para a bola!
+                    // Olhinhos dinâmicos voltados para a bola
                     const angBola = Math.atan2(bola.position.y - p.position.y, bola.position.x - p.position.x);
                     const eyeOffX = Math.cos(angBola) * 4, eyeOffY = Math.sin(angBola) * 4;
 
-                    // Olho Esquerdo
                     ctx.beginPath(); ctx.arc(p.position.x - 6 + eyeOffX, p.position.y - 7 + eyeOffY, 3.5, 0, 2*Math.PI); ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.stroke();
                     ctx.beginPath(); ctx.arc(p.position.x - 6 + eyeOffX*1.3, p.position.y - 7 + eyeOffY*1.3, 1.8, 0, 2*Math.PI); ctx.fillStyle = '#000'; ctx.fill();
-                    // Olho Direito
+                    
                     ctx.beginPath(); ctx.arc(p.position.x + 6 + eyeOffX, p.position.y - 7 + eyeOffY, 3.5, 0, 2*Math.PI); ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.stroke();
                     ctx.beginPath(); ctx.arc(p.position.x + 6 + eyeOffX*1.3, p.position.y - 7 + eyeOffY*1.3, 1.8, 0, 2*Math.PI); ctx.fillStyle = '#000'; ctx.fill();
 
-                    // Número / Avatar Central
+                    // Número / Avatar
                     const textoCirculo = playerAvatars[i] || playerNumbers[i] || 10;
                     ctx.fillStyle = cfg.num || '#fff';
                     ctx.font = '900 14px Fredoka';
@@ -2129,15 +2458,15 @@
                     ctx.shadowBlur = 0;
                     ctx.restore();
 
-                    // Plaquinha Cartoon com Nome do Jogador
-                    const nomeReal = (i === 1 ? (meuPerfil.nome || 'P1') : (playerNames[i] || (i === 2 ? 'ADVERSÁRIO' : `P${i}`))).substring(0, 10);
+                    // Placa de Nome Nítida
+                    const nomeReal = (i === 1 ? (meuPerfil.nome || 'P1') : (playerNames[i] || (i === 2 ? (isRanked ? 'RIVAL' : 'ADVERSÁRIO') : `P${i}`))).substring(0, 10);
                     ctx.save();
                     const boxW = Math.max(55, nomeReal.length * 8 + 12);
-                    ctx.fillStyle = '#062313';
+                    ctx.fillStyle = 'rgba(4, 20, 11, 0.95)';
                     ctx.fillRect(p.position.x - boxW/2, p.position.y - 36, boxW, 16);
-                    ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2;
+                    ctx.strokeStyle = isRanked && i === 2 ? '#d2a8ff' : '#10b981'; ctx.lineWidth = 2;
                     ctx.strokeRect(p.position.x - boxW/2, p.position.y - 36, boxW, 16);
-                    ctx.fillStyle = '#fff'; ctx.font = '900 10.5px Fredoka';
+                    ctx.fillStyle = '#ffffff'; ctx.font = '900 11px Fredoka';
                     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                     ctx.fillText(nomeReal, p.position.x, p.position.y - 28);
                     ctx.restore();
@@ -2186,7 +2515,6 @@
                             }
                         }
 
-                        // Goleiro
                         const keeper = window.player2;
                         if (penaltyKicked) {
                             const dy = bola.position.y - keeper.position.y;
@@ -2208,6 +2536,27 @@
                             registrarResultadoPenalti(false);
                         }
                         processarControles(); return;
+                    }
+
+                    // IA BOT NO MODO RANKED OFFLINE
+                    if (isRanked && !isOnline && window.player2) {
+                        const p2 = window.player2;
+                        const dx = bola.position.x - p2.position.x;
+                        const dy = bola.position.y - p2.position.y;
+                        const dist = Math.hypot(dx, dy);
+
+                        let botVx = 0, botVy = 0;
+                        if (bola.position.x > selCampoW * 0.35) {
+                            botVx = Math.sign(dx) * 3.8;
+                            botVy = Math.sign(dy) * 3.8;
+                            if (dist < 55) tentarChutar(p2);
+                        } else {
+                            const goalCenterY = selCampoH / 2;
+                            const targetX = selCampoW * 0.75;
+                            botVx = Math.sign(targetX - p2.position.x) * 3.2;
+                            botVy = Math.sign(bola.position.y - p2.position.y) * 3.5;
+                        }
+                        Body.setVelocity(p2, { x: p2.velocity.x + (botVx - p2.velocity.x) * 0.25, y: p2.velocity.y + (botVy - p2.velocity.y) * 0.25 });
                     }
 
                     if (isHost || !isOnline) {
@@ -2250,10 +2599,10 @@
             Render.run(render); runner = Runner.create(); Runner.run(runner, engine);
         }
 
-        // PÊNALTIS REGRAS
+        // PÊNALTIS
         function iniciarModoPenaltis() {
             AudioEngine.playClick(); isPenaltiesMode = true; isRanked = false; modoDeJogo = 'PENALTIS';
-            selCampoW = 1400; selCampoH = 750; // TITÃ
+            selCampoW = 1400; selCampoH = 750;
             currPlayer = 1; prepararTelaTime(); showScreen('screen-team');
         }
 
@@ -2337,16 +2686,25 @@
             estadoJogo = 'FIM'; meuPerfil.partidas = (meuPerfil.partidas || 0) + 1;
             AudioEngine.playVictoryFanfare();
             let xpGanho = 100, moedasGanhas = 30;
+            let pdlGanho = 0;
 
             if (vencedorStr) {
                 currentStatusMsg = `${(vencedorStr === 'P1' ? cfgP1.time : cfgP2.time).toUpperCase()} VENCEU!`;
-                if (vencedorStr === 'P1') { meuPerfil.vitorias = (meuPerfil.vitorias || 0) + 1; xpGanho += 150; moedasGanhas += 120; }
-                else meuPerfil.derrotas = (meuPerfil.derrotas || 0) + 1;
+                if (vencedorStr === 'P1') {
+                    meuPerfil.vitorias = (meuPerfil.vitorias || 0) + 1;
+                    xpGanho += 150; moedasGanhas += 120;
+                    if (isRanked) { pdlGanho = 28; meuPerfil.elo = (meuPerfil.elo || 1000) + pdlGanho; }
+                } else {
+                    meuPerfil.derrotas = (meuPerfil.derrotas || 0) + 1;
+                    if (isRanked) { pdlGanho = -20; meuPerfil.elo = Math.max(0, (meuPerfil.elo || 1000) + pdlGanho); }
+                }
             } else { currentStatusMsg = "FIM DE JOGO: EMPATE!"; }
 
-            adicionarXP(xpGanho); adicionarMoedas(moedasGanhas); salvarPerfil();
+            adicionarXP(xpGanho); adicionarMoedas(moedasGanhas); salvarPerfil(); atualizarPerfilUI();
+            
             uiText('texto-gol', currentStatusMsg);
-            uiText('texto-assist', `+${xpGanho} XP | +${moedasGanhas} 🪙`);
+            const pdlMsg = isRanked ? ` | ${pdlGanho >= 0 ? '+' + pdlGanho : pdlGanho} PDL` : '';
+            uiText('texto-assist', `+${xpGanho} XP | +${moedasGanhas} 🪙${pdlMsg}`);
             uiShow('texto-assist'); uiShow('botoes-fim-jogo', 'flex'); uiShow('mensagem-overlay', 'flex');
         }
 
@@ -2361,6 +2719,7 @@
             }
         }
 
+        // --- PROCESSAMENTO DE CONTROLES COM CHUTE 100% FUNCIONAL ---
         function processarControles() {
             let inputs = {};
             if (isOnline && isHost) {
@@ -2374,17 +2733,26 @@
 
             const max = isPenaltiesMode ? 2 : (modoDeJogo.includes('5V5') ? 10 : (modoDeJogo.includes('3V3') ? 6 : (modoDeJogo.includes('2V2') ? 4 : 2)));
 
-            for(let i=1; i<=max; i++) {
-                const p = window['player' + i]; if (!p) continue;
+            for (let i = 1; i <= max; i++) {
+                if (isRanked && !isOnline && i === 2) continue; // IA controla P2 no modo Ranked offline
+                const p = window['player' + i];
+                if (!p) continue;
+
                 const inData = inputs[i];
                 let moveX = 0, moveY = 0;
                 if (inData) {
-                    if (inData.up) moveY -= 1; if (inData.down) moveY += 1;
-                    if (inData.left) moveX -= 1; if (inData.right) moveX += 1;
+                    if (inData.up) moveY -= 1;
+                    if (inData.down) moveY += 1;
+                    if (inData.left) moveX -= 1;
+                    if (inData.right) moveX += 1;
                 }
+
                 if (moveX !== 0 && moveY !== 0) { moveX *= 0.7071; moveY *= 0.7071; }
+
                 if (inData && inData.dash && (window['dashP' + i] || 0) === 0) {
-                    window['dashP' + i] = DASH_COOLDOWN; window['dashActiveP' + i] = 14; AudioEngine.playDash();
+                    window['dashP' + i] = DASH_COOLDOWN;
+                    window['dashActiveP' + i] = 14;
+                    AudioEngine.playDash();
                 }
 
                 let maxSpeed = (window['dashActiveP' + i] && window['dashActiveP' + i] > 0) ? (window['dashActiveP' + i]--, 7.2) : 4.65;
@@ -2396,18 +2764,45 @@
                     Body.setVelocity(p, { x: p.velocity.x * 0.90, y: p.velocity.y * 0.90 });
                 }
 
-                if (inData && inData.shoot) tentarChutar(p);
+                // CHUTE PRECISO
+                if (inData && inData.shoot) {
+                    tentarChutar(p);
+                }
             }
         }
 
-        function tentarChutar(jogador) {
-            const dx = bola.position.x - jogador.position.x, dy = bola.position.y - jogador.position.y;
+        // FÍSICA DE IMPACTO DO CHUTE
+        function tentarChutar(jogadorBody) {
+            if (!jogadorBody || !bola) return;
+            const dx = bola.position.x - jogadorBody.position.x;
+            const dy = bola.position.y - jogadorBody.position.y;
             const dist = Math.hypot(dx, dy);
-            if (dist < jogador.circleRadius + bola.circleRadius + 18 && dist > 0.001) {
-                const dirX = dx / dist, dirY = dy / dist;
-                const pForward = Math.max(0, jogador.velocity.x * dirX + jogador.velocity.y * dirY);
-                Body.setVelocity(bola, { x: dirX * (10.5 + pForward * 0.4), y: dirY * (10.5 + pForward * 0.4) });
+            const alcanceChute = jogadorBody.circleRadius + bola.circleRadius + 26;
+
+            if (dist < alcanceChute && dist > 0.001) {
+                const dirX = dx / dist;
+                const dirY = dy / dist;
+                const pForward = Math.max(0, jogadorBody.velocity.x * dirX + jogadorBody.velocity.y * dirY);
+                const forcaChute = 12.8 + (pForward * 0.45);
+
+                Body.setVelocity(bola, {
+                    x: dirX * forcaChute,
+                    y: dirY * forcaChute
+                });
+
                 AudioEngine.playKick();
+
+                // Partículas de impacto do chute
+                for (let k = 0; k < 6; k++) {
+                    particulas.push({
+                        x: bola.position.x,
+                        y: bola.position.y,
+                        vx: (dirX + (Math.random() - 0.5)) * 4,
+                        vy: (dirY + (Math.random() - 0.5)) * 4,
+                        color: '#f1c40f',
+                        life: 20
+                    });
+                }
             }
         }
 
@@ -2417,7 +2812,7 @@
         }
         function voltarMenu() {
             AudioEngine.playClick(); estadoJogo = 'MENU'; limparMotorFisico();
-            isPenaltiesMode = false; uiHide('game-screen-container');
+            isPenaltiesMode = false; isRanked = false; uiHide('game-screen-container');
             resetarUICompleta(); if(isOnline) cancelarOnline();
             uiShow('main-content-wrapper'); showScreen('screen-home');
         }
