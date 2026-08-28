@@ -43,18 +43,18 @@
         }
 
         #menu-container {
-            padding: 30px 35px; text-align: center; position: absolute; z-index: 100;
-            max-height: 94vh; overflow-y: auto; width: 940px; max-width: 96%;
+            padding: 26px 30px; text-align: center; position: absolute; z-index: 100;
+            max-height: 95vh; overflow-y: auto; width: 940px; max-width: 96%;
         }
 
         h1, h2, h3 { margin: 0 0 10px 0; text-transform: uppercase; font-weight: 900; }
-        h1 { font-size: 38px; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { font-size: 36px; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         h2 { font-size: 20px; color: var(--primary-gold); }
 
         /* BOTÕES */
         .btn {
-            background: linear-gradient(135deg, #1e528e, #2980b9); color: white; border: none; padding: 12px 22px;
-            font-size: 13px; font-weight: 900; border-radius: 6px; cursor: pointer; transition: all 0.2s;
+            background: linear-gradient(135deg, #1e528e, #2980b9); color: white; border: none; padding: 12px 20px;
+            font-size: 12px; font-weight: 900; border-radius: 6px; cursor: pointer; transition: all 0.2s;
             text-transform: uppercase; outline: none; letter-spacing: 0.5px;
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
@@ -62,9 +62,10 @@
         .btn:hover { transform: translateY(-2px); filter: brightness(1.15); box-shadow: 0 6px 18px rgba(41, 128, 185, 0.5); }
         .btn:active { transform: translateY(1px); }
         
-        .btn-avancar { background: linear-gradient(135deg, #1e824c, #2ecc71); width: 100%; font-size: 15px; margin-top: 15px; }
+        .btn-avancar { background: linear-gradient(135deg, #1e824c, #2ecc71); width: 100%; font-size: 14px; margin-top: 15px; }
         .btn-voltar { background: linear-gradient(135deg, #962d22, #e74c3c); font-size: 11px; padding: 8px 16px; }
         .btn-gold { background: linear-gradient(135deg, #d4ac0d, #f1c40f); color: #0b131b; }
+        .btn-ranked { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: #fff; }
 
         .screen { display: none; flex-direction: column; align-items: center; width: 100%; }
         .active-screen { display: flex; animation: fadeIn 0.25s ease; }
@@ -87,23 +88,42 @@
         .xp-bar-container { width: 130px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; margin-top: 5px; overflow: hidden; margin-left: auto; }
         .xp-bar-fill { height: 100%; background: #2ecc71; width: 0%; transition: width 0.4s; }
 
-        /* MENU PRINCIPAL */
-        .menu-modes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%; margin: 12px 0; }
+        /* TOAST DE NOTIFICAÇÃO NÃO-INTRUSIVO */
+        #toast-notif {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(13, 22, 34, 0.95); border: 2px solid var(--primary-gold);
+            padding: 10px 24px; border-radius: 8px; font-weight: 900; font-size: 13px;
+            color: #fff; z-index: 1000; display: none; box-shadow: 0 8px 25px rgba(0,0,0,0.8);
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
+
+        /* CONVITE DE GRUPO POPUP */
+        #invite-popup {
+            position: fixed; bottom: 25px; right: 25px;
+            background: #111a24; border: 2px solid #00f2fe; border-radius: 10px;
+            padding: 15px 20px; z-index: 1000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+            animation: slideUp 0.3s ease; text-align: left;
+        }
+        @keyframes slideUp { from { bottom: -80px; opacity: 0; } to { bottom: 25px; opacity: 1; } }
+
+        /* MENU PRINCIPAL GRID */
+        .menu-modes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; margin: 12px 0; }
         .mode-card {
             background: linear-gradient(145deg, rgba(25, 40, 60, 0.8), rgba(12, 20, 32, 0.95));
-            border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 18px;
-            text-align: left; cursor: pointer; transition: all 0.2s; min-height: 105px;
+            border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 16px;
+            text-align: left; cursor: pointer; transition: all 0.2s; min-height: 110px;
             display: flex; flex-direction: column; justify-content: space-between;
         }
         .mode-card:hover { transform: translateY(-3px); border-color: var(--primary-gold); box-shadow: 0 10px 25px rgba(0,0,0,0.6); }
-        .mode-card-title { font-size: 18px; font-weight: 900; color: #fff; display: flex; align-items: gap: 8px; }
-        .mode-card-desc { font-size: 11px; color: #a0aec0; margin-top: 4px; }
-        .mode-card-badge { align-self: flex-start; margin-top: 8px; font-size: 9px; font-weight: 900; padding: 2px 7px; border-radius: 4px; background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); }
+        .mode-card-title { font-size: 16px; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 6px; }
+        .mode-card-desc { font-size: 10px; color: #a0aec0; margin-top: 4px; line-height: 1.3; }
+        .mode-card-badge { align-self: flex-start; margin-top: 8px; font-size: 9px; font-weight: 900; padding: 2px 7px; border-radius: 4px; }
 
         .menu-sub-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; margin-top: 8px; }
         .sub-btn-card {
             background: rgba(18, 30, 46, 0.85); border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 8px; padding: 12px 6px; text-align: center; cursor: pointer; transition: 0.2s;
+            border-radius: 8px; padding: 10px 6px; text-align: center; cursor: pointer; transition: 0.2s;
             font-size: 10px; font-weight: 800; text-transform: uppercase; color: #e2e8f0;
             display: flex; flex-direction: column; align-items: center; gap: 4px;
         }
@@ -147,7 +167,6 @@
         }
         .hax-side-btn:hover { background: #34495e; border-color: #3498db; }
         .hax-side-btn.primary { background: #2980b9; border-color: #3498db; }
-        .hax-side-btn.primary:hover { background: #3498db; }
 
         .hax-footer {
             background: #0f171e; padding: 8px 15px; display: flex; align-items: center; gap: 15px;
@@ -158,11 +177,12 @@
         /* MODAIS */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.8); z-index: 500; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.85); z-index: 500; justify-content: center; align-items: center;
         }
         .modal-box {
             background: #111a24; border: 2px solid #3498db; border-radius: 10px; padding: 25px;
-            width: 480px; max-width: 92%; text-align: left; box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+            width: 500px; max-width: 92%; text-align: left; box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+            max-height: 88vh; overflow-y: auto;
         }
 
         /* CONFIGURAÇÕES DE ÁUDIO SLIDERS */
@@ -196,7 +216,7 @@
         .camisa-manga-esq, .camisa-manga-dir { position: absolute; width: 30px; height: 42px; background: #fff; top: 15px; border: 5px solid #000; border-radius: 6px; box-sizing: border-box; }
         .camisa-manga-esq { left: 2px; transform: rotate(20deg); } .camisa-manga-dir { right: 2px; transform: rotate(-20deg); }
 
-        /* PLACAR TV */
+        /* PLACAR TV COM INDICADOR DE 1º E 2º TEMPO */
         #top-bar {
             display: none; align-items: center; justify-content: center;
             width: 100%; max-width: 860px; margin-bottom: 8px;
@@ -219,7 +239,7 @@
         }
         .match-timer-tv {
             background: #111e2e; color: var(--primary-gold); padding: 4px 14px; border-radius: 6px;
-            font-size: 22px; min-width: 85px; text-align: center; border: 1px solid rgba(241, 196, 15, 0.4);
+            font-size: 20px; min-width: 115px; text-align: center; border: 1px solid rgba(241, 196, 15, 0.4);
             font-weight: 900; font-family: 'Rajdhani', sans-serif; margin: 0 10px;
         }
 
@@ -239,10 +259,10 @@
         #mensagem-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
             display: none; justify-content: center; align-items: center; flex-direction: column;
-            background: rgba(0,0,0,0.65); text-align: center; padding: 20px;
+            background: rgba(0,0,0,0.7); text-align: center; padding: 20px;
         }
         #texto-gol {
-            font-size: 64px; font-style: italic; font-weight: 900; letter-spacing: 5px;
+            font-size: 60px; font-style: italic; font-weight: 900; letter-spacing: 4px;
             font-family: 'Rajdhani', sans-serif; text-shadow: 0 0 25px rgba(255,255,255,0.6);
         }
         #texto-assist { font-size: 18px; color: #00f2fe; font-weight: 800; margin-top: 4px; }
@@ -269,7 +289,7 @@
         #btn-skip-replay { bottom: 20px; right: 20px; display: none; background: #c0392b; }
 
         .input-sala {
-            padding: 10px; font-size: 16px; border-radius: 6px; border: 2px solid #2980b9;
+            padding: 10px; font-size: 15px; border-radius: 6px; border: 2px solid #2980b9;
             background: #0a1118; color: #fff; text-align: center; margin-bottom: 10px; width: 80%;
             font-family: 'Rajdhani', sans-serif; font-weight: 800; outline: none;
         }
@@ -298,9 +318,28 @@
         .pass-tier-icon { font-size: 22px; }
         .pass-tier-name { font-size: 10px; font-weight: 800; }
         .pass-tier-reward { font-size: 9px; color: #2ecc71; font-weight: 900; }
+
+        /* LISTA DE AMIGOS E GRUPOS */
+        .amigo-card {
+            background: #0d1622; border: 1px solid #1e293b; border-radius: 6px; padding: 8px 12px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+        }
     </style>
 </head>
 <body>
+
+    <!-- TOAST DE NOTIFICAÇÃO NÃO-INTRUSIVO -->
+    <div id="toast-notif"></div>
+
+    <!-- POPUP DE CONVITE DE GRUPO -->
+    <div id="invite-popup">
+        <div style="font-size:11px; color:#00f2fe; font-weight:bold;">✉️ CONVITE DE GRUPO</div>
+        <div id="invite-popup-txt" style="font-size:13px; font-weight:900; margin:6px 0;">Jogador te convidou para o grupo!</div>
+        <div style="display:flex; gap:8px;">
+            <button class="btn btn-avancar" style="margin:0; padding:6px 12px; font-size:11px;" onclick="aceitarConviteGrupo()">ACEITAR</button>
+            <button class="btn btn-voltar" style="margin:0; padding:6px 12px; font-size:11px;" onclick="recusarConviteGrupo()">RECUSAR</button>
+        </div>
+    </div>
 
     <!-- CARD DE PERFIL -->
     <div id="perfil-ui" onclick="abrirEstatisticas()">
@@ -332,36 +371,70 @@
 
         <!-- MENU PRINCIPAL -->
         <div id="screen-home" class="screen">
-            <h1 style="font-size: 38px; color: var(--primary-gold); margin-bottom: 2px;">IAES BALL</h1>
-            <div style="font-size: 12px; color: #94a3b8; margin-bottom: 18px; letter-spacing: 2px; font-weight: 700;">HAXBALL CHAMPIONS EDITION</div>
+            <h1 style="font-size: 36px; color: var(--primary-gold); margin-bottom: 2px;">IAES BALL</h1>
+            <div style="font-size: 11px; color: #94a3b8; margin-bottom: 16px; letter-spacing: 2px; font-weight: 700;">HAXBALL CHAMPIONS & RANKED</div>
             
             <div class="menu-modes-grid">
+                <!-- MODO RANKED MATCHMAKING -->
+                <div class="mode-card" style="border-color: rgba(155, 89, 182, 0.6);" onclick="abrirMatchmakingRanked()">
+                    <div>
+                        <div class="mode-card-title" style="color: #d2a8ff;">⚔️ BUSCAR RANKED</div>
+                        <div class="mode-card-desc">Fila automática competitiva 1v1 ou 2v2 valendo PDL e subida de Elo!</div>
+                    </div>
+                    <div class="mode-card-badge" style="background: rgba(142, 68, 173, 0.3); color:#d2a8ff;">MATCHMAKING • PDL</div>
+                </div>
+
+                <!-- JOGO RÁPIDO LOCAL -->
                 <div class="mode-card" onclick="irParaModo(false)">
                     <div>
                         <div class="mode-card-title">⚽ JOGO RÁPIDO LOCAL</div>
-                        <div class="mode-card-desc">1v1, 2v2, 3v3 ou 5v5 no mesmo teclado com física fluida e Bots IA!</div>
+                        <div class="mode-card-desc">1v1 a 5v5 com 2 tempos de 1m30s e troca de lados no intervalo!</div>
                     </div>
-                    <div class="mode-card-badge">OFFLINE • INSTANTÂNEO</div>
+                    <div class="mode-card-badge" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan);">OFFLINE • 2 TEMPOS</div>
                 </div>
 
+                <!-- SALAS HAXBALL -->
                 <div class="mode-card" onclick="irParaModo(true)">
                     <div>
-                        <div class="mode-card-title" style="color: var(--accent-cyan);">🌐 SALAS ONLINE (HAXBALL)</div>
-                        <div class="mode-card-desc">Navegador completo de salas estilo HaxBall com lista em tempo real e criação!</div>
+                        <div class="mode-card-title" style="color: #2ecc71;">🌐 SALAS ONLINE</div>
+                        <div class="mode-card-desc">Navegador completo estilo HaxBall com lista em tempo real!</div>
                     </div>
-                    <div class="mode-card-badge" style="background: rgba(46,204,113,0.15); color:#2ecc71;">ONLINE ROOM LIST</div>
+                    <div class="mode-card-badge" style="background: rgba(46,204,113,0.15); color:#2ecc71;">ROOM LIST</div>
                 </div>
             </div>
 
             <div class="menu-sub-grid">
+                <div class="sub-btn-card" onclick="abrirModalAmigos()" style="border-color: rgba(0,242,254,0.4);"><span>👥</span><div>AMIGOS/GRUPO</div></div>
                 <div class="sub-btn-card" onclick="abrirPasseBatalha()" style="border-color: rgba(241,196,15,0.4);"><span>🎫</span><div>PASSE (20)</div></div>
                 <div class="sub-btn-card" onclick="abrirLoja()"><span>🛒</span><div>MERCADO</div></div>
                 <div class="sub-btn-card" onclick="abrirEstatisticas()"><span>📊</span><div>STATS</div></div>
-                <div class="sub-btn-card" onclick="mostrarLeaderboard()"><span>🏆</span><div>RANKING</div></div>
                 <div class="sub-btn-card" onclick="abrirModalConfiguracoes()"><span>⚙️</span><div>ÁUDIO</div></div>
             </div>
 
-            <button class="btn btn-voltar" style="margin-top: 18px;" onclick="deslogar()">Sair da Conta</button>
+            <button class="btn btn-voltar" style="margin-top: 16px;" onclick="deslogar()">Sair da Conta</button>
+        </div>
+
+        <!-- TELA DE FILA RANKED (MATCHMAKING) -->
+        <div id="screen-matchmaking" class="screen">
+            <h1 style="color: #d2a8ff;">⚔️ FILA RANKED COMPETITIVA</h1>
+            <p style="color:#94a3b8; font-size:12px; margin-bottom:15px;">Partidas competitivas valendo PDL com 2 tempos de 1m30s</p>
+
+            <div style="background: #111a24; border: 2px solid #8e44ad; border-radius: 10px; padding: 20px; width: 440px; max-width: 90%; margin-bottom: 15px;">
+                <div style="display:flex; justify-content:space-around; margin-bottom:15px;">
+                    <label><input type="radio" name="ranked-mode-select" value="1V1" checked> 1v1 Duelo Solo</label>
+                    <label><input type="radio" name="ranked-mode-select" value="2V2"> 2v2 Duplas (Com Grupo)</label>
+                </div>
+
+                <div id="mm-status-box" style="text-align:center;">
+                    <div id="mm-status-txt" style="font-size:16px; font-weight:900; color:#cbd5e1;">Pronto para buscar partida</div>
+                    <div id="mm-timer-txt" style="font-size:26px; font-weight:900; color:var(--primary-gold); font-family:'Rajdhani'; margin:8px 0; display:none;">00:00</div>
+                </div>
+
+                <button class="btn btn-ranked" id="btn-iniciar-mm" style="width:100%; margin-top:10px;" onclick="iniciarBuscaRanked()">🔍 BUSCAR PARTIDA</button>
+                <button class="btn btn-voltar" id="btn-cancelar-mm" style="width:100%; margin-top:10px; display:none;" onclick="cancelarBuscaRanked()">CANCELAR BUSCA</button>
+            </div>
+
+            <button class="btn btn-voltar" onclick="sairTelaMatchmaking()">⏴ VOLTAR AO MENU</button>
         </div>
 
         <!-- HAXBALL ROOM LIST SCREEN -->
@@ -384,9 +457,7 @@
                                     <th style="width: 25%;">Host / Dist</th>
                                 </tr>
                             </thead>
-                            <tbody id="hax-rooms-tbody">
-                                <!-- Linhas de salas reais do Firestore -->
-                            </tbody>
+                            <tbody id="hax-rooms-tbody"></tbody>
                         </table>
                     </div>
 
@@ -447,13 +518,6 @@
             <button class="btn btn-voltar" onclick="showScreen('screen-home')">⏴ VOLTAR</button>
         </div>
 
-        <!-- HALL DA FAMA -->
-        <div id="screen-leaderboard" class="screen">
-            <h1>🏆 HALL DA FAMA</h1>
-            <div id="ranking-list" style="width:100%; max-height:350px; overflow-y:auto; background:rgba(0,0,0,0.5); padding:10px; border-radius:8px;">Carregando ranking...</div>
-            <button class="btn btn-voltar" style="margin-top:12px;" onclick="showScreen('screen-home')">⏴ VOLTAR</button>
-        </div>
-
         <!-- LOBBY DO HOST -->
         <div id="screen-online-host" class="screen">
             <h2>SALA DO CAPITÃO CRIADA</h2>
@@ -463,12 +527,10 @@
                 <div class="lobby-team-box" style="flex:1; background:rgba(41,128,185,0.15); border:2px solid #2980b9; padding:10px; border-radius:8px;">
                     <h3 style="color:#3498db; margin:0 0 6px 0;">TIME AZUL</h3>
                     <div id="lobby-t1-container" style="display:flex; flex-direction:column; gap:4px;"></div>
-                    <button class="btn" style="background:#2980b9; font-size:10px; padding:6px; margin-top:6px; width:100%;" onclick="mudarTime(1)">ENTRAR AZUL</button>
                 </div>
                 <div class="lobby-team-box" style="flex:1; background:rgba(192,57,43,0.15); border:2px solid #c0392b; padding:10px; border-radius:8px;">
                     <h3 style="color:#e74c3c; margin:0 0 6px 0;">TIME VERMELHO</h3>
                     <div id="lobby-t2-container" style="display:flex; flex-direction:column; gap:4px;"></div>
-                    <button class="btn" style="background:#c0392b; font-size:10px; padding:6px; margin-top:6px; width:100%;" onclick="mudarTime(2)">ENTRAR VERMELHO</button>
                 </div>
             </div>
 
@@ -533,6 +595,32 @@
                 </div>
             </div>
             <button class="btn btn-avancar" onclick="confirmarUniforme()">CONFIRMAR E JOGAR ➔</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE AMIGOS & GRUPO -->
+    <div id="modal-amigos" class="modal-overlay">
+        <div class="modal-box">
+            <h2 style="margin-top:0; color:var(--accent-cyan);">👥 AMIGOS & GRUPO 2V2</h2>
+            
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+                <input type="text" id="input-add-amigo" class="input-sala" style="margin:0; width:100%; text-align:left;" placeholder="Digite o nickname exato..." maxlength="16">
+                <button class="btn" style="padding:8px 14px;" onclick="adicionarAmigoPorNick()">ADICIONAR</button>
+            </div>
+
+            <!-- GRUPO ATUAL -->
+            <div style="background: rgba(0, 242, 254, 0.08); border: 2px solid #00f2fe; border-radius: 8px; padding: 10px; margin-bottom: 12px;">
+                <div style="font-size:11px; font-weight:900; color:#00f2fe; margin-bottom:6px;">LOBBY DO GRUPO (2v2 RANKED)</div>
+                <div id="grupo-membros-list" style="font-size:12px; font-weight:bold;">Carregando grupo...</div>
+                <div id="grupo-acoes-box" style="margin-top:8px; display:flex; gap:6px;"></div>
+            </div>
+
+            <div style="font-size:11px; font-weight:bold; color:#cbd5e1; margin-bottom:6px;">MEUS AMIGOS:</div>
+            <div id="lista-amigos-container" style="max-height:180px; overflow-y:auto; margin-bottom:12px;">
+                <div style="font-size:11px; color:#94a3b8;">Nenhum amigo adicionado ainda.</div>
+            </div>
+
+            <button class="btn btn-voltar" style="width:100%; margin:0;" onclick="fecharModalAmigos()">FECHAR</button>
         </div>
     </div>
 
@@ -602,18 +690,18 @@
         </div>
     </div>
 
-    <!-- HUD DA PARTIDA - PLACAR TV -->
+    <!-- HUD DA PARTIDA - PLACAR TV COM INDICADOR DE TEMPO -->
     <button id="btn-voltar-partida" class="btn-ingame" onclick="voltarMenu()">🚪 SAIR</button>
     <button id="btn-config-ingame" class="btn-ingame" onclick="abrirModalConfiguracoes()">⚙️ SOM</button>
 
     <div id="top-bar">
-        <div class="tv-scoreboard-badge">AO VIVO • IAES CUP</div>
+        <div class="tv-scoreboard-badge" id="tv-badge-status">1º TEMPO • IAES CUP</div>
         <div class="team-box-broadcast t1">
             <div class="team-flag-color" id="badge-color-p1"></div>
             <div class="time-nome-tv" id="nome-p1">PAL</div>
             <div class="score-box-tv" id="score1">0</div>
         </div>
-        <div class="match-timer-tv" id="timer">03:00</div>
+        <div class="match-timer-tv" id="timer">1º T • 01:30</div>
         <div class="team-box-broadcast t2">
             <div class="score-box-tv" id="score2">0</div>
             <div class="time-nome-tv" id="nome-p2">COR</div>
@@ -632,7 +720,6 @@
             <div id="texto-gol">GOL!</div>
             <div id="texto-assist"></div>
             <div id="texto-estado"></div>
-            <div id="texto-rank"></div>
             <div id="recompensas-partida"></div>
             
             <div id="botoes-fim-jogo" style="display: none; gap: 12px; margin-top: 18px; flex-direction: row; z-index: 50;">
@@ -648,28 +735,17 @@
     <script>
         const Engine = Matter.Engine, Render = Matter.Render, Runner = Matter.Runner, Bodies = Matter.Bodies, Body = Matter.Body, Composite = Matter.Composite, Events = Matter.Events;
 
-        // --- SISTEMA DE ÁUDIO AVANÇADO COM MÚSICA PROCEDURAL E CONTROLE DE VOLUMES ---
+        // --- SISTEMA DE ÁUDIO ---
         const AudioEngine = {
-            ctx: null,
-            masterGain: null,
-            sfxGain: null,
-            musicGain: null,
-            
-            volMaster: 0.8,
-            volSFX: 0.8,
-            volMusic: 0.5,
-            musicEnabled: true,
-            
-            isMusicPlaying: false,
-            musicTimer: null,
-            stepIndex: 0,
+            ctx: null, masterGain: null, sfxGain: null, musicGain: null,
+            volMaster: 0.8, volSFX: 0.8, volMusic: 0.5, musicEnabled: true,
+            isMusicPlaying: false, musicTimer: null, stepIndex: 0,
 
             init() {
                 if (!this.ctx) {
                     const AudioCtx = window.AudioContext || window.webkitAudioContext;
                     if (AudioCtx) {
                         this.ctx = new AudioCtx();
-                        
                         this.masterGain = this.ctx.createGain();
                         this.sfxGain = this.ctx.createGain();
                         this.musicGain = this.ctx.createGain();
@@ -682,12 +758,8 @@
                         this.aplicarVolumes();
                     }
                 }
-                if (this.ctx && this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
-                if (!this.isMusicPlaying && this.musicEnabled) {
-                    this.startMusic();
-                }
+                if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+                if (!this.isMusicPlaying && this.musicEnabled) this.startMusic();
             },
 
             carregarPreferencias() {
@@ -721,75 +793,49 @@
                 this.musicGain.gain.setValueAtTime(this.musicEnabled ? this.volMusic : 0, now);
             },
 
-            // Som tátil de toque/condução na bola
             playBallTouch(speed = 1) {
                 this.init(); if (!this.ctx) return;
                 const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(160 + Math.min(speed * 15, 80), now);
+                const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+                osc.type = 'sine'; osc.frequency.setValueAtTime(160 + Math.min(speed * 15, 80), now);
                 osc.frequency.exponentialRampToValueAtTime(45, now + 0.05);
-
                 gain.gain.setValueAtTime(0.25 * Math.min(speed * 0.4, 1), now);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
-
-                osc.connect(gain);
-                gain.connect(this.sfxGain);
-                osc.start(now);
-                osc.stop(now + 0.07);
+                osc.connect(gain); gain.connect(this.sfxGain);
+                osc.start(now); osc.stop(now + 0.07);
             },
 
-            // Som de chute potente
             playKick(power = 1) {
                 this.init(); if (!this.ctx) return;
                 const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(140 + power * 25, now);
+                const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+                osc.type = 'sine'; osc.frequency.setValueAtTime(140 + power * 25, now);
                 osc.frequency.exponentialRampToValueAtTime(32, now + 0.09);
-
                 gain.gain.setValueAtTime(0.45, now);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-
-                osc.connect(gain);
-                gain.connect(this.sfxGain);
-                osc.start(now);
-                osc.stop(now + 0.11);
+                osc.connect(gain); gain.connect(this.sfxGain);
+                osc.start(now); osc.stop(now + 0.11);
             },
 
-            // Som festivo de estouro de confetes e festa no gol
             playConfetti() {
                 this.init(); if (!this.ctx) return;
                 const now = this.ctx.currentTime;
-
-                // Estouro de popper (pop)
-                const popOsc = this.ctx.createOscillator();
-                const popGain = this.ctx.createGain();
-                popOsc.type = 'triangle';
-                popOsc.frequency.setValueAtTime(350, now);
+                const popOsc = this.ctx.createOscillator(); const popGain = this.ctx.createGain();
+                popOsc.type = 'triangle'; popOsc.frequency.setValueAtTime(350, now);
                 popOsc.frequency.exponentialRampToValueAtTime(60, now + 0.12);
                 popGain.gain.setValueAtTime(0.5, now);
                 popGain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
-                popOsc.connect(popGain);
-                popGain.connect(this.sfxGain);
-                popOsc.start(now);
-                popOsc.stop(now + 0.15);
+                popOsc.connect(popGain); popGain.connect(this.sfxGain);
+                popOsc.start(now); popOsc.stop(now + 0.15);
 
-                // Brilhos e confetes cintilantes caindo
                 [587.33, 739.99, 880.00, 1174.66, 1479.98, 1760.00].forEach((freq, i) => {
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.type = 'sine';
-                    const startTime = now + 0.04 + (i * 0.05);
+                    const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+                    osc.type = 'sine'; const startTime = now + 0.04 + (i * 0.05);
                     osc.frequency.setValueAtTime(freq, startTime);
                     gain.gain.setValueAtTime(0.2, startTime);
                     gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.25);
-                    osc.connect(gain);
-                    gain.connect(this.sfxGain);
-                    osc.start(startTime);
-                    osc.stop(startTime + 0.26);
+                    osc.connect(gain); gain.connect(this.sfxGain);
+                    osc.start(startTime); osc.stop(startTime + 0.26);
                 });
             },
 
@@ -845,29 +891,13 @@
                 });
             },
 
-            // --- MOTOR DE MÚSICA DE FUNDO SINTETIZADA EM TEMPO REAL ---
             startMusic() {
                 if (this.isMusicPlaying) return;
-                this.isMusicPlaying = true;
-                this.stepIndex = 0;
+                this.isMusicPlaying = true; this.stepIndex = 0;
                 
-                // Trilha sonora eletrônica esportiva (Progressão: Dm -> F -> C -> G)
-                const bassline = [
-                    146.83, 146.83, 146.83, 220.00,  // D3
-                    174.61, 174.61, 174.61, 261.63,  // F3
-                    130.81, 130.81, 130.81, 196.00,  // C3
-                    196.00, 196.00, 196.00, 293.66   // G3
-                ];
-                
-                const leads = [
-                    293.66, 349.23, 440.00, 523.25,
-                    349.23, 440.00, 523.25, 659.25,
-                    261.63, 329.63, 392.00, 523.25,
-                    392.00, 493.88, 587.33, 783.99
-                ];
-
-                const bpm = 120;
-                const stepDuration = (60 / bpm) / 2; // Colcheias (8th notes)
+                const bassline = [ 146.83, 146.83, 146.83, 220.00, 174.61, 174.61, 174.61, 261.63, 130.81, 130.81, 130.81, 196.00, 196.00, 196.00, 196.00, 293.66 ];
+                const leads = [ 293.66, 349.23, 440.00, 523.25, 349.23, 440.00, 523.25, 659.25, 261.63, 329.63, 392.00, 523.25, 392.00, 493.88, 587.33, 783.99 ];
+                const bpm = 120, stepDuration = (60 / bpm) / 2;
 
                 const playStep = () => {
                     if (!this.isMusicPlaying) return;
@@ -875,75 +905,44 @@
                         const now = this.ctx.currentTime;
                         const idx = this.stepIndex % 16;
                         
-                        // Sintetizador de Baixo (Bass Synth)
-                        const bOsc = this.ctx.createOscillator();
-                        const bGain = this.ctx.createGain();
-                        bOsc.type = 'sawtooth';
-                        bOsc.frequency.setValueAtTime(bassline[idx], now);
-
-                        const filter = this.ctx.createBiquadFilter();
-                        filter.type = 'lowpass';
+                        const bOsc = this.ctx.createOscillator(); const bGain = this.ctx.createGain();
+                        bOsc.type = 'sawtooth'; bOsc.frequency.setValueAtTime(bassline[idx], now);
+                        const filter = this.ctx.createBiquadFilter(); filter.type = 'lowpass';
                         filter.frequency.setValueAtTime(400, now);
                         filter.frequency.exponentialRampToValueAtTime(100, now + stepDuration * 0.9);
-
                         bGain.gain.setValueAtTime(0.12, now);
                         bGain.gain.exponentialRampToValueAtTime(0.001, now + stepDuration * 0.9);
+                        bOsc.connect(filter); filter.connect(bGain); bGain.connect(this.musicGain);
+                        bOsc.start(now); bOsc.stop(now + stepDuration);
 
-                        bOsc.connect(filter);
-                        filter.connect(bGain);
-                        bGain.connect(this.musicGain);
-                        bOsc.start(now);
-                        bOsc.stop(now + stepDuration);
-
-                        // Melodia Suave (Arp Synth)
                         if (idx % 2 === 0 || idx % 3 === 0) {
-                            const lOsc = this.ctx.createOscillator();
-                            const lGain = this.ctx.createGain();
-                            lOsc.type = 'sine';
-                            lOsc.frequency.setValueAtTime(leads[idx], now);
+                            const lOsc = this.ctx.createOscillator(); const lGain = this.ctx.createGain();
+                            lOsc.type = 'sine'; lOsc.frequency.setValueAtTime(leads[idx], now);
                             lGain.gain.setValueAtTime(0.08, now);
                             lGain.gain.exponentialRampToValueAtTime(0.0001, now + stepDuration * 1.5);
-                            lOsc.connect(lGain);
-                            lGain.connect(this.musicGain);
-                            lOsc.start(now);
-                            lOsc.stop(now + stepDuration * 1.6);
+                            lOsc.connect(lGain); lGain.connect(this.musicGain);
+                            lOsc.start(now); lOsc.stop(now + stepDuration * 1.6);
                         }
-
-                        // Pulso Rítmico (Soft Shaker)
-                        const nBuf = this.ctx.createBuffer(1, Math.floor(this.ctx.sampleRate * 0.02), this.ctx.sampleRate);
-                        const nData = nBuf.getChannelData(0);
-                        for (let k = 0; k < nData.length; k++) nData[k] = Math.random() * 2 - 1;
-                        const nSrc = this.ctx.createBufferSource();
-                        nSrc.buffer = nBuf;
-                        const nFilt = this.ctx.createBiquadFilter();
-                        nFilt.type = 'highpass';
-                        nFilt.frequency.value = 5000;
-                        const nG = this.ctx.createGain();
-                        nG.gain.setValueAtTime(idx % 4 === 0 ? 0.06 : 0.025, now);
-                        nG.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
-                        nSrc.connect(nFilt);
-                        nFilt.connect(nG);
-                        nG.connect(this.musicGain);
-                        nSrc.start(now);
                     }
                     this.stepIndex++;
                     this.musicTimer = setTimeout(playStep, stepDuration * 1000);
                 };
-
                 playStep();
             },
 
-            stopMusic() {
-                this.isMusicPlaying = false;
-                if (this.musicTimer) clearTimeout(this.musicTimer);
-            }
+            stopMusic() { this.isMusicPlaying = false; if (this.musicTimer) clearTimeout(this.musicTimer); }
         };
 
-        // --- CONTROLE DE CONFIGURAÇÕES DE ÁUDIO ---
+        function mostrarToast(msg) {
+            const toast = document.getElementById('toast-notif');
+            if (!toast) return;
+            toast.innerText = msg; toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3500);
+        }
+
+        // --- CONFIGURAÇÕES DE ÁUDIO ---
         function abrirModalConfiguracoes() {
-            AudioEngine.playClick();
-            AudioEngine.init();
-            
+            AudioEngine.playClick(); AudioEngine.init();
             document.getElementById('slider-vol-master').value = Math.round(AudioEngine.volMaster * 100);
             document.getElementById('slider-vol-sfx').value = Math.round(AudioEngine.volSFX * 100);
             document.getElementById('slider-vol-music').value = Math.round(AudioEngine.volMusic * 100);
@@ -952,32 +951,18 @@
             uiText('txt-vol-master', Math.round(AudioEngine.volMaster * 100) + '%');
             uiText('txt-vol-sfx', Math.round(AudioEngine.volSFX * 100) + '%');
             uiText('txt-vol-music', Math.round(AudioEngine.volMusic * 100) + '%');
-
             uiShow('modal-configuracoes', 'flex');
         }
-
-        function fecharModalConfiguracoes() {
-            AudioEngine.playClick();
-            AudioEngine.salvarPreferencias();
-            uiHide('modal-configuracoes');
-        }
-
+        function fecharModalConfiguracoes() { AudioEngine.playClick(); AudioEngine.salvarPreferencias(); uiHide('modal-configuracoes'); }
         function ajustarVolumes() {
-            const vM = parseInt(document.getElementById('slider-vol-master').value) / 100;
-            const vS = parseInt(document.getElementById('slider-vol-sfx').value) / 100;
-            const vMu = parseInt(document.getElementById('slider-vol-music').value) / 100;
-
-            AudioEngine.volMaster = vM;
-            AudioEngine.volSFX = vS;
-            AudioEngine.volMusic = vMu;
-
-            uiText('txt-vol-master', Math.round(vM * 100) + '%');
-            uiText('txt-vol-sfx', Math.round(vS * 100) + '%');
-            uiText('txt-vol-music', Math.round(vMu * 100) + '%');
-
+            AudioEngine.volMaster = parseInt(document.getElementById('slider-vol-master').value) / 100;
+            AudioEngine.volSFX = parseInt(document.getElementById('slider-vol-sfx').value) / 100;
+            AudioEngine.volMusic = parseInt(document.getElementById('slider-vol-music').value) / 100;
+            uiText('txt-vol-master', Math.round(AudioEngine.volMaster * 100) + '%');
+            uiText('txt-vol-sfx', Math.round(AudioEngine.volSFX * 100) + '%');
+            uiText('txt-vol-music', Math.round(AudioEngine.volMusic * 100) + '%');
             AudioEngine.aplicarVolumes();
         }
-
         function toggleMusicaAtiva() {
             AudioEngine.musicEnabled = document.getElementById('chk-musica-ativa').checked;
             AudioEngine.aplicarVolumes();
@@ -1053,15 +1038,24 @@
             return { tier: lvl, recompensa: `🪙 ${lvl * 60} Moedas`, tipo: 'moedas', qtd: lvl * 60, icon: '🪙', nome: `Recompensa ${lvl}` };
         });
 
-        // --- VARIÁVEIS GLOBAIS ---
+        // --- VARIÁVEIS GLOBAIS DE PARTIDA COM 2 TEMPOS ---
         let engine, render, runner, bola;
         let estadoJogo = 'MENU';
         let delayTimer = 0;
-        let placar1 = 0, placar2 = 0, isProrrogacao = false;
-        let ticksJogo = 0, tempoRestante = 180;
+        let placar1 = 0, placar2 = 0;
+        
+        // ESTRUTURA DE 2 TEMPOS DE 1m30s (90 segundos cada)
+        const DURACAO_TEMPO = 90;
+        let periodoJogo = 1; // 1 = 1º Tempo, 2 = 2º Tempo
+        let tempoRestante = DURACAO_TEMPO;
+        let ticksJogo = 0;
+        let ladosInvertidos = false; // no 2º tempo inverte de lado!
+
         let currPlayer = 1, selCampoW = 1000, selCampoH = 550;
         let cfgP1 = null, cfgP2 = null, timeTemporario = "";
         let modoDeJogo = 'CLASSICO';
+        let isRanked = false; // Modo competitivo ranked valendo PDL
+
         let historicoPosicoes = [], particulas = [];
         let frameReplay = 0, rewindIndex = 0;
         const DASH_COOLDOWN = 180;
@@ -1069,12 +1063,17 @@
         let historicoToques = [], ultimoGoleador = null, ultimoAssistente = null;
 
         let meuPerfil = {
-            nome: '', uid: '', elo: 0, vitorias: 0, derrotas: 0, numero: 10,
+            nome: '', uid: '', elo: 1000, vitorias: 0, derrotas: 0, numero: 10,
             moedas: 300, xp: 0, nivel: 1, gols: 0, assistencias: 0, partidas: 0,
             itensComprados: ['bola_classica', 'rastro_nenhum', 'aura_nenhuma', 'exp_padrao'],
             equipados: { bola: 'bola_classica', rastro: 'rastro_nenhum', aura: 'aura_nenhuma', explosao: 'exp_padrao' },
-            passeResgatados: []
+            passeResgatados: [], amigos: []
         };
+
+        // --- SISTEMA DE MATCHMAKING & GRUPOS (PARTY) ---
+        let matchmakingInterval = null, matchmakingSeconds = 0, myMatchTicketId = null;
+        let meuGrupo = { id: null, lider: null, membros: [] };
+        let convitePendente = null;
 
         // --- WEBRTC & ROOM LIST ---
         const peerConfig = { config: { 'iceServers': [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] } };
@@ -1088,9 +1087,8 @@
         let salaSelecionada = null;
 
         window.addEventListener('beforeunload', () => {
-            if (isHost && myRoomID && db) {
-                db.collection("salas").doc(myRoomID).delete().catch(() => {});
-            }
+            if (isHost && myRoomID && db) db.collection("salas").doc(myRoomID).delete().catch(() => {});
+            if (myMatchTicketId && db) db.collection("matchmaking").doc(myMatchTicketId).delete().catch(() => {});
         });
 
         // --- CONTROLES DE TECLADO ---
@@ -1134,6 +1132,7 @@
                             if (doc.exists) {
                                 meuPerfil = { ...meuPerfil, ...doc.data(), uid: user.uid };
                                 atualizarPerfilUI();
+                                escutarNotificacoesUsuario();
                                 showScreen('screen-home');
                             }
                         } catch (e) { console.error("Erro perfil:", e); }
@@ -1155,7 +1154,7 @@
                 const cred = await auth.signInWithEmailAndPassword(emailFromNick(nick), senha);
                 const doc = await db.collection("jogadores").doc(cred.user.uid).get();
                 if (doc.exists) meuPerfil = { ...meuPerfil, ...doc.data(), uid: cred.user.uid };
-                atualizarPerfilUI(); showScreen('screen-home');
+                atualizarPerfilUI(); escutarNotificacoesUsuario(); showScreen('screen-home');
             } catch (err) {
                 uiText('auth-status-msg', 'Erro no login. Se for novo, clique em CRIAR CONTA.');
             } finally { uiText('btn-login-txt', '⚽ ENTRAR'); }
@@ -1173,14 +1172,14 @@
                 uiText('btn-criar-txt', 'CRIANDO...');
                 const cred = await auth.createUserWithEmailAndPassword(emailFromNick(nick), senha);
                 meuPerfil = {
-                    nome: nick, uid: cred.user.uid, elo: 0, vitorias: 0, derrotas: 0, numero: 10,
+                    nome: nick, uid: cred.user.uid, elo: 1000, vitorias: 0, derrotas: 0, numero: 10,
                     moedas: 300, xp: 0, nivel: 1, gols: 0, assistencias: 0, partidas: 0,
                     itensComprados: ['bola_classica', 'rastro_nenhum', 'aura_nenhuma', 'exp_padrao'],
                     equipados: { bola: 'bola_classica', rastro: 'rastro_nenhum', aura: 'aura_nenhuma', explosao: 'exp_padrao' },
-                    passeResgatados: []
+                    passeResgatados: [], amigos: []
                 };
                 await db.collection("jogadores").doc(cred.user.uid).set(meuPerfil);
-                atualizarPerfilUI(); showScreen('screen-home');
+                atualizarPerfilUI(); escutarNotificacoesUsuario(); showScreen('screen-home');
             } catch (err) {
                 uiText('auth-status-msg', 'Erro ao criar conta: ' + (err.message || 'Tente outro nick'));
             } finally { uiText('btn-criar-txt', 'CRIAR CONTA'); }
@@ -1198,13 +1197,14 @@
             uiHide('perfil-ui'); showScreen('screen-login');
         }
 
+        // Adiciona XP sem interromper com popups na partida
         function adicionarXP(qtd) {
             meuPerfil.xp += qtd;
             if (meuPerfil.xp >= meuPerfil.nivel * 500) {
                 meuPerfil.xp -= meuPerfil.nivel * 500;
                 meuPerfil.nivel++; meuPerfil.moedas += 200;
-                AudioEngine.playVictoryFanfare();
-                alert(`🎉 Subiu para o NÍVEL ${meuPerfil.nivel}! (+200 Moedas 🪙)`);
+                mostrarToast(`🎉 Subiu para o NÍVEL ${meuPerfil.nivel}! (+200 🪙)`);
+                if (estadoJogo === 'MENU') AudioEngine.playVictoryFanfare();
             }
             salvarPerfil(); atualizarPerfilUI();
         }
@@ -1213,32 +1213,308 @@
         function atualizarPerfilUI() {
             uiShow('perfil-ui'); uiText('perfil-nome', meuPerfil.nome);
             uiText('perfil-nivel-badge', `NVL ${meuPerfil.nivel}`);
-            uiText('perfil-rank', `OURO (${meuPerfil.elo} PDL)`);
+            uiText('perfil-rank', `RANKED (${meuPerfil.elo || 1000} PDL)`);
             uiText('perfil-moedas-val', meuPerfil.moedas);
             const perc = Math.min(100, Math.floor((meuPerfil.xp / (meuPerfil.nivel * 500)) * 100));
             const bar = document.getElementById('perfil-xp-bar'); if(bar) bar.style.width = perc + '%';
         }
 
-        // --- SISTEMA DE SALAS REAIS ESTILO HAXBALL ---
-        function abrirNavegadorSalas() {
-            AudioEngine.playClick();
-            showScreen('screen-online-rooms');
-            carregarSalasOnline();
+        // --- SISTEMA DE AMIGOS E GRUPOS (PARTY) ---
+        function escutarNotificacoesUsuario() {
+            if (!db || !auth || !auth.currentUser) return;
+            db.collection("notificacoes").where("destinatarioUid", "==", auth.currentUser.uid)
+              .onSnapshot(snap => {
+                  snap.docChanges().forEach(change => {
+                      if (change.type === "added") {
+                          const n = change.doc.data();
+                          if (n.tipo === 'convite_grupo') {
+                              convitePendente = { id: change.doc.id, ...n };
+                              uiText('invite-popup-txt', `${n.remetenteNome} convidou você para o grupo 2v2!`);
+                              uiShow('invite-popup');
+                          }
+                      }
+                  });
+              });
         }
+
+        async function abrirModalAmigos() {
+            AudioEngine.playClick();
+            uiShow('modal-amigos', 'flex');
+            carregarListaAmigosUI();
+            atualizarGrupoUI();
+        }
+        function fecharModalAmigos() { AudioEngine.playClick(); uiHide('modal-amigos'); }
+
+        async function adicionarAmigoPorNick() {
+            const input = document.getElementById('input-add-amigo');
+            const nick = input.value.trim().toUpperCase();
+            if (!nick || nick === meuPerfil.nome) return;
+
+            try {
+                const snap = await db.collection("jogadores").where("nome", "==", nick).limit(1).get();
+                if (snap.empty) { alert("Jogador não encontrado!"); return; }
+                
+                const amigoData = snap.docs[0].data();
+                if (!meuPerfil.amigos) meuPerfil.amigos = [];
+                if (meuPerfil.amigos.some(a => a.nome === nick)) { alert("Esse amigo já está na sua lista!"); return; }
+
+                meuPerfil.amigos.push({ nome: nick, uid: snap.docs[0].id, elo: amigoData.elo || 1000 });
+                salvarPerfil();
+                input.value = '';
+                carregarListaAmigosUI();
+                mostrarToast(`👥 ${nick} adicionado à sua lista de amigos!`);
+            } catch(e) { console.error("Erro add amigo:", e); }
+        }
+
+        function carregarListaAmigosUI() {
+            const cont = document.getElementById('lista-amigos-container');
+            cont.innerHTML = '';
+            const amigos = meuPerfil.amigos || [];
+            if (amigos.length === 0) {
+                cont.innerHTML = '<div style="font-size:11px; color:#94a3b8; padding:10px;">Nenhum amigo adicionado. Digite o nick acima!</div>';
+                return;
+            }
+
+            amigos.forEach(a => {
+                const card = document.createElement('div');
+                card.className = 'amigo-card';
+                card.innerHTML = `
+                    <div>
+                        <div style="font-weight:900; font-size:12px; color:#fff;">${a.nome}</div>
+                        <div style="font-size:10px; color:var(--primary-gold);">${a.elo || 1000} PDL</div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn btn-ranked" style="padding:4px 8px; font-size:10px;" onclick="convidarAmigoGrupo('${a.uid}', '${a.nome}')">CONVIDAR GRUPO</button>
+                    </div>
+                `;
+                cont.appendChild(card);
+            });
+        }
+
+        async function convidarAmigoGrupo(amigoUid, amigoNome) {
+            AudioEngine.playClick();
+            if (!db || !auth.currentUser) return;
+            try {
+                if (!meuGrupo.id) {
+                    meuGrupo = { id: 'grp_' + auth.currentUser.uid, lider: meuPerfil.nome, membros: [meuPerfil.nome] };
+                }
+                await db.collection("notificacoes").add({
+                    tipo: 'convite_grupo',
+                    remetenteUid: auth.currentUser.uid,
+                    remetenteNome: meuPerfil.nome,
+                    destinatarioUid: amigoUid,
+                    grupoId: meuGrupo.id,
+                    criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                mostrarToast(`✉️ Convite enviado para ${amigoNome}!`);
+            } catch(e) { console.error("Erro convite:", e); }
+        }
+
+        async function aceitarConviteGrupo() {
+            AudioEngine.playClick();
+            uiHide('invite-popup');
+            if (!convitePendente) return;
+
+            meuGrupo = { id: convitePendente.grupoId, lider: convitePendente.remetenteNome, membros: [convitePendente.remetenteNome, meuPerfil.nome] };
+            if (db) db.collection("notificacoes").doc(convitePendente.id).delete().catch(()=>{});
+            mostrarToast(`🟢 Você entrou no grupo de ${convitePendente.remetenteNome}!`);
+            atualizarGrupoUI();
+        }
+
+        function recusarConviteGrupo() {
+            AudioEngine.playClick();
+            uiHide('invite-popup');
+            if (convitePendente && db) db.collection("notificacoes").doc(convitePendente.id).delete().catch(()=>{});
+            convitePendente = null;
+        }
+
+        function atualizarGrupoUI() {
+            const list = document.getElementById('grupo-membros-list');
+            const acoes = document.getElementById('grupo-acoes-box');
+            if (!list || !acoes) return;
+
+            if (!meuGrupo.id || meuGrupo.membros.length === 0) {
+                list.innerHTML = `<span>Solo (Sem Grupo Ativo)</span>`;
+                acoes.innerHTML = `<button class="btn btn-avancar" style="margin:0; padding:6px 12px; font-size:10px;" onclick="criarNovoGrupo()">CRIAR GRUPO 2V2</button>`;
+            } else {
+                list.innerHTML = `👑 Líder: ${meuGrupo.lider} | Membros (${meuGrupo.membros.length}/2): <b>${meuGrupo.membros.join(', ')}</b>`;
+                acoes.innerHTML = `
+                    <button class="btn btn-ranked" style="margin:0; padding:6px 12px; font-size:10px;" onclick="puxarRankedEmGrupo()">⚔️ PUXAR 2V2 COM GRUPO</button>
+                    <button class="btn btn-voltar" style="margin:0; padding:6px 12px; font-size:10px;" onclick="sairDoGrupo()">SAIR</button>
+                `;
+            }
+        }
+
+        function criarNovoGrupo() {
+            AudioEngine.playClick();
+            meuGrupo = { id: 'grp_' + auth.currentUser.uid, lider: meuPerfil.nome, membros: [meuPerfil.nome] };
+            atualizarGrupoUI();
+            mostrarToast("Grupo 2v2 criado! Convide um amigo na lista abaixo.");
+        }
+        function sairDoGrupo() {
+            AudioEngine.playClick();
+            meuGrupo = { id: null, lider: null, membros: [] };
+            atualizarGrupoUI();
+        }
+        function puxarRankedEmGrupo() {
+            fecharModalAmigos();
+            abrirMatchmakingRanked();
+            document.querySelector('input[name="ranked-mode-select"][value="2V2"]').checked = true;
+            iniciarBuscaRanked();
+        }
+
+        // --- SISTEMA DE MATCHMAKING RANKED COMPETITIVO ---
+        function abrirMatchmakingRanked() {
+            AudioEngine.playClick();
+            showScreen('screen-matchmaking');
+            uiText('mm-status-txt', 'Pronto para buscar partida competitiva');
+            uiHide('mm-timer-txt');
+            uiShow('btn-iniciar-mm');
+            uiHide('btn-cancelar-mm');
+        }
+
+        function sairTelaMatchmaking() {
+            AudioEngine.playClick();
+            cancelarBuscaRanked();
+            showScreen('screen-home');
+        }
+
+        async function iniciarBuscaRanked() {
+            AudioEngine.playClick();
+            const mode = document.querySelector('input[name="ranked-mode-select"]:checked').value;
+            isRanked = true;
+            modoDeJogo = mode === '2V2' ? 'CLASSICO_2V2' : 'CLASSICO';
+            selCampoW = mode === '2V2' ? 1200 : 1000;
+            selCampoH = mode === '2V2' ? 660 : 550;
+
+            uiText('mm-status-txt', `🔍 Buscando adversário Ranked ${mode}...`);
+            uiShow('mm-timer-txt');
+            uiHide('btn-iniciar-mm');
+            uiShow('btn-cancelar-mm');
+
+            matchmakingSeconds = 0;
+            uiText('mm-timer-txt', '00:00');
+            if (matchmakingInterval) clearInterval(matchmakingInterval);
+            matchmakingInterval = setInterval(() => {
+                matchmakingSeconds++;
+                let m = Math.floor(matchmakingSeconds/60), s = matchmakingSeconds%60;
+                uiText('mm-timer-txt', `0${m}:${s<10?'0'+s:s}`);
+            }, 1000);
+
+            // Procura ticket na fila do Firestore
+            try {
+                if (db) {
+                    const snap = await db.collection("matchmaking")
+                        .where("modo", "==", mode)
+                        .where("status", "==", "waiting")
+                        .orderBy("criadoEm", "asc")
+                        .limit(5).get();
+
+                    let foundOpponent = null;
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        if (d.uid !== meuPerfil.uid && !foundOpponent) {
+                            foundOpponent = { id: doc.id, ...d };
+                        }
+                    });
+
+                    if (foundOpponent) {
+                        // Conecta como CLIENT no Host encontrado
+                        await db.collection("matchmaking").doc(foundOpponent.id).update({ status: 'matched', clientUid: meuPerfil.uid, clientNome: meuPerfil.nome });
+                        uiText('mm-status-txt', `⚔️ Partida encontrada contra ${foundOpponent.nome}! Conectando...`);
+                        conectarPeerMatchmaking(foundOpponent.peerId);
+                    } else {
+                        // Cria ticket como HOST esperando alguém
+                        myMatchTicketId = 'mm_' + meuPerfil.uid;
+                        myRoomID = 'ranked_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                        
+                        await db.collection("matchmaking").doc(myMatchTicketId).set({
+                            uid: meuPerfil.uid, nome: meuPerfil.nome, elo: meuPerfil.elo || 1000,
+                            modo: mode, status: 'waiting', peerId: myRoomID,
+                            criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+
+                        iniciarHostMatchmaking();
+
+                        // Listener para quando alguém parear com o Host
+                        const unsub = db.collection("matchmaking").doc(myMatchTicketId).onSnapshot(doc => {
+                            if (doc.exists && doc.data().status === 'matched') {
+                                uiText('mm-status-txt', `⚔️ Partida encontrada contra ${doc.data().clientNome}! Iniciando...`);
+                                unsub();
+                            }
+                        });
+                    }
+                }
+            } catch(e) { console.error("Erro matchmaking:", e); }
+        }
+
+        function cancelarBuscaRanked() {
+            if (matchmakingInterval) { clearInterval(matchmakingInterval); matchmakingInterval = null; }
+            if (myMatchTicketId && db) { db.collection("matchmaking").doc(myMatchTicketId).delete().catch(()=>{}); myMatchTicketId = null; }
+            if (peer) { peer.destroy(); peer = null; }
+            uiText('mm-status-txt', 'Busca cancelada');
+            uiHide('mm-timer-txt');
+            uiShow('btn-iniciar-mm');
+            uiHide('btn-cancelar-mm');
+        }
+
+        function iniciarHostMatchmaking() {
+            isOnline = true; isHost = true; mySlot = 1;
+            clientConnections = [];
+            playerNames[1] = meuPerfil.nome;
+            try {
+                peer = new Peer(myRoomID, peerConfig);
+                peer.on('connection', (conn) => {
+                    conn.playerSlot = 2; clientConnections.push(conn);
+                    conn.on('open', () => {
+                        conn.send({ type: 'welcome', slot: 2, modo: modoDeJogo, w: selCampoW, h: selCampoH });
+                    });
+                    conn.on('data', (d) => {
+                        if (d.type === 'identify') { playerNames[2] = d.nome; }
+                        if (d.type === 'input') remoteInputs[d.slot] = d.keys;
+                        if (d.type === 'ready_start') {
+                            cfgP1 = { time: "Palmeiras", uni: 1, cores: TIMES["Palmeiras"].cor1 };
+                            cfgP2 = { time: "Corinthians", uni: 1, cores: TIMES["Corinthians"].cor1 };
+                            uiHide('menu-container');
+                            broadcast({ type: 'start', cfgP1: cfgP1, cfgP2: cfgP2, w: selCampoW, h: selCampoH, modo: modoDeJogo, names: playerNames });
+                            iniciarEngineJogo();
+                        }
+                    });
+                });
+            } catch(e) { console.error("Erro Host MM:", e); }
+        }
+
+        function conectarPeerMatchmaking(hostPeerId) {
+            isOnline = true; isHost = false; mySlot = 2;
+            try {
+                peer = new Peer(peerConfig);
+                peer.on('open', () => {
+                    myConn = peer.connect(hostPeerId, { reliable: true });
+                    myConn.on('open', () => {
+                        myConn.send({ type: 'identify', nome: meuPerfil.nome, numero: 10 });
+                        myConn.send({ type: 'ready_start' });
+                    });
+                    myConn.on('data', (d) => {
+                        if (d.type === 'welcome') { mySlot = d.slot; modoDeJogo = d.modo; if(d.w) selCampoW = d.w; if(d.h) selCampoH = d.h; }
+                        if (d.type === 'start') { cfgP1 = d.cfgP1; cfgP2 = d.cfgP2; selCampoW = d.w; selCampoH = d.h; modoDeJogo = d.modo; playerNames = d.names; uiHide('menu-container'); iniciarEngineJogo(); }
+                        if (d.type === 'sync' && estadoJogo !== 'MENU') sincronizarJogoCliente(d);
+                    });
+                });
+            } catch(e) { console.error("Erro Client MM:", e); }
+        }
+
+        // --- SISTEMA DE SALAS REAIS DO HAXBALL ---
+        function abrirNavegadorSalas() { AudioEngine.playClick(); isRanked = false; showScreen('screen-online-rooms'); carregarSalasOnline(); }
 
         async function carregarSalasOnline() {
             const tbody = document.getElementById('hax-rooms-tbody');
             tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:25px; color:#94a3b8;">Buscando salas reais no servidor...</td></tr>';
-            
-            salasOnlineCache = [];
-            salaSelecionada = null;
+            salasOnlineCache = []; salaSelecionada = null;
 
             try {
                 if (db) {
                     const snap = await db.collection("salas").orderBy("criadoEm", "desc").limit(30).get();
-                    snap.forEach(doc => {
-                        salasOnlineCache.push({ id: doc.id, ...doc.data() });
-                    });
+                    snap.forEach(doc => salasOnlineCache.push({ id: doc.id, ...doc.data() }));
                 }
             } catch (e) { console.error("Erro salas reais:", e); }
 
@@ -1247,9 +1523,7 @@
         }
 
         function filtrarTabelaSalas() {
-            const tbody = document.getElementById('hax-rooms-tbody');
-            tbody.innerHTML = '';
-            
+            const tbody = document.getElementById('hax-rooms-tbody'); tbody.innerHTML = '';
             const showLocked = document.getElementById('chk-show-locked').checked;
             const showFull = document.getElementById('chk-show-full').checked;
             const showEmpty = document.getElementById('chk-show-empty').checked;
@@ -1262,50 +1536,31 @@
             });
 
             if (filtradas.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="4" style="text-align:center; padding:35px 20px; color:#94a3b8;">
-                            <div style="font-size:13px; margin-bottom:12px;">Nenhuma sala aberta no momento.</div>
-                            <button class="hax-side-btn primary" style="margin: 0 auto; display: inline-flex;" onclick="abrirModalCriarSala()">➕ Criar Primeira Sala</button>
-                        </td>
-                    </tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:35px 20px; color:#94a3b8;"><div style="font-size:13px; margin-bottom:12px;">Nenhuma sala aberta no momento.</div><button class="hax-side-btn primary" style="margin: 0 auto; display: inline-flex;" onclick="abrirModalCriarSala()">➕ Criar Primeira Sala</button></td></tr>`;
                 return;
             }
 
             filtradas.forEach(s => {
-                const tr = document.createElement('tr');
-                tr.className = 'hax-row';
+                const tr = document.createElement('tr'); tr.className = 'hax-row';
                 tr.onclick = () => selecionarLinhaSala(s, tr);
                 tr.ondblclick = () => { selecionarLinhaSala(s, tr); conectarSalaSelecionada(); };
 
                 const passTxt = s.temSenha ? '<span style="color:#e74c3c;">Yes</span>' : '<span style="color:#2ecc71;">No</span>';
                 const distTxt = s.host ? `👑 ${s.host}` : '🇧🇷 BRASIL';
 
-                tr.innerHTML = `
-                    <td style="color:#fff;">${s.nome}</td>
-                    <td style="color:#f1c40f;">${s.jogadores || 1}/${s.max}</td>
-                    <td>${passTxt}</td>
-                    <td style="color:#cbd5e1;">${distTxt}</td>
-                `;
+                tr.innerHTML = `<td style="color:#fff;">${s.nome}</td><td style="color:#f1c40f;">${s.jogadores || 1}/${s.max}</td><td>${passTxt}</td><td style="color:#cbd5e1;">${distTxt}</td>`;
                 tbody.appendChild(tr);
             });
         }
 
         function selecionarLinhaSala(sala, elTr) {
-            AudioEngine.playClick();
-            salaSelecionada = sala;
+            AudioEngine.playClick(); salaSelecionada = sala;
             document.querySelectorAll('.hax-row').forEach(r => r.classList.remove('selected'));
             elTr.classList.add('selected');
         }
 
-        function abrirModalCriarSala() {
-            AudioEngine.playClick();
-            uiShow('modal-criar-sala', 'flex');
-        }
-        function fecharModalCriarSala() {
-            AudioEngine.playClick();
-            uiHide('modal-criar-sala');
-        }
+        function abrirModalCriarSala() { AudioEngine.playClick(); uiShow('modal-criar-sala', 'flex'); }
+        function fecharModalCriarSala() { AudioEngine.playClick(); uiHide('modal-criar-sala'); }
 
         async function confirmarCriacaoSala() {
             AudioEngine.playClick();
@@ -1315,7 +1570,7 @@
             const pass = document.getElementById('modal-input-pass').value.trim();
             fecharModalCriarSala();
 
-            isOnline = true; isHost = true; mySlot = 1; modoDeJogo = modo;
+            isOnline = true; isHost = true; mySlot = 1; modoDeJogo = modo; isRanked = false;
             selCampoW = parseInt(estadioDim[0]); selCampoH = parseInt(estadioDim[1]);
 
             myRoomID = 'iaes_' + Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -1351,9 +1606,7 @@
                     for (let s = 1; s <= max; s++) { if (!used.includes(s)) { slotAssigned = s; break; } }
                     conn.playerSlot = slotAssigned; clientConnections.push(conn);
 
-                    if (db && myRoomID) {
-                        db.collection("salas").doc(myRoomID).update({ jogadores: 1 + clientConnections.length }).catch(()=>{});
-                    }
+                    if (db && myRoomID) db.collection("salas").doc(myRoomID).update({ jogadores: 1 + clientConnections.length }).catch(()=>{});
 
                     conn.on('open', () => conn.send({ type: 'welcome', slot: slotAssigned, modo: modoDeJogo, w: selCampoW, h: selCampoH }));
                     conn.on('data', (d) => {
@@ -1364,7 +1617,7 @@
                     conn.on('close', () => { 
                         clientConnections = clientConnections.filter(c => c !== conn); 
                         renderLobbySlotsHost();
-                        if (db && myRoomID) { db.collection("salas").doc(myRoomID).update({ jogadores: 1 + clientConnections.length }).catch(()=>{}); }
+                        if (db && myRoomID) db.collection("salas").doc(myRoomID).update({ jogadores: 1 + clientConnections.length }).catch(()=>{});
                     });
                 });
             } catch(e) { console.error("Peer host erro:", e); }
@@ -1379,7 +1632,7 @@
             }
 
             const targetPeerId = salaSelecionada.peerId || salaSelecionada.id;
-            isOnline = true; isHost = false;
+            isOnline = true; isHost = false; isRanked = false;
             if (salaSelecionada.selCampoW) selCampoW = salaSelecionada.selCampoW;
             if (salaSelecionada.selCampoH) selCampoH = salaSelecionada.selCampoH;
 
@@ -1395,10 +1648,7 @@
                         myConn.send({ type: 'identify', nome: meuPerfil.nome, numero: meuPerfil.numero || 10 });
                     });
                     myConn.on('data', (d) => {
-                        if (d.type === 'welcome') { 
-                            mySlot = d.slot; modoDeJogo = d.modo; 
-                            if(d.w) selCampoW = d.w; if(d.h) selCampoH = d.h; 
-                        }
+                        if (d.type === 'welcome') { mySlot = d.slot; modoDeJogo = d.modo; if(d.w) selCampoW = d.w; if(d.h) selCampoH = d.h; }
                         if (d.type === 'your_turn') { cfgP1 = d.cfgP1; modoDeJogo = d.modo; selCampoW = d.w; selCampoH = d.h; currPlayer = 2; prepararTelaTime(); showScreen('screen-team'); }
                         if (d.type === 'start') { cfgP1 = d.cfgP1; cfgP2 = d.cfgP2; selCampoW = d.w; selCampoH = d.h; modoDeJogo = d.modo; playerNames = d.names; uiHide('menu-container'); iniciarEngineJogo(); }
                         if (d.type === 'sync' && estadoJogo !== 'MENU') sincronizarJogoCliente(d);
@@ -1421,12 +1671,7 @@
             else { btn.disabled = true; btn.innerText = "AGUARDANDO JOGADORES..."; }
         }
         function broadcast(msg) { clientConnections.forEach(c => { if(c && c.open) c.send(msg); }); }
-        function mudarTime(t) {}
-
-        function avancarAposLobby() {
-            AudioEngine.playClick();
-            currPlayer = 1; prepararTelaTime(); showScreen('screen-team');
-        }
+        function avancarAposLobby() { AudioEngine.playClick(); currPlayer = 1; prepararTelaTime(); showScreen('screen-team'); }
 
         function sincronizarJogoCliente(data) {
             Body.setPosition(bola, data.b);
@@ -1436,13 +1681,19 @@
             if(placar1 !== data.s1) { placar1 = data.s1; uiText('score1', placar1); }
             if(placar2 !== data.s2) { placar2 = data.s2; uiText('score2', placar2); }
             uiText('timer', data.timeStr);
+            periodoJogo = data.periodo;
+            ladosInvertidos = data.ladosInvertidos;
+
             if (data.st !== estadoJogo) {
                 estadoJogo = data.st;
                 if(estadoJogo === 'GOL_CELEBRATION') { 
                     AudioEngine.playConfetti();
                     uiText('texto-gol', data.msg); uiShow('mensagem-overlay', 'flex'); 
-                }
-                else if(estadoJogo === 'JOGANDO') resetarUICompleta();
+                } else if(estadoJogo === 'INTERVALO') {
+                    uiText('texto-gol', '⏸️ INTERVALO!');
+                    uiText('texto-assist', 'TROCA DE LADOS PARA O 2º TEMPO');
+                    uiShow('mensagem-overlay', 'flex');
+                } else if(estadoJogo === 'JOGANDO') resetarUICompleta();
             }
         }
 
@@ -1461,7 +1712,7 @@
         function irParaModo(online) {
             AudioEngine.playClick();
             if(online) abrirNavegadorSalas();
-            else { isHost = true; currPlayer = 1; mySlot = 1; isOnline = false; showScreen('screen-mode'); }
+            else { isHost = true; currPlayer = 1; mySlot = 1; isOnline = false; isRanked = false; showScreen('screen-mode'); }
         }
         function escolherModo(modo) {
             AudioEngine.playClick(); modoDeJogo = modo;
@@ -1602,21 +1853,6 @@
             showScreen('screen-stats');
         }
 
-        async function mostrarLeaderboard() {
-            AudioEngine.playClick(); showScreen('screen-leaderboard');
-            const list = document.getElementById('ranking-list'); list.innerHTML = 'Carregando ranking...';
-            try {
-                if(!db) throw new Error("Offline");
-                const snap = await db.collection("jogadores").orderBy("elo", "desc").limit(10).get();
-                list.innerHTML = ''; let pos = 1;
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:6px; border-bottom:1px solid rgba(255,255,255,0.08); font-size:12px; font-weight:bold;"><span>#${pos} ${d.nome||'CRAQUE'}</span><span style="color:#f1c40f;">${d.elo||0} PDL</span></div>`;
-                    pos++;
-                });
-            } catch(e) { list.innerHTML = 'Erro ao carregar o ranking.'; }
-        }
-
         // --- UI UTILS ---
         function uiShow(id, d = 'block') { const el = document.getElementById(id); if(el) el.style.display = d; }
         function uiHide(id) { const el = document.getElementById(id); if(el) el.style.display = 'none'; }
@@ -1725,33 +1961,37 @@
             ctx.shadowBlur = 0;
         }
 
-        // --- TORCIDA CLÁSSICA ---
+        // --- TORCIDA CLÁSSICA COM CORES INVERTIDAS NO 2º TEMPO ---
         function desenharTorcida(ctx) {
             const time = Date.now() / 150, size = 18;
             const halfW = selCampoW / 2;
             const countHalf = Math.floor((halfW - PITCH_INSET_X) / 25);
 
+            const corEsq = !ladosInvertidos ? cfgP1.cores : cfgP2.cores;
+            const corDir = !ladosInvertidos ? cfgP2.cores : cfgP1.cores;
+
             for (let i = 0; i < countHalf; i++) {
                 let x = PITCH_INSET_X + i * 25;
                 let yT = 5 + Math.sin(time + i) * 4;
                 let yB = selCampoH - 18 + Math.sin(time + i + Math.PI) * 4;
-                ctx.fillStyle = i % 2 === 0 ? (cfgP1.cores?.bg || '#000') : (cfgP1.cores?.line || '#fff');
+                ctx.fillStyle = i % 2 === 0 ? (corEsq?.bg || '#000') : (corEsq?.line || '#fff');
                 ctx.fillRect(x, yT, size, size - 5); ctx.fillRect(x, yB, size, size - 5);
             }
             for (let i = 0; i < countHalf; i++) {
                 let x = halfW + i * 25;
                 let yT = 5 + Math.sin(time + i) * 4;
                 let yB = selCampoH - 18 + Math.sin(time + i + Math.PI) * 4;
-                ctx.fillStyle = i % 2 === 0 ? (cfgP2.cores?.bg || '#000') : (cfgP2.cores?.line || '#fff');
+                ctx.fillStyle = i % 2 === 0 ? (corDir?.bg || '#000') : (corDir?.line || '#fff');
                 ctx.fillRect(x, yT, size, size - 5); ctx.fillRect(x, yB, size, size - 5);
             }
         }
 
-        // --- MOTOR DE FÍSICA FLUIDA ESTILO HAXBALL ---
+        // --- MOTOR DE FÍSICA E PARTIDA COM 2 TEMPOS DE 1m30s ---
         function iniciarEngineJogo() {
             try {
                 limparMotorFisico();
-                estadoJogo = 'JOGANDO'; placar1 = 0; placar2 = 0; isProrrogacao = false; tempoRestante = 180; ticksJogo = 0;
+                estadoJogo = 'JOGANDO'; placar1 = 0; placar2 = 0; 
+                periodoJogo = 1; tempoRestante = DURACAO_TEMPO; ticksJogo = 0; ladosInvertidos = false;
                 historicoPosicoes = []; particulas = []; historicoToques = []; resetarUICompleta();
 
                 for(let i=1; i<=10; i++) { window['dashP' + i] = 0; window['dashActiveP' + i] = 0; }
@@ -1762,6 +2002,9 @@
                 playerNames[2] = cfgP2.time ? cfgP2.time.substring(0, 3).toUpperCase() : "P2";
 
                 uiText('score1', "0"); uiText('score2', "0");
+                uiText('timer', "1º T • 01:30");
+                uiText('tv-badge-status', isRanked ? "⚔️ RANKED • 1º TEMPO" : "1º TEMPO • IAES CUP");
+                
                 uiShow('btn-voltar-partida'); uiShow('btn-config-ingame'); uiShow('top-bar', 'flex'); 
                 document.getElementById('top-bar').style.maxWidth = selCampoW + 'px';
                 
@@ -1955,6 +2198,14 @@
                         estadoJogo = 'REWIND'; rewindIndex = historicoPosicoes.length - 1;
                         uiHide('texto-gol'); uiHide('texto-assist'); uiShow('texto-estado'); uiText('texto-estado', "⏪ REPLAY...");
                     }
+                } else if (estadoJogo === 'INTERVALO') {
+                    delayTimer--;
+                    if (delayTimer <= 0) {
+                        periodoJogo = 2; tempoRestante = DURACAO_TEMPO;
+                        resetarUICompleta(); reposicionarJogadores();
+                        estadoJogo = 'JOGANDO'; forceFocus();
+                        uiText('tv-badge-status', isRanked ? "⚔️ RANKED • 2º TEMPO" : "2º TEMPO • IAES CUP");
+                    }
                 } else if (estadoJogo === 'REWIND') processarRewind();
                 else if (estadoJogo === 'REPLAY') tocarReplay();
                 else if (estadoJogo === 'JOGANDO') {
@@ -1963,8 +2214,13 @@
                     if (isHost || !isOnline) {
                         const golSize = selCampoH * 0.44;
                         const golTop = (selCampoH / 2) - (golSize / 2), golBottom = (selCampoH / 2) + (golSize / 2);
-                        if (bola.position.x < PITCH_INSET_X - 5 && bola.position.y > golTop && bola.position.y < golBottom) marcarGol('P2');
-                        else if (bola.position.x > selCampoW - PITCH_INSET_X + 5 && bola.position.y > golTop && bola.position.y < golBottom) marcarGol('P1');
+                        
+                        // Lógica de Gols respeitando a inversão de lados no 2º tempo
+                        if (bola.position.x < PITCH_INSET_X - 5 && bola.position.y > golTop && bola.position.y < golBottom) {
+                            marcarGol(!ladosInvertidos ? 'P2' : 'P1');
+                        } else if (bola.position.x > selCampoW - PITCH_INSET_X + 5 && bola.position.y > golTop && bola.position.y < golBottom) {
+                            marcarGol(!ladosInvertidos ? 'P1' : 'P2');
+                        }
                     }
 
                     processarControles();
@@ -1973,8 +2229,23 @@
                     if (ticksJogo >= 60) {
                         ticksJogo = 0; tempoRestante--;
                         let min = Math.floor(tempoRestante / 60), sec = tempoRestante % 60;
-                        uiText('timer', `0${min}:${sec < 10 ? '0'+sec : sec}`);
-                        if (tempoRestante <= 0) finalizarPartida(placar1 !== placar2 ? (placar1 > placar2 ? 'P1' : 'P2') : null);
+                        uiText('timer', `${periodoJogo}º T • 0${min}:${sec < 10 ? '0'+sec : sec}`);
+                        
+                        if (tempoRestante <= 0) {
+                            if (periodoJogo === 1) {
+                                // FIM DO 1º TEMPO -> INTERVALO E TROCA DE LADOS
+                                estadoJogo = 'INTERVALO'; delayTimer = 180;
+                                ladosInvertidos = true;
+                                AudioEngine.playVictoryFanfare();
+                                uiText('texto-gol', '⏸️ INTERVALO!');
+                                uiText('texto-assist', 'TROCA DE LADOS PARA O 2º TEMPO');
+                                uiShow('texto-gol'); uiShow('texto-assist');
+                                uiShow('mensagem-overlay', 'flex');
+                            } else {
+                                // FIM DO 2º TEMPO -> FINAL DA PARTIDA
+                                finalizarPartida(placar1 !== placar2 ? (placar1 > placar2 ? 'P1' : 'P2') : null);
+                            }
+                        }
                     }
 
                     let fData = { b: {x: bola.position.x, y: bola.position.y} };
@@ -1990,7 +2261,8 @@
                         b: {x: bola.position.x, y: bola.position.y},
                         p1: window.player1 ? {x: window.player1.position.x, y: window.player1.position.y} : null,
                         p2: window.player2 ? {x: window.player2.position.x, y: window.player2.position.y} : null,
-                        s1: placar1, s2: placar2, timeStr: `0${min}:${sec < 10 ? '0'+sec : sec}`,
+                        s1: placar1, s2: placar2, timeStr: `${periodoJogo}º T • 0${min}:${sec < 10 ? '0'+sec : sec}`,
+                        periodo: periodoJogo, ladosInvertidos: ladosInvertidos,
                         msg: currentStatusMsg, msgC: currentStatusMsgColor
                     };
                     for(let i=3; i<=max; i++) { if(window['player'+i]) payload['p'+i] = {x: window['player'+i].position.x, y: window['player'+i].position.y}; }
@@ -2005,8 +2277,6 @@
             if (estadoJogo !== 'JOGANDO') return;
             estadoJogo = 'GOL_CELEBRATION'; delayTimer = 120;
             resetarUICompleta();
-
-            // Som comemorativo festivo de confetes
             AudioEngine.playConfetti();
 
             const isP1 = quem === 'P1';
@@ -2045,10 +2315,9 @@
 
             uiShow('mensagem-overlay', 'flex');
 
-            // Chuva visual de confetes festivos
             for(let k=0; k<70; k++) {
                 particulas.push({
-                    x: isP1 ? selCampoW - PITCH_INSET_X : PITCH_INSET_X,
+                    x: isP1 ? (ladosInvertidos ? PITCH_INSET_X : selCampoW - PITCH_INSET_X) : (ladosInvertidos ? selCampoW - PITCH_INSET_X : PITCH_INSET_X),
                     y: selCampoH / 2,
                     vx: (Math.random() - 0.5) * 14,
                     vy: (Math.random() - 0.5) * 14,
@@ -2066,16 +2335,29 @@
             const isT1 = [1, 3, 5, 7, 9].includes(mySlot);
             const ganhei = (vencedorStr === 'P1' && isT1) || (vencedorStr === 'P2' && !isT1);
 
+            let pdlTxt = "";
+            if (isRanked) {
+                if (ganhei) {
+                    meuPerfil.elo = (meuPerfil.elo || 1000) + 25;
+                    pdlTxt = " | +25 PDL 🟢";
+                } else if (vencedorStr) {
+                    meuPerfil.elo = Math.max(0, (meuPerfil.elo || 1000) - 20);
+                    pdlTxt = " | -20 PDL 🔴";
+                }
+            }
+
             if (vencedorStr) {
                 currentStatusMsg = `${(vencedorStr === 'P1' ? cfgP1.time : cfgP2.time).toUpperCase()} VENCEU!`;
                 if (ganhei) { meuPerfil.vitorias = (meuPerfil.vitorias || 0) + 1; xpGanho += 150; moedasGanhas += 120; }
                 else meuPerfil.derrotas = (meuPerfil.derrotas || 0) + 1;
             } else {
-                currentStatusMsg = "EMPATE!"; xpGanho += 60; moedasGanhas += 50;
+                currentStatusMsg = "FIM DE JOGO: EMPATE!"; xpGanho += 60; moedasGanhas += 50;
             }
 
             adicionarXP(xpGanho); adicionarMoedas(moedasGanhas); salvarPerfil();
             uiText('texto-gol', currentStatusMsg);
+            uiText('texto-assist', `+${xpGanho} XP | +${moedasGanhas} 🪙${pdlTxt}`);
+            uiShow('texto-assist');
             uiShow('botoes-fim-jogo', 'flex'); uiShow('mensagem-overlay', 'flex');
         }
 
@@ -2115,13 +2397,18 @@
                 const p = window['player' + i]; if(!p) continue;
                 Body.setVelocity(p, { x: 0, y: 0 });
                 const isT1 = i % 2 !== 0;
+                
+                // Posições com base no lado invertido ou não
+                let posX1 = !ladosInvertidos ? 0.32 : 0.68;
+                let posX2 = !ladosInvertidos ? 0.68 : 0.32;
+
                 if (max === 10) {
-                    const formT1 = [{x: 0.20, y: 0.5}, {x: 0.34, y: 0.25}, {x: 0.34, y: 0.75}, {x: 0.40, y: 0.5}, {x: 0.46, y: 0.5}];
-                    const formT2 = [{x: 0.80, y: 0.5}, {x: 0.66, y: 0.25}, {x: 0.66, y: 0.75}, {x: 0.60, y: 0.5}, {x: 0.54, y: 0.5}];
+                    const formT1 = [{x: !ladosInvertidos ? 0.20 : 0.80, y: 0.5}, {x: !ladosInvertidos ? 0.34 : 0.66, y: 0.25}, {x: !ladosInvertidos ? 0.34 : 0.66, y: 0.75}, {x: !ladosInvertidos ? 0.40 : 0.60, y: 0.5}, {x: !ladosInvertidos ? 0.46 : 0.54, y: 0.5}];
+                    const formT2 = [{x: !ladosInvertidos ? 0.80 : 0.20, y: 0.5}, {x: !ladosInvertidos ? 0.66 : 0.34, y: 0.25}, {x: !ladosInvertidos ? 0.66 : 0.34, y: 0.75}, {x: !ladosInvertidos ? 0.60 : 0.40, y: 0.5}, {x: !ladosInvertidos ? 0.54 : 0.46, y: 0.5}];
                     const pos = isT1 ? formT1[Math.floor((i-1)/2)] : formT2[Math.floor((i-2)/2)];
                     Body.setPosition(p, { x: selCampoW * pos.x, y: selCampoH * pos.y });
                 } else {
-                    Body.setPosition(p, { x: selCampoW * (isT1 ? 0.32 : 0.68), y: selCampoH * (i <= 2 ? 0.5 : (i <= 4 ? 0.32 : 0.68)) });
+                    Body.setPosition(p, { x: selCampoW * (isT1 ? posX1 : posX2), y: selCampoH * (i <= 2 ? 0.5 : (i <= 4 ? 0.32 : 0.68)) });
                 }
             }
         }
@@ -2181,7 +2468,7 @@
                     const dx = bola.position.x - p.position.x, dy = bola.position.y - p.position.y;
                     const distBola = Math.hypot(dx, dy);
 
-                    let targetX = distBola < 280 ? bola.position.x : (isT1 ? selCampoW * 0.35 : selCampoW * 0.65);
+                    let targetX = distBola < 280 ? bola.position.x : (isT1 ? (ladosInvertidos ? selCampoW * 0.65 : selCampoW * 0.35) : (ladosInvertidos ? selCampoW * 0.35 : selCampoW * 0.65));
                     let targetY = distBola < 280 ? bola.position.y : selCampoH * (0.28 + (i % 3) * 0.22);
 
                     const dirX = targetX - p.position.x, dirY = targetY - p.position.y;
@@ -2204,7 +2491,6 @@
             }
         }
 
-        // --- SISTEMA DE CHUTE PRECISO ---
         function tentarChutar(jogador) {
             const dx = bola.position.x - jogador.position.x;
             const dy = bola.position.y - jogador.position.y;
