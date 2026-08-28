@@ -88,7 +88,7 @@
         .xp-bar-container { width: 130px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; margin-top: 5px; overflow: hidden; margin-left: auto; }
         .xp-bar-fill { height: 100%; background: #2ecc71; width: 0%; transition: width 0.4s; }
 
-        /* TOAST DE NOTIFICAÇÃO NÃO-INTRUSIVO */
+        /* TOAST DE NOTIFICAÇÃO */
         #toast-notif {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: rgba(13, 22, 34, 0.95); border: 2px solid var(--primary-gold);
@@ -185,7 +185,7 @@
             max-height: 88vh; overflow-y: auto;
         }
 
-        /* CONFIGURAÇÕES DE ÁUDIO SLIDERS */
+        /* CONFIGURAÇÕES DE ÁUDIO */
         .config-row { margin-bottom: 14px; }
         .config-row label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: #cbd5e1; margin-bottom: 4px; }
         .config-slider {
@@ -216,7 +216,7 @@
         .camisa-manga-esq, .camisa-manga-dir { position: absolute; width: 30px; height: 42px; background: #fff; top: 15px; border: 5px solid #000; border-radius: 6px; box-sizing: border-box; }
         .camisa-manga-esq { left: 2px; transform: rotate(20deg); } .camisa-manga-dir { right: 2px; transform: rotate(-20deg); }
 
-        /* PLACAR TV COM INDICADOR DE 1º E 2º TEMPO */
+        /* PLACAR TV */
         #top-bar {
             display: none; align-items: center; justify-content: center;
             width: 100%; max-width: 860px; margin-bottom: 8px;
@@ -319,7 +319,7 @@
         .pass-tier-name { font-size: 10px; font-weight: 800; }
         .pass-tier-reward { font-size: 9px; color: #2ecc71; font-weight: 900; }
 
-        /* LISTA DE AMIGOS E GRUPOS */
+        /* LISTA DE AMIGOS */
         .amigo-card {
             background: #0d1622; border: 1px solid #1e293b; border-radius: 6px; padding: 8px 12px;
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
@@ -328,7 +328,7 @@
 </head>
 <body>
 
-    <!-- TOAST DE NOTIFICAÇÃO NÃO-INTRUSIVO -->
+    <!-- TOAST DE NOTIFICAÇÃO -->
     <div id="toast-notif"></div>
 
     <!-- POPUP DE CONVITE DE GRUPO -->
@@ -419,7 +419,7 @@
             <h1 style="color: #d2a8ff;">⚔️ FILA RANKED COMPETITIVA</h1>
             <p style="color:#94a3b8; font-size:12px; margin-bottom:15px;">Partidas competitivas valendo PDL com 2 tempos de 1m30s</p>
 
-            <div style="background: #111a24; border: 2px solid #8e44ad; border-radius: 10px; padding: 20px; width: 440px; max-width: 90%; margin-bottom: 15px;">
+            <div style="background: #111a24; border: 2px solid #8e44ad; border-radius: 10px; padding: 20px; width: 460px; max-width: 90%; margin-bottom: 15px;">
                 <div style="display:flex; justify-content:space-around; margin-bottom:15px;">
                     <label><input type="radio" name="ranked-mode-select" value="1V1" checked> 1v1 Duelo Solo</label>
                     <label><input type="radio" name="ranked-mode-select" value="2V2"> 2v2 Duplas (Com Grupo)</label>
@@ -427,11 +427,12 @@
 
                 <div id="mm-status-box" style="text-align:center;">
                     <div id="mm-status-txt" style="font-size:15px; font-weight:900; color:#cbd5e1;">Pronto para buscar partida</div>
-                    <div id="mm-timer-txt" style="font-size:26px; font-weight:900; color:var(--primary-gold); font-family:'Rajdhani'; margin:8px 0; display:none;">00:00</div>
+                    <div id="mm-timer-txt" style="font-size:28px; font-weight:900; color:var(--primary-gold); font-family:'Rajdhani'; margin:8px 0; display:none;">00:00</div>
+                    <div id="mm-detail-txt" style="font-size:11px; color:#94a3b8; margin-top:4px;"></div>
                 </div>
 
-                <button class="btn btn-ranked" id="btn-iniciar-mm" style="width:100%; margin-top:10px;" onclick="iniciarBuscaRanked()">🔍 BUSCAR PARTIDA</button>
-                <button class="btn btn-voltar" id="btn-cancelar-mm" style="width:100%; margin-top:10px; display:none;" onclick="cancelarBuscaRanked()">CANCELAR BUSCA</button>
+                <button class="btn btn-ranked" id="btn-iniciar-mm" style="width:100%; margin-top:12px;" onclick="iniciarBuscaRanked()">🔍 BUSCAR PARTIDA</button>
+                <button class="btn btn-voltar" id="btn-cancelar-mm" style="width:100%; margin-top:12px; display:none;" onclick="cancelarBuscaRanked()">CANCELAR BUSCA</button>
             </div>
 
             <button class="btn btn-voltar" onclick="sairTelaMatchmaking()">⏴ VOLTAR AO MENU</button>
@@ -700,7 +701,7 @@
         </div>
     </div>
 
-    <!-- HUD DA PARTIDA - PLACAR TV COM INDICADOR DE TEMPO -->
+    <!-- HUD DA PARTIDA - PLACAR TV -->
     <button id="btn-voltar-partida" class="btn-ingame" onclick="voltarMenu()">🚪 SAIR</button>
     <button id="btn-config-ingame" class="btn-ingame" onclick="abrirModalConfiguracoes()">⚙️ SOM</button>
 
@@ -1082,6 +1083,7 @@
 
         // --- SISTEMA DE MATCHMAKING & GRUPOS (PARTY) ---
         let matchmakingInterval = null, matchmakingSeconds = 0, myMatchTicketId = null;
+        let mmPollInterval = null;
         let meuGrupo = { id: null, lider: null, membros: [] };
         let convitePendente = null;
 
@@ -1193,7 +1195,6 @@
                     salvarPerfil();
                     atualizarPerfilUI(); escutarNotificacoesUsuario(); showScreen('screen-home');
                 } catch(e2) {
-                    // Se Firebase Auth falhar por domínio ou regras, entra em sessão local para jogar normalmente!
                     meuPerfil.uid = 'local_' + Math.random().toString(36).substring(2, 8);
                     atualizarPerfilUI(); showScreen('screen-home');
                 }
@@ -1413,11 +1414,12 @@
             iniciarBuscaRanked();
         }
 
-        // --- SISTEMA DE MATCHMAKING RANKED COMPETITIVO COM P2P FALLBACK ---
+        // --- SISTEMA DE MATCHMAKING RANKED 100% FUNCIONAL E ROBUSTO ---
         function abrirMatchmakingRanked() {
             AudioEngine.playClick();
             showScreen('screen-matchmaking');
             uiText('mm-status-txt', 'Pronto para buscar partida competitiva');
+            uiText('mm-detail-txt', '');
             uiHide('mm-timer-txt');
             uiShow('btn-iniciar-mm');
             uiHide('btn-cancelar-mm');
@@ -1429,15 +1431,19 @@
             showScreen('screen-home');
         }
 
+        let isMatchmakingActive = false;
+
         async function iniciarBuscaRanked() {
             AudioEngine.playClick();
             const mode = document.querySelector('input[name="ranked-mode-select"]:checked').value;
             isRanked = true;
+            isMatchmakingActive = true;
             modoDeJogo = mode === '2V2' ? 'CLASSICO_2V2' : 'CLASSICO';
             selCampoW = mode === '2V2' ? 1200 : 1000;
             selCampoH = mode === '2V2' ? 660 : 550;
 
             uiText('mm-status-txt', `🔍 Buscando adversário Ranked ${mode}...`);
+            uiText('mm-detail-txt', 'Pesquisando na fila global...');
             uiShow('mm-timer-txt');
             uiHide('btn-iniciar-mm');
             uiShow('btn-cancelar-mm');
@@ -1451,50 +1457,66 @@
                 uiText('mm-timer-txt', `0${m}:${s<10?'0'+s:s}`);
             }, 1000);
 
-            let matchedViaFirestore = false;
-
-            // 1. Tenta buscar no Firestore
+            // 1. TENTA ENCONTRAR UM TICKET EXISTENTE NA FILA (SEM REQUERER ÍNDICES COMPOSTOS)
+            let foundTicket = null;
             try {
                 if (db) {
                     const snap = await db.collection("matchmaking")
                         .where("modo", "==", mode)
                         .where("status", "==", "waiting")
-                        .orderBy("criadoEm", "asc")
-                        .limit(5).get();
+                        .limit(10).get();
 
-                    let foundOpponent = null;
-                    snap.forEach(doc => {
-                        const d = doc.data();
-                        if (d.uid !== meuPerfil.uid && !foundOpponent) {
-                            foundOpponent = { id: doc.id, ...d };
+                    let docs = [];
+                    snap.forEach(d => {
+                        const data = d.data();
+                        // Ignora se for seu próprio ticket
+                        if (data.uid !== meuPerfil.uid) {
+                            docs.push({ id: d.id, ...data });
                         }
                     });
 
-                    if (foundOpponent) {
-                        matchedViaFirestore = true;
-                        uiText('mm-status-txt', `⚔️ Partida encontrada contra ${foundOpponent.nome}! Conectando...`);
-                        await db.collection("matchmaking").doc(foundOpponent.id).update({ status: 'matched', clientUid: meuPerfil.uid, clientNome: meuPerfil.nome }).catch(()=>{});
-                        conectarPeerMatchmaking(foundOpponent.peerId);
-                        return;
+                    // Ordena pelo ticket mais antigo
+                    if (docs.length > 0) {
+                        docs.sort((a, b) => (a.criadoEmSec || 0) - (b.criadoEmSec || 0));
+                        foundTicket = docs[0];
                     }
                 }
-            } catch(e) {
-                console.warn("Aviso matchmaking Firestore (usando P2P direto):", e.message);
+            } catch (err) {
+                console.warn("Aviso busca fila Firestore:", err.message);
             }
 
-            // 2. Se não encontrou no Firestore (ou deu permission-denied), inicia como Host P2P
-            if (!matchedViaFirestore) {
-                myMatchTicketId = 'mm_' + (meuPerfil.uid || Math.random().toString(36).substring(2, 6));
-                myRoomID = 'iaes_rk_' + (mode === '2V2' ? '2v2_' : '1v1_') + Math.random().toString(36).substring(2, 7).toUpperCase();
+            if (!isMatchmakingActive) return;
+
+            // Se achou um adversário na fila:
+            if (foundTicket && foundTicket.peerId) {
+                uiText('mm-status-txt', `⚔️ Adversário encontrado: ${foundTicket.nome}!`);
+                uiText('mm-detail-txt', 'Estabelecendo conexão WebRTC...');
+                try {
+                    if (db) {
+                        await db.collection("matchmaking").doc(foundTicket.id).update({
+                            status: 'matched',
+                            clientUid: meuPerfil.uid,
+                            clientNome: meuPerfil.nome
+                        }).catch(() => {});
+                    }
+                } catch(e) {}
+
+                conectarPeerMatchmaking(foundTicket.peerId, foundTicket.nome);
+            } else {
+                // Se a fila estiver vazia: cria ticket e aguarda desafiante
+                myMatchTicketId = 'mm_' + (meuPerfil.uid || Math.random().toString(36).substring(2, 8));
                 iniciarHostMatchmaking(mode);
             }
         }
 
         function cancelarBuscaRanked() {
+            isMatchmakingActive = false;
             if (matchmakingInterval) { clearInterval(matchmakingInterval); matchmakingInterval = null; }
+            if (mmPollInterval) { clearInterval(mmPollInterval); mmPollInterval = null; }
             if (myMatchTicketId && db) { db.collection("matchmaking").doc(myMatchTicketId).delete().catch(()=>{}); myMatchTicketId = null; }
             if (peer) { peer.destroy(); peer = null; }
             uiText('mm-status-txt', 'Busca cancelada');
+            uiText('mm-detail-txt', '');
             uiHide('mm-timer-txt');
             uiShow('btn-iniciar-mm');
             uiHide('btn-cancelar-mm');
@@ -1506,32 +1528,54 @@
             playerNames[1] = meuPerfil.nome || "P1";
 
             if (peer) { peer.destroy(); peer = null; }
-            peer = new Peer(myRoomID, peerIceConfig);
+            peer = new Peer(peerIceConfig);
 
             peer.on('open', (id) => {
-                console.log("Peer Matchmaking Host aberto:", id);
-                uiText('mm-status-txt', `🔍 Fila ativa (Sala P2P: ${id}). Aguardando desafiante...`);
-                
+                myRoomID = id;
+                console.log("Peer Host Matchmaking aberto com ID:", id);
+                uiText('mm-status-txt', `🔍 Fila ativa! Aguardando oponente...`);
+                uiText('mm-detail-txt', `Ticket ID: ${id.substring(0, 10)}...`);
+
                 if (db && myMatchTicketId) {
                     db.collection("matchmaking").doc(myMatchTicketId).set({
-                        uid: meuPerfil.uid, nome: meuPerfil.nome || "CRAQUE", elo: meuPerfil.elo || 1000,
-                        modo: mode, status: 'waiting', peerId: id,
+                        uid: meuPerfil.uid,
+                        nome: meuPerfil.nome || "CRAQUE",
+                        elo: meuPerfil.elo || 1000,
+                        modo: mode,
+                        status: 'waiting',
+                        peerId: id,
+                        criadoEmSec: Math.floor(Date.now() / 1000),
                         criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-                    }).catch(e => console.warn("Aviso ticket Firestore:", e.message));
+                    }).catch(e => console.warn("Aviso gravar ticket:", e.message));
+
+                    // Escuta se o ticket for aceito
+                    try {
+                        db.collection("matchmaking").doc(myMatchTicketId).onSnapshot(doc => {
+                            if (doc.exists && doc.data().status === 'matched') {
+                                uiText('mm-status-txt', `⚔️ Adversário conectado!`);
+                                uiText('mm-detail-txt', 'Iniciando partida...');
+                            }
+                        }, () => {});
+                    } catch(e) {}
                 }
             });
 
             peer.on('connection', (conn) => {
-                console.log("Adversário conectou ao Matchmaking Host!");
-                conn.playerSlot = 2; clientConnections.push(conn);
+                console.log("Adversário conectou diretamente ao Host Ranked!");
+                conn.playerSlot = 2;
+                clientConnections.push(conn);
 
                 conn.on('open', () => {
                     conn.send({ type: 'welcome', slot: 2, modo: modoDeJogo, w: selCampoW, h: selCampoH });
                 });
 
                 conn.on('data', (d) => {
-                    if (d.type === 'identify') { playerNames[2] = d.nome || "P2"; }
-                    if (d.type === 'input') remoteInputs[d.slot] = d.keys;
+                    if (d.type === 'identify') {
+                        playerNames[2] = d.nome || "P2";
+                    }
+                    if (d.type === 'input') {
+                        remoteInputs[d.slot] = d.keys;
+                    }
                     if (d.type === 'ready_start') {
                         if (matchmakingInterval) clearInterval(matchmakingInterval);
                         if (myMatchTicketId && db) db.collection("matchmaking").doc(myMatchTicketId).delete().catch(()=>{});
@@ -1550,10 +1594,10 @@
                 });
             });
 
-            peer.on('error', (err) => console.warn("Aviso Peer MM Host:", err.type));
+            peer.on('error', (err) => console.warn("Aviso Peer Host MM:", err.type));
         }
 
-        function conectarPeerMatchmaking(hostPeerId) {
+        function conectarPeerMatchmaking(hostPeerId, hostNome) {
             isOnline = true; isHost = false; mySlot = 2;
             if (peer) { peer.destroy(); peer = null; }
             peer = new Peer(peerIceConfig);
@@ -1564,24 +1608,46 @@
 
                 myConn.on('open', () => {
                     if (matchmakingInterval) clearInterval(matchmakingInterval);
-                    uiText('mm-status-txt', "Conectado! Iniciando partida...");
+                    uiText('mm-status-txt', `⚔️ Conectado com ${hostNome}!`);
+                    uiText('mm-detail-txt', 'Iniciando partida...');
                     myConn.send({ type: 'identify', nome: meuPerfil.nome || 'JOGADOR', numero: 10 });
                     myConn.send({ type: 'ready_start' });
                 });
 
                 myConn.on('data', (d) => {
-                    if (d.type === 'welcome') { mySlot = d.slot; modoDeJogo = d.modo; if(d.w) selCampoW = d.w; if(d.h) selCampoH = d.h; }
-                    if (d.type === 'start') { cfgP1 = d.cfgP1; cfgP2 = d.cfgP2; selCampoW = d.w; selCampoH = d.h; modoDeJogo = d.modo; playerNames = d.names; uiHide('menu-container'); iniciarEngineJogo(); }
-                    if (d.type === 'sync' && estadoJogo !== 'MENU') sincronizarJogoCliente(d);
+                    if (d.type === 'welcome') {
+                        mySlot = d.slot;
+                        modoDeJogo = d.modo;
+                        if(d.w) selCampoW = d.w;
+                        if(d.h) selCampoH = d.h;
+                    }
+                    if (d.type === 'start') {
+                        cfgP1 = d.cfgP1;
+                        cfgP2 = d.cfgP2;
+                        selCampoW = d.w;
+                        selCampoH = d.h;
+                        modoDeJogo = d.modo;
+                        playerNames = d.names;
+                        uiHide('menu-container');
+                        iniciarEngineJogo();
+                    }
+                    if (d.type === 'sync' && estadoJogo !== 'MENU') {
+                        sincronizarJogoCliente(d);
+                    }
                 });
 
                 myConn.on('close', () => {
-                    alert("Partida encerrada pelo host.");
+                    alert("A partida foi encerrada pelo adversário.");
                     voltarMenu();
+                });
+
+                myConn.on('error', (err) => {
+                    console.warn("Aviso erro conexão MM:", err);
+                    uiText('mm-status-txt', 'Tentando reconectar...');
                 });
             });
 
-            peer.on('error', (err) => console.warn("Aviso Peer MM Client:", err.type));
+            peer.on('error', (err) => console.warn("Aviso Peer Client MM:", err.type));
         }
 
         // --- SISTEMA DE SALAS REAIS DO HAXBALL COM CONEXÃO POR CÓDIGO ---
@@ -1594,8 +1660,9 @@
 
             try {
                 if (db) {
-                    const snap = await db.collection("salas").orderBy("criadoEm", "desc").limit(30).get();
+                    const snap = await db.collection("salas").limit(30).get();
                     snap.forEach(doc => salasOnlineCache.push({ id: doc.id, ...doc.data() }));
+                    salasOnlineCache.sort((a, b) => (b.criadoEmSec || 0) - (a.criadoEmSec || 0));
                 }
             } catch (e) { console.warn("Aviso salas Firestore:", e.message); }
 
@@ -1662,7 +1729,6 @@
             isOnline = true; isHost = true; mySlot = 1; modoDeJogo = modo; isRanked = false;
             selCampoW = parseInt(estadioDim[0]); selCampoH = parseInt(estadioDim[1]);
 
-            myRoomID = 'iaes_room_' + Math.random().toString(36).substring(2, 8).toUpperCase();
             pendingRoomConfig = { nome: nome, pass: pass, modo: modo, w: selCampoW, h: selCampoH };
 
             showScreen('screen-online-host');
@@ -1697,10 +1763,11 @@
             playerNumbers[mySlot] = meuPerfil.numero || 10;
 
             if (peer) { peer.destroy(); peer = null; }
-            peer = new Peer(myRoomID, peerIceConfig);
+            peer = new Peer(peerIceConfig);
 
             peer.on('open', (id) => {
-                console.log("Peer Host Room aberto:", id);
+                myRoomID = id;
+                console.log("Peer Host Room aberto com ID:", id);
                 uiText('txt-codigo-sala', `SALA: ${id}`);
                 uiText('host-network-status', "🟢 Online! Amigos podem entrar pelo Room list ou pelo código.");
 
@@ -1711,6 +1778,7 @@
                         nome: pendingRoomConfig.nome, host: meuPerfil.nome || "CRAQUE", modo: modoDeJogo, max: max,
                         selCampoW: selCampoW, selCampoH: selCampoH,
                         jogadores: 1, temSenha: pendingRoomConfig.pass.length > 0, senha: pendingRoomConfig.pass, peerId: id,
+                        criadoEmSec: Math.floor(Date.now() / 1000),
                         criadoEm: firebase.firestore.FieldValue.serverTimestamp()
                     }).catch(e => console.warn("Aviso registrar sala Firestore:", e.message));
                 }
@@ -1843,6 +1911,7 @@
         function cancelarOnline() {
             AudioEngine.playClick();
             if (isHost && myRoomID && db) { db.collection("salas").doc(myRoomID).delete().catch(()=>{}); }
+            if (myMatchTicketId && db) { db.collection("matchmaking").doc(myMatchTicketId).delete().catch(()=>{}); }
             if(myConn) myConn.close(); if(peer) peer.destroy();
             isOnline = false; isHost = true; showScreen('screen-home');
         }
