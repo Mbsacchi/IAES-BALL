@@ -98,7 +98,7 @@
         }
         @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
 
-        /* CONVITE DE GRUPO POPUP */
+        /* POPUP DE CONVITE DE GRUPO */
         #invite-popup {
             position: fixed; bottom: 25px; right: 25px;
             background: #111a24; border: 2px solid #00f2fe; border-radius: 10px;
@@ -347,7 +347,7 @@
             <span id="perfil-nivel-badge">NVL 1</span>
             <div id="perfil-nome">CRAQUE</div>
         </div>
-        <div id="perfil-rank">OURO (1200 PDL)</div>
+        <div id="perfil-rank">OURO (1000 PDL)</div>
         <div id="perfil-moedas">🪙 <span id="perfil-moedas-val">0</span></div>
         <div class="xp-bar-container"><div class="xp-bar-fill" id="perfil-xp-bar"></div></div>
     </div>
@@ -358,9 +358,9 @@
         <!-- TELA DE LOGIN / REGISTRO -->
         <div id="screen-login" class="screen active-screen">
             <h1>🏆 IAES BALL PRO</h1>
-            <p style="color:#94a3b8; margin-bottom: 20px; font-size: 13px;">Autenticação segura via Firebase Auth</p>
+            <p style="color:#94a3b8; margin-bottom: 20px; font-size: 13px;">Entre com seu Nickname para jogar online ou offline</p>
             <input type="text" id="input-nickname" class="input-sala" placeholder="SEU NICKNAME (MÍN. 3 LETRAS)" maxlength="16">
-            <input type="password" id="input-senha" class="input-sala" placeholder="SENHA SECRETA (MÍN. 6 DÍGITOS)" maxlength="32">
+            <input type="password" id="input-senha" class="input-sala" placeholder="SENHA (MÍN. 6 DÍGITOS)" maxlength="32">
             
             <div style="display: flex; gap: 12px; width: 80%; margin-top: 8px;">
                 <button id="btn-login" class="btn btn-avancar" style="margin-top: 0;" onclick="fazerLogin()"><span id="btn-login-txt">⚽ ENTRAR</span></button>
@@ -397,7 +397,7 @@
                 <div class="mode-card" onclick="irParaModo(true)">
                     <div>
                         <div class="mode-card-title" style="color: #2ecc71;">🌐 SALAS ONLINE</div>
-                        <div class="mode-card-desc">Navegador completo estilo HaxBall com lista em tempo real!</div>
+                        <div class="mode-card-desc">Navegador completo estilo HaxBall com lista de salas em tempo real!</div>
                     </div>
                     <div class="mode-card-badge" style="background: rgba(46,204,113,0.15); color:#2ecc71;">ROOM LIST</div>
                 </div>
@@ -426,7 +426,7 @@
                 </div>
 
                 <div id="mm-status-box" style="text-align:center;">
-                    <div id="mm-status-txt" style="font-size:16px; font-weight:900; color:#cbd5e1;">Pronto para buscar partida</div>
+                    <div id="mm-status-txt" style="font-size:15px; font-weight:900; color:#cbd5e1;">Pronto para buscar partida</div>
                     <div id="mm-timer-txt" style="font-size:26px; font-weight:900; color:var(--primary-gold); font-family:'Rajdhani'; margin:8px 0; display:none;">00:00</div>
                 </div>
 
@@ -521,7 +521,8 @@
         <!-- LOBBY DO HOST -->
         <div id="screen-online-host" class="screen">
             <h2>SALA DO CAPITÃO CRIADA</h2>
-            <div class="codigo-sala" id="txt-codigo-sala">GERANDO...</div>
+            <div class="codigo-sala" id="txt-codigo-sala" style="font-size:18px; font-weight:900; color:var(--accent-cyan); padding:8px; background:#000; border-radius:6px; margin:8px 0;">GERANDO SALA...</div>
+            <div id="host-network-status" style="font-size:11px; color:#94a3b8; margin-bottom:8px;">Conectando ao broker WebRTC...</div>
             
             <div class="lobby-panel" style="display:flex; gap:10px; width:100%; margin:10px 0;">
                 <div class="lobby-team-box" style="flex:1; background:rgba(41,128,185,0.15); border:2px solid #2980b9; padding:10px; border-radius:8px;">
@@ -540,8 +541,8 @@
 
         <!-- CLIENT ESPERANDO -->
         <div id="screen-client-waiting" class="screen">
-            <h2 id="txt-meu-slot-client">CONECTADO À SALA!</h2>
-            <div class="codigo-sala" style="font-size: 16px;" id="txt-status-client-lobby">Aguardando Capitão iniciar...</div>
+            <h2 id="txt-meu-slot-client">CONECTANDO À SALA...</h2>
+            <div class="codigo-sala" style="font-size: 15px; padding:12px; background:#000; border-radius:6px; margin:10px 0; color:var(--primary-gold);" id="txt-status-client-lobby">Iniciando conexão WebRTC...</div>
             <button class="btn btn-voltar" style="margin-top: 15px;" onclick="cancelarOnline()">DESCONECTAR</button>
         </div>
 
@@ -1076,7 +1077,19 @@
         let convitePendente = null;
 
         // --- WEBRTC & ROOM LIST ---
-        const peerConfig = { config: { 'iceServers': [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] } };
+        const peerIceConfig = {
+            debug: 1,
+            config: {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun2.l.google.com:19302' },
+                    { urls: 'stun:stun3.l.google.com:19302' },
+                    { urls: 'stun:stun4.l.google.com:19302' }
+                ]
+            }
+        };
+
         let peer = null, clientConnections = [], myConn = null;
         let isOnline = false, isHost = true, mySlot = 1;
         let remoteInputs = { 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {} };
@@ -1156,7 +1169,21 @@
                 if (doc.exists) meuPerfil = { ...meuPerfil, ...doc.data(), uid: cred.user.uid };
                 atualizarPerfilUI(); escutarNotificacoesUsuario(); showScreen('screen-home');
             } catch (err) {
-                uiText('auth-status-msg', 'Erro no login. Se for novo, clique em CRIAR CONTA.');
+                // Se falhar signIn, tenta criar direto para facilitar o teste
+                try {
+                    const cred = await auth.createUserWithEmailAndPassword(emailFromNick(nick), senha);
+                    meuPerfil = {
+                        nome: nick, uid: cred.user.uid, elo: 1000, vitorias: 0, derrotas: 0, numero: 10,
+                        moedas: 300, xp: 0, nivel: 1, gols: 0, assistencias: 0, partidas: 0,
+                        itensComprados: ['bola_classica', 'rastro_nenhum', 'aura_nenhuma', 'exp_padrao'],
+                        equipados: { bola: 'bola_classica', rastro: 'rastro_nenhum', aura: 'aura_nenhuma', explosao: 'exp_padrao' },
+                        passeResgatados: [], amigos: []
+                    };
+                    await db.collection("jogadores").doc(cred.user.uid).set(meuPerfil);
+                    atualizarPerfilUI(); escutarNotificacoesUsuario(); showScreen('screen-home');
+                } catch(e2) {
+                    uiText('auth-status-msg', 'Senha incorreta ou nick inválido.');
+                }
             } finally { uiText('btn-login-txt', '⚽ ENTRAR'); }
         }
 
@@ -1197,7 +1224,6 @@
             uiHide('perfil-ui'); showScreen('screen-login');
         }
 
-        // Adiciona XP sem interromper com popups na partida
         function adicionarXP(qtd) {
             meuPerfil.xp += qtd;
             if (meuPerfil.xp >= meuPerfil.nivel * 500) {
@@ -1401,7 +1427,6 @@
                 uiText('mm-timer-txt', `0${m}:${s<10?'0'+s:s}`);
             }, 1000);
 
-            // Procura ticket na fila do Firestore
             try {
                 if (db) {
                     const snap = await db.collection("matchmaking")
@@ -1419,30 +1444,14 @@
                     });
 
                     if (foundOpponent) {
-                        // Conecta como CLIENT no Host encontrado
-                        await db.collection("matchmaking").doc(foundOpponent.id).update({ status: 'matched', clientUid: meuPerfil.uid, clientNome: meuPerfil.nome });
                         uiText('mm-status-txt', `⚔️ Partida encontrada contra ${foundOpponent.nome}! Conectando...`);
+                        await db.collection("matchmaking").doc(foundOpponent.id).update({ status: 'matched', clientUid: meuPerfil.uid, clientNome: meuPerfil.nome });
                         conectarPeerMatchmaking(foundOpponent.peerId);
                     } else {
-                        // Cria ticket como HOST esperando alguém
                         myMatchTicketId = 'mm_' + meuPerfil.uid;
-                        myRoomID = 'ranked_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                        myRoomID = 'iaes_rk_' + Math.random().toString(36).substring(2, 8).toUpperCase();
                         
-                        await db.collection("matchmaking").doc(myMatchTicketId).set({
-                            uid: meuPerfil.uid, nome: meuPerfil.nome, elo: meuPerfil.elo || 1000,
-                            modo: mode, status: 'waiting', peerId: myRoomID,
-                            criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-
-                        iniciarHostMatchmaking();
-
-                        // Listener para quando alguém parear com o Host
-                        const unsub = db.collection("matchmaking").doc(myMatchTicketId).onSnapshot(doc => {
-                            if (doc.exists && doc.data().status === 'matched') {
-                                uiText('mm-status-txt', `⚔️ Partida encontrada contra ${doc.data().clientNome}! Iniciando...`);
-                                unsub();
-                            }
-                        });
+                        iniciarHostMatchmaking(mode);
                     }
                 }
             } catch(e) { console.error("Erro matchmaking:", e); }
@@ -1458,49 +1467,86 @@
             uiHide('btn-cancelar-mm');
         }
 
-        function iniciarHostMatchmaking() {
+        function iniciarHostMatchmaking(mode) {
             isOnline = true; isHost = true; mySlot = 1;
             clientConnections = [];
-            playerNames[1] = meuPerfil.nome;
-            try {
-                peer = new Peer(myRoomID, peerConfig);
-                peer.on('connection', (conn) => {
-                    conn.playerSlot = 2; clientConnections.push(conn);
-                    conn.on('open', () => {
-                        conn.send({ type: 'welcome', slot: 2, modo: modoDeJogo, w: selCampoW, h: selCampoH });
-                    });
-                    conn.on('data', (d) => {
-                        if (d.type === 'identify') { playerNames[2] = d.nome; }
-                        if (d.type === 'input') remoteInputs[d.slot] = d.keys;
-                        if (d.type === 'ready_start') {
-                            cfgP1 = { time: "Palmeiras", uni: 1, cores: TIMES["Palmeiras"].cor1 };
-                            cfgP2 = { time: "Corinthians", uni: 1, cores: TIMES["Corinthians"].cor1 };
-                            uiHide('menu-container');
-                            broadcast({ type: 'start', cfgP1: cfgP1, cfgP2: cfgP2, w: selCampoW, h: selCampoH, modo: modoDeJogo, names: playerNames });
-                            iniciarEngineJogo();
-                        }
-                    });
+            playerNames[1] = meuPerfil.nome || "P1";
+
+            if (peer) { peer.destroy(); peer = null; }
+            peer = new Peer(myRoomID, peerIceConfig);
+
+            peer.on('open', (id) => {
+                console.log("Peer Matchmaking Host aberto:", id);
+                if (db && myMatchTicketId) {
+                    db.collection("matchmaking").doc(myMatchTicketId).set({
+                        uid: meuPerfil.uid, nome: meuPerfil.nome || "CRAQUE", elo: meuPerfil.elo || 1000,
+                        modo: mode, status: 'waiting', peerId: id,
+                        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                    }).catch(e => console.error("Erro doc MM:", e));
+                }
+            });
+
+            peer.on('connection', (conn) => {
+                console.log("Adversário conectou ao Matchmaking Host!");
+                conn.playerSlot = 2; clientConnections.push(conn);
+
+                conn.on('open', () => {
+                    conn.send({ type: 'welcome', slot: 2, modo: modoDeJogo, w: selCampoW, h: selCampoH });
                 });
-            } catch(e) { console.error("Erro Host MM:", e); }
+
+                conn.on('data', (d) => {
+                    if (d.type === 'identify') { playerNames[2] = d.nome || "P2"; }
+                    if (d.type === 'input') remoteInputs[d.slot] = d.keys;
+                    if (d.type === 'ready_start') {
+                        if (matchmakingInterval) clearInterval(matchmakingInterval);
+                        if (myMatchTicketId && db) db.collection("matchmaking").doc(myMatchTicketId).delete().catch(()=>{});
+
+                        cfgP1 = { time: "Palmeiras", uni: 1, cores: TIMES["Palmeiras"].cor1 };
+                        cfgP2 = { time: "Corinthians", uni: 1, cores: TIMES["Corinthians"].cor1 };
+                        uiHide('menu-container');
+                        broadcast({ type: 'start', cfgP1: cfgP1, cfgP2: cfgP2, w: selCampoW, h: selCampoH, modo: modoDeJogo, names: playerNames });
+                        iniciarEngineJogo();
+                    }
+                });
+
+                conn.on('close', () => {
+                    alert("Adversário desconectou.");
+                    voltarMenu();
+                });
+            });
+
+            peer.on('error', (err) => console.error("Erro Peer MM Host:", err));
         }
 
         function conectarPeerMatchmaking(hostPeerId) {
             isOnline = true; isHost = false; mySlot = 2;
-            try {
-                peer = new Peer(peerConfig);
-                peer.on('open', () => {
-                    myConn = peer.connect(hostPeerId, { reliable: true });
-                    myConn.on('open', () => {
-                        myConn.send({ type: 'identify', nome: meuPerfil.nome, numero: 10 });
-                        myConn.send({ type: 'ready_start' });
-                    });
-                    myConn.on('data', (d) => {
-                        if (d.type === 'welcome') { mySlot = d.slot; modoDeJogo = d.modo; if(d.w) selCampoW = d.w; if(d.h) selCampoH = d.h; }
-                        if (d.type === 'start') { cfgP1 = d.cfgP1; cfgP2 = d.cfgP2; selCampoW = d.w; selCampoH = d.h; modoDeJogo = d.modo; playerNames = d.names; uiHide('menu-container'); iniciarEngineJogo(); }
-                        if (d.type === 'sync' && estadoJogo !== 'MENU') sincronizarJogoCliente(d);
-                    });
+            if (peer) { peer.destroy(); peer = null; }
+            peer = new Peer(peerIceConfig);
+
+            peer.on('open', () => {
+                console.log("Client MM conectando a:", hostPeerId);
+                myConn = peer.connect(hostPeerId, { reliable: true });
+
+                myConn.on('open', () => {
+                    if (matchmakingInterval) clearInterval(matchmakingInterval);
+                    uiText('mm-status-txt', "Conectado! Iniciando partida...");
+                    myConn.send({ type: 'identify', nome: meuPerfil.nome || 'JOGADOR', numero: 10 });
+                    myConn.send({ type: 'ready_start' });
                 });
-            } catch(e) { console.error("Erro Client MM:", e); }
+
+                myConn.on('data', (d) => {
+                    if (d.type === 'welcome') { mySlot = d.slot; modoDeJogo = d.modo; if(d.w) selCampoW = d.w; if(d.h) selCampoH = d.h; }
+                    if (d.type === 'start') { cfgP1 = d.cfgP1; cfgP2 = d.cfgP2; selCampoW = d.w; selCampoH = d.h; modoDeJogo = d.modo; playerNames = d.names; uiHide('menu-container'); iniciarEngineJogo(); }
+                    if (d.type === 'sync' && estadoJogo !== 'MENU') sincronizarJogoCliente(d);
+                });
+
+                myConn.on('close', () => {
+                    alert("Partida encerrada pelo host.");
+                    voltarMenu();
+                });
+            });
+
+            peer.on('error', (err) => console.error("Erro Peer MM Client:", err));
         }
 
         // --- SISTEMA DE SALAS REAIS DO HAXBALL ---
@@ -1562,6 +1608,8 @@
         function abrirModalCriarSala() { AudioEngine.playClick(); uiShow('modal-criar-sala', 'flex'); }
         function fecharModalCriarSala() { AudioEngine.playClick(); uiHide('modal-criar-sala'); }
 
+        let pendingRoomConfig = null;
+
         async function confirmarCriacaoSala() {
             AudioEngine.playClick();
             const nome = document.getElementById('modal-input-nome').value.trim() || "⚽ SALA OFICIAL";
@@ -1573,54 +1621,74 @@
             isOnline = true; isHost = true; mySlot = 1; modoDeJogo = modo; isRanked = false;
             selCampoW = parseInt(estadioDim[0]); selCampoH = parseInt(estadioDim[1]);
 
-            myRoomID = 'iaes_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            myRoomID = 'iaes_room_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            pendingRoomConfig = { nome: nome, pass: pass, modo: modo, w: selCampoW, h: selCampoH };
+
             showScreen('screen-online-host');
-            uiText('txt-codigo-sala', myRoomID);
+            uiText('txt-codigo-sala', "GERANDO...");
+            uiText('host-network-status', "Conectando ao servidor WebRTC...");
             renderLobbySlotsHost();
-
-            const max = modo.includes('5V5') ? 10 : (modo.includes('3V3') ? 6 : (modo.includes('2V2') ? 4 : 2));
-
-            try {
-                if (db) {
-                    await db.collection("salas").doc(myRoomID).set({
-                        nome: nome, host: meuPerfil.nome, modo: modo, max: max,
-                        selCampoW: selCampoW, selCampoH: selCampoH,
-                        jogadores: 1, temSenha: pass.length > 0, senha: pass, peerId: myRoomID,
-                        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-            } catch (e) { console.error("Erro registrar sala:", e); }
 
             iniciarPeerHost();
         }
 
         function iniciarPeerHost() {
-            clientConnections = []; playerNames[mySlot] = meuPerfil.nome; playerNumbers[mySlot] = meuPerfil.numero || 10;
-            try {
-                peer = new Peer(myRoomID, peerConfig);
-                peer.on('open', () => uiText('txt-codigo-sala', myRoomID));
-                peer.on('connection', (conn) => {
-                    const max = modoDeJogo.includes('5V5') ? 10 : (modoDeJogo.includes('3V3') ? 6 : (modoDeJogo.includes('2V2') ? 4 : 2));
-                    let slotAssigned = 2;
-                    const used = [mySlot, ...clientConnections.map(c => c.playerSlot)];
-                    for (let s = 1; s <= max; s++) { if (!used.includes(s)) { slotAssigned = s; break; } }
-                    conn.playerSlot = slotAssigned; clientConnections.push(conn);
+            clientConnections = [];
+            playerNames[mySlot] = meuPerfil.nome || "P1";
+            playerNumbers[mySlot] = meuPerfil.numero || 10;
 
-                    if (db && myRoomID) db.collection("salas").doc(myRoomID).update({ jogadores: 1 + clientConnections.length }).catch(()=>{});
+            if (peer) { peer.destroy(); peer = null; }
+            peer = new Peer(myRoomID, peerIceConfig);
 
-                    conn.on('open', () => conn.send({ type: 'welcome', slot: slotAssigned, modo: modoDeJogo, w: selCampoW, h: selCampoH }));
-                    conn.on('data', (d) => {
-                        if (d.type === 'identify') { playerNames[conn.playerSlot] = d.nome; playerNumbers[conn.playerSlot] = d.numero || 10; renderLobbySlotsHost(); }
-                        if (d.type === 'input') remoteInputs[d.slot] = d.keys;
-                        if (d.type === 'p2_ready') { cfgP2 = d.cfgP2; uiHide('menu-container'); broadcast({ type: 'start', cfgP1: cfgP1, cfgP2: cfgP2, w: selCampoW, h: selCampoH, modo: modoDeJogo, names: playerNames }); iniciarEngineJogo(); }
-                    });
-                    conn.on('close', () => { 
-                        clientConnections = clientConnections.filter(c => c !== conn); 
-                        renderLobbySlotsHost();
-                        if (db && myRoomID) db.collection("salas").doc(myRoomID).update({ jogadores: 1 + clientConnections.length }).catch(()=>{});
-                    });
+            peer.on('open', (id) => {
+                console.log("Peer Host Room aberto:", id);
+                uiText('txt-codigo-sala', `SALA: ${id}`);
+                uiText('host-network-status', "🟢 Online e visível no Room list!");
+
+                const max = modoDeJogo.includes('5V5') ? 10 : (modoDeJogo.includes('3V3') ? 6 : (modoDeJogo.includes('2V2') ? 4 : 2));
+
+                if (db && pendingRoomConfig) {
+                    db.collection("salas").doc(myRoomID).set({
+                        nome: pendingRoomConfig.nome, host: meuPerfil.nome || "CRAQUE", modo: modoDeJogo, max: max,
+                        selCampoW: selCampoW, selCampoH: selCampoH,
+                        jogadores: 1, temSenha: pendingRoomConfig.pass.length > 0, senha: pendingRoomConfig.pass, peerId: id,
+                        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                    }).catch(e => console.error("Erro registrar sala firestore:", e));
+                }
+            });
+
+            peer.on('connection', (conn) => {
+                console.log("Novo jogador conectado ao Host Room:", conn);
+                const max = modoDeJogo.includes('5V5') ? 10 : (modoDeJogo.includes('3V3') ? 6 : (modoDeJogo.includes('2V2') ? 4 : 2));
+                let slotAssigned = 2;
+                const used = [mySlot, ...clientConnections.map(c => c.playerSlot)];
+                for (let s = 1; s <= max; s++) { if (!used.includes(s)) { slotAssigned = s; break; } }
+                conn.playerSlot = slotAssigned; clientConnections.push(conn);
+
+                if (db && myRoomID) db.collection("salas").doc(myRoomID).update({ jogadores: 1 + clientConnections.length }).catch(()=>{});
+
+                conn.on('open', () => {
+                    conn.send({ type: 'welcome', slot: slotAssigned, modo: modoDeJogo, w: selCampoW, h: selCampoH });
+                    renderLobbySlotsHost();
                 });
-            } catch(e) { console.error("Peer host erro:", e); }
+
+                conn.on('data', (d) => {
+                    if (d.type === 'identify') { playerNames[conn.playerSlot] = d.nome || `P${conn.playerSlot}`; playerNumbers[conn.playerSlot] = d.numero || 10; renderLobbySlotsHost(); }
+                    if (d.type === 'input') remoteInputs[d.slot] = d.keys;
+                    if (d.type === 'p2_ready') { cfgP2 = d.cfgP2; uiHide('menu-container'); broadcast({ type: 'start', cfgP1: cfgP1, cfgP2: cfgP2, w: selCampoW, h: selCampoH, modo: modoDeJogo, names: playerNames }); iniciarEngineJogo(); }
+                });
+
+                conn.on('close', () => { 
+                    clientConnections = clientConnections.filter(c => c !== conn); 
+                    renderLobbySlotsHost();
+                    if (db && myRoomID) db.collection("salas").doc(myRoomID).update({ jogadores: 1 + clientConnections.length }).catch(()=>{});
+                });
+            });
+
+            peer.on('error', (err) => {
+                console.error("Erro Peer Host:", err);
+                uiText('host-network-status', `Erro de conexão: ${err.type}`);
+            });
         }
 
         function conectarSalaSelecionada() {
@@ -1639,22 +1707,36 @@
             showScreen('screen-client-waiting');
             uiText('txt-status-client-lobby', `Conectando a ${salaSelecionada.nome}...`);
 
-            try {
-                peer = new Peer(peerConfig);
-                peer.on('open', () => {
-                    myConn = peer.connect(targetPeerId, { reliable: true });
-                    myConn.on('open', () => {
-                        uiText('txt-status-client-lobby', "Conectado! Aguardando o Capitão iniciar...");
-                        myConn.send({ type: 'identify', nome: meuPerfil.nome, numero: meuPerfil.numero || 10 });
-                    });
-                    myConn.on('data', (d) => {
-                        if (d.type === 'welcome') { mySlot = d.slot; modoDeJogo = d.modo; if(d.w) selCampoW = d.w; if(d.h) selCampoH = d.h; }
-                        if (d.type === 'your_turn') { cfgP1 = d.cfgP1; modoDeJogo = d.modo; selCampoW = d.w; selCampoH = d.h; currPlayer = 2; prepararTelaTime(); showScreen('screen-team'); }
-                        if (d.type === 'start') { cfgP1 = d.cfgP1; cfgP2 = d.cfgP2; selCampoW = d.w; selCampoH = d.h; modoDeJogo = d.modo; playerNames = d.names; uiHide('menu-container'); iniciarEngineJogo(); }
-                        if (d.type === 'sync' && estadoJogo !== 'MENU') sincronizarJogoCliente(d);
-                    });
+            if (peer) { peer.destroy(); peer = null; }
+            peer = new Peer(peerIceConfig);
+
+            peer.on('open', () => {
+                console.log("Client Room aberto, conectando a:", targetPeerId);
+                myConn = peer.connect(targetPeerId, { reliable: true });
+
+                myConn.on('open', () => {
+                    console.log("Conexão com o Host estabelecida!");
+                    uiText('txt-status-client-lobby', "Conectado! Aguardando Capitão iniciar...");
+                    myConn.send({ type: 'identify', nome: meuPerfil.nome || 'JOGADOR', numero: meuPerfil.numero || 10 });
                 });
-            } catch(e) { uiText('txt-status-client-lobby', "Erro ao conectar na sala."); }
+
+                myConn.on('data', (d) => {
+                    if (d.type === 'welcome') { mySlot = d.slot; modoDeJogo = d.modo; if(d.w) selCampoW = d.w; if(d.h) selCampoH = d.h; uiText('txt-meu-slot-client', `CONECTADO COMO P${mySlot}!`); }
+                    if (d.type === 'your_turn') { cfgP1 = d.cfgP1; modoDeJogo = d.modo; selCampoW = d.w; selCampoH = d.h; currPlayer = 2; prepararTelaTime(); showScreen('screen-team'); }
+                    if (d.type === 'start') { cfgP1 = d.cfgP1; cfgP2 = d.cfgP2; selCampoW = d.w; selCampoH = d.h; modoDeJogo = d.modo; playerNames = d.names; uiHide('menu-container'); iniciarEngineJogo(); }
+                    if (d.type === 'sync' && estadoJogo !== 'MENU') sincronizarJogoCliente(d);
+                });
+
+                myConn.on('close', () => {
+                    alert("A sala foi fechada pelo Capitão.");
+                    cancelarOnline();
+                });
+            });
+
+            peer.on('error', (err) => {
+                console.error("Erro Peer Client Room:", err);
+                uiText('txt-status-client-lobby', `Erro ao conectar: ${err.type}`);
+            });
         }
 
         function renderLobbySlotsHost() {
@@ -1663,7 +1745,8 @@
             const max = modoDeJogo.includes('5V5') ? 10 : (modoDeJogo.includes('3V3') ? 6 : (modoDeJogo.includes('2V2') ? 4 : 2));
             for(let i=1; i<=max; i++) {
                 const conn = i === mySlot || clientConnections.some(c=>c.playerSlot===i);
-                const html = `<div style="background:rgba(0,0,0,0.5); padding:6px; border-radius:4px; font-size:11px; font-weight:bold; display:flex; justify-content:space-between;"><span>${conn ? '🟢' : '🟡'} P${i}</span><span>Nº 10</span></div>`;
+                const nomeExib = playerNames[i] || (conn ? (i===1 ? meuPerfil.nome : `Jogador ${i}`) : "Aguardando...");
+                const html = `<div style="background:rgba(0,0,0,0.5); padding:6px 10px; border-radius:4px; font-size:11px; font-weight:bold; display:flex; justify-content:space-between;"><span>${conn ? '🟢' : '🟡'} P${i}: ${nomeExib}</span><span>Nº 10</span></div>`;
                 if(i % 2 !== 0) cT1.innerHTML += html; else cT2.innerHTML += html;
             }
             const btn = document.getElementById('btn-host-avancar');
@@ -2215,7 +2298,6 @@
                         const golSize = selCampoH * 0.44;
                         const golTop = (selCampoH / 2) - (golSize / 2), golBottom = (selCampoH / 2) + (golSize / 2);
                         
-                        // Lógica de Gols respeitando a inversão de lados no 2º tempo
                         if (bola.position.x < PITCH_INSET_X - 5 && bola.position.y > golTop && bola.position.y < golBottom) {
                             marcarGol(!ladosInvertidos ? 'P2' : 'P1');
                         } else if (bola.position.x > selCampoW - PITCH_INSET_X + 5 && bola.position.y > golTop && bola.position.y < golBottom) {
@@ -2233,7 +2315,6 @@
                         
                         if (tempoRestante <= 0) {
                             if (periodoJogo === 1) {
-                                // FIM DO 1º TEMPO -> INTERVALO E TROCA DE LADOS
                                 estadoJogo = 'INTERVALO'; delayTimer = 180;
                                 ladosInvertidos = true;
                                 AudioEngine.playVictoryFanfare();
@@ -2242,7 +2323,6 @@
                                 uiShow('texto-gol'); uiShow('texto-assist');
                                 uiShow('mensagem-overlay', 'flex');
                             } else {
-                                // FIM DO 2º TEMPO -> FINAL DA PARTIDA
                                 finalizarPartida(placar1 !== placar2 ? (placar1 > placar2 ? 'P1' : 'P2') : null);
                             }
                         }
@@ -2398,7 +2478,6 @@
                 Body.setVelocity(p, { x: 0, y: 0 });
                 const isT1 = i % 2 !== 0;
                 
-                // Posições com base no lado invertido ou não
                 let posX1 = !ladosInvertidos ? 0.32 : 0.68;
                 let posX2 = !ladosInvertidos ? 0.68 : 0.32;
 
