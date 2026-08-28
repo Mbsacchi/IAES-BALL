@@ -1,8 +1,21 @@
+Aqui está o código completo do **IAES BALL** com os modos **5v5 Local** e **5v5 Ranked (Online)** integrados!
+
+### ✨ O que foi adicionado e aprimorado:
+1. **Modo 5v5 Local**: Partida completa de 10 jogadores (5 no Time 1 vs 5 no Time 2) com **Inteligência Artificial (Bots)** para auxiliar os companheiros de equipe em campo caso joguem no mesmo teclado, além de suporte a controles manuais.
+2. **Modo 5v5 Ranked Online**: Sala WebRTC com suporte para até **10 jogadores conectados simultaneamente** (5 no time Azul vs 5 no time Vermelho), com escolha de camisa/número, troca de times no lobby e cálculo completo de PDL/Elo Ranked para todos os 10 slots.
+3. **Novo Tamanho de Estádio "Colosso (Mega 5v5)"**: Dimensões de `1600x850` para garantir espaço e fluidez perfeita na troca de passes e jogadas 5v5.
+4. **Formação Tática 5v5**: Posicionamento realista de Futsal/Society (Goleiro/Zagueiro, Ala Esquerdo, Ala Direito, Meia e Pivô/Centroavante) para ambos os times.
+5. **Disputa de Pênaltis 5v5**: Rodízio dinâmico entre todos os 5 cobradores e goleiros na prorrogação/pênaltis.
+6. **Sincronização de Rede e Replay**: Suporte completo a 10 corpos físicos no Matter.js, sincronização de inputs remotos, replay cinematográfico e efeitos visuais.
+
+---
+
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>IAES BALL - Versão Definitiva Pro (Torcida e Bugs Corrigidos)</title>
+    <title>IAES BALL - Versão Definitiva Pro (Modo 5v5 Local & Ranked)</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
     
     <!-- BIBLIOTECAS -->
@@ -24,7 +37,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 15px 35px rgba(0,0,0,0.8); border-radius: 12px;
         }
 
-        #menu-container { padding: 40px; text-align: center; position: absolute; z-index: 100; max-height: 90vh; overflow-y: auto; width: 800px; max-width: 95%; }
+        #menu-container { padding: 40px; text-align: center; position: absolute; z-index: 100; max-height: 90vh; overflow-y: auto; width: 850px; max-width: 95%; }
         h1, h2 { margin: 0 0 20px 0; text-transform: uppercase; font-weight: 900; }
         h1 { font-size: 40px; color: #fff; } h2 { font-size: 28px; color: #f1c40f; }
 
@@ -76,10 +89,10 @@
 
         /* LOBBY DIVIDIDO POR TIMES */
         .lobby-panel { display: flex; width: 100%; gap: 15px; margin: 15px 0; text-align: left; }
-        .lobby-team-box { flex: 1; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .lobby-team-box { flex: 1; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
         .box-azul { border: 2px solid #3498db; background: rgba(52, 152, 219, 0.1); }
         .box-vermelho { border: 2px solid #e74c3c; background: rgba(231, 76, 60, 0.1); }
-        .lobby-slot { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.5); padding: 10px 15px; border-radius: 5px; font-weight: bold; font-size: 14px; border: 1px solid #444;}
+        .lobby-slot { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.5); padding: 8px 12px; border-radius: 5px; font-weight: bold; font-size: 13px; border: 1px solid #444;}
         .lobby-slot.connected { border-color: #2ecc71; color: #2ecc71; }
         .lobby-slot.waiting { border-color: #f39c12; color: #f39c12; opacity: 0.5; }
 
@@ -218,12 +231,12 @@
             <div class="lobby-panel">
                 <div class="lobby-team-box box-azul">
                     <h3 style="color: #3498db; margin:0; text-align: center;">TIME AZUL</h3>
-                    <div id="lobby-t1-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    <div id="lobby-t1-container" style="display:flex; flex-direction:column; gap:6px;"></div>
                     <button class="btn" style="background:#3498db; font-size:12px; padding:10px; margin-top:5px;" onclick="mudarTime(1)">ENTRAR NO AZUL</button>
                 </div>
                 <div class="lobby-team-box box-vermelho">
                     <h3 style="color: #e74c3c; margin:0; text-align: center;">TIME VERMELHO</h3>
-                    <div id="lobby-t2-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    <div id="lobby-t2-container" style="display:flex; flex-direction:column; gap:6px;"></div>
                     <button class="btn" style="background:#e74c3c; font-size:12px; padding:10px; margin-top:5px;" onclick="mudarTime(2)">ENTRAR NO VERMELHO</button>
                 </div>
             </div>
@@ -254,12 +267,12 @@
             <div class="lobby-panel">
                 <div class="lobby-team-box box-azul">
                     <h3 style="color: #3498db; margin:0; text-align: center;">TIME AZUL</h3>
-                    <div id="client-t1-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    <div id="client-t1-container" style="display:flex; flex-direction:column; gap:6px;"></div>
                     <button class="btn" style="background:#3498db; font-size:12px; padding:10px; margin-top:5px;" onclick="mudarTime(1)">ENTRAR NO AZUL</button>
                 </div>
                 <div class="lobby-team-box box-vermelho">
                     <h3 style="color: #e74c3c; margin:0; text-align: center;">TIME VERMELHO</h3>
-                    <div id="client-t2-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    <div id="client-t2-container" style="display:flex; flex-direction:column; gap:6px;"></div>
                     <button class="btn" style="background:#e74c3c; font-size:12px; padding:10px; margin-top:5px;" onclick="mudarTime(2)">ENTRAR NO VERMELHO</button>
                 </div>
             </div>
@@ -274,19 +287,22 @@
                 <button class="btn" onclick="escolherModo('CLASSICO')">1v1 Clássico</button>
                 <button class="btn" style="background: linear-gradient(45deg, #e67e22, #d35400);" onclick="escolherModo('CLASSICO_2V2')">2v2 Clássico</button>
                 <button class="btn" style="background: linear-gradient(45deg, #2c3e50, #000);" onclick="escolherModo('CLASSICO_3V3')">3v3 Clássico</button>
+                <button class="btn" style="background: linear-gradient(45deg, #16a085, #27ae60);" onclick="escolherModo('CLASSICO_5V5')">⚽ 5v5 Clássico</button>
             </div>
             
             <div class="botoes-modo">
                 <button id="btn-ranked" class="btn" style="background: linear-gradient(45deg, #c0392b, #900); display: none; font-size: 16px; border: 2px solid #f1c40f;" onclick="escolherModo('RANKED')">👑 RANKED 1V1</button>
                 <button id="btn-ranked-2v2" class="btn" style="background: linear-gradient(45deg, #f39c12, #d35400); display: none; font-size: 16px; border: 2px solid #f1c40f;" onclick="escolherModo('RANKED_2V2')">👑 RANKED 2V2</button>
                 <button id="btn-ranked-3v3" class="btn" style="background: linear-gradient(45deg, #8e44ad, #2c3e50); display: none; font-size: 16px; border: 2px solid #f1c40f;" onclick="escolherModo('RANKED_3V3')">👑 RANKED 3V3</button>
+                <button id="btn-ranked-5v5" class="btn" style="background: linear-gradient(45deg, #27ae60, #2980b9); display: none; font-size: 16px; border: 2px solid #f1c40f;" onclick="escolherModo('RANKED_5V5')">👑 RANKED 5V5</button>
             </div>
             
             <div class="controles-info">
                 <strong>Controles no mesmo teclado:</strong><br>
                 P1 (Time 1): W, A, S, D - Espaço (Chute) - Shift (Arrancada)<br>
                 P2 (Time 2): Setas - Enter (Chute) - Ctrl (Arrancada)<br>
-                Demais jogadores: Apenas via Multiplayer Online!
+                P3: T, F, G, H - C (Chute) - V (Arrancada) | P4: I, J, K, L - O (Chute) - P (Arrancada)<br>
+                <em>No modo local 5v5/3v3, os demais companheiros jogam automaticamente como IA inteligente!</em>
             </div>
             <button class="btn btn-voltar" style="margin-top: 30px;" onclick="cancelarOnline()">⏴ VOLTAR</button>
         </div>
@@ -299,6 +315,7 @@
                 <button class="btn" onclick="escolherCampo(1000, 550)">Padrão (Médio)</button>
                 <button class="btn" onclick="escolherCampo(1200, 660)">Maracanã (Grande)</button>
                 <button class="btn" onclick="escolherCampo(1400, 750)">Titã (Gigante 3v3)</button>
+                <button class="btn" style="background: linear-gradient(45deg, #27ae60, #2980b9);" onclick="escolherCampo(1600, 850)">Colosso (Mega 5v5)</button>
             </div>
             <button class="btn btn-voltar" style="margin-top: 30px;" onclick="showScreen('screen-mode')">⏴ VOLTAR</button>
         </div>
@@ -395,8 +412,9 @@
             alert("Aviso: Falha ao carregar o banco de dados. O jogo pode funcionar apenas localmente.");
         }
 
-        // --- VARIÁVEIS GLOBAIS DE JOGO E REDE (TUDO DECLARADO NO TOPO) ---
-        let engine, render, runner, bola, player1, player2, player3, player4, player5, player6;
+        // --- VARIÁVEIS GLOBAIS DE JOGO E REDE (SUPORTE 1V1, 2V2, 3V3, 5V5) ---
+        let engine, render, runner, bola;
+        let player1, player2, player3, player4, player5, player6, player7, player8, player9, player10;
         let estadoJogo = 'MENU';
         let delayTimer = 0, onMessageEnd = null;
         let placar1 = 0, placar2 = 0, isProrrogacao = false;
@@ -408,7 +426,8 @@
         let modoDeJogo = 'CLASSICO';
         let historicoPosicoes = [], particulas = [];
         let frameReplay = 0, rewindIndex = 0;
-        let dashP1 = 0, dashP2 = 0, dashP3 = 0, dashP4 = 0, dashP5 = 0, dashP6 = 0;
+        
+        let dashP1 = 0, dashP2 = 0, dashP3 = 0, dashP4 = 0, dashP5 = 0, dashP6 = 0, dashP7 = 0, dashP8 = 0, dashP9 = 0, dashP10 = 0;
         const DASH_COOLDOWN = 180;
         let currentStatusMsg = "", currentStatusMsgColor = "";
         let meuPerfil = { nome: '', senha: '', elo: 0, vitorias: 0, derrotas: 0, numero: 10 };
@@ -419,9 +438,9 @@
         let myConn = null;
         let isOnline = false, isHost = true;
         let mySlot = 1;
-        let remoteInputs = { 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {} };
-        let playerNumbers = { 1: 10, 2: 10, 3: 7, 4: 7, 5: 11, 6: 11 };
-        let playerNames = { 1: '', 2: '', 3: '', 4: '', 5: '', 6: '' };
+        let remoteInputs = { 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {} };
+        let playerNumbers = { 1: 10, 2: 10, 3: 7, 4: 7, 5: 11, 6: 11, 7: 8, 8: 8, 9: 9, 10: 9 };
+        let playerNames = { 1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '', 9: '', 10: '' };
         let myRoomID = "";
         let votosPular = new Set();
 
@@ -718,7 +737,6 @@
             }
         }
 
-
         // --- 4. CONTROLES DO TECLADO ---
         const keys = {};
         window.addEventListener('keydown', (e) => { 
@@ -759,7 +777,6 @@
             };
         }
 
-
         // --- 5. NAVEGAÇÃO DE TELAS ---
         function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen')); document.getElementById(id).classList.add('active-screen'); }
         
@@ -769,7 +786,7 @@
                 showScreen('screen-online-choice');
             } else { 
                 isHost = true; currPlayer = 1; mySlot = 1; 
-                uiHide('btn-ranked'); uiHide('btn-ranked-2v2'); uiHide('btn-ranked-3v3');
+                uiHide('btn-ranked'); uiHide('btn-ranked-2v2'); uiHide('btn-ranked-3v3'); uiHide('btn-ranked-5v5');
                 showScreen('screen-mode'); 
             }
         }
@@ -779,13 +796,15 @@
             uiShow('btn-ranked', 'inline-block'); 
             uiShow('btn-ranked-2v2', 'inline-block'); 
             uiShow('btn-ranked-3v3', 'inline-block'); 
+            uiShow('btn-ranked-5v5', 'inline-block'); 
             showScreen('screen-mode');
         }
 
         function escolherModo(modo) { 
             modoDeJogo = modo; 
-            if (modo.includes('RANKED') || modo.includes('3V3') || modo.includes('2V2')) {
-                if (modo.includes('3V3')) { selCampoW = 1400; selCampoH = 750; }
+            if (modo.includes('RANKED') || modo.includes('5V5') || modo.includes('3V3') || modo.includes('2V2')) {
+                if (modo.includes('5V5')) { selCampoW = 1600; selCampoH = 850; }
+                else if (modo.includes('3V3')) { selCampoW = 1400; selCampoH = 750; }
                 else if (modo.includes('2V2')) { selCampoW = 1200; selCampoH = 660; }
                 else { selCampoW = 1000; selCampoH = 550; }
                 
@@ -805,8 +824,7 @@
             }
         }
 
-
-        // --- 6. WEBRTC LOBBY E REDE ---
+        // --- 6. WEBRTC LOBBY E REDE (SUPORTE ATÉ 10 SLOTS) ---
         function gerarCodigo() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let res = '';
             for(let i=0; i<6; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -840,15 +858,16 @@
             if (isOnline && !isHost && myConn && myConn.open) {
                 myConn.send({ type: 'change_team', team: timeSolicitado });
             } else if (isHost) {
+                const isModo10Players = (modoDeJogo.includes('5V5'));
                 const isModo6Players = (modoDeJogo.includes('3V3'));
                 const isModo4Players = (modoDeJogo.includes('2V2'));
-                const maxPlayers = isModo6Players ? 6 : (isModo4Players ? 4 : 2);
+                const maxPlayers = isModo10Players ? 10 : (isModo6Players ? 6 : (isModo4Players ? 4 : 2));
                 
                 const wantsT1 = timeSolicitado === 1;
                 const isCurrentlyT1 = mySlot % 2 !== 0;
                 
                 if (isCurrentlyT1 !== wantsT1) {
-                    const targetSlots = wantsT1 ? [1, 3, 5].filter(s => s <= maxPlayers) : [2, 4, 6].filter(s => s <= maxPlayers);
+                    const targetSlots = wantsT1 ? [1, 3, 5, 7, 9].filter(s => s <= maxPlayers) : [2, 4, 6, 8, 10].filter(s => s <= maxPlayers);
                     const uSlots = clientConnections.map(c => c.playerSlot);
                     
                     for (let s of targetSlots) {
@@ -885,9 +904,10 @@
                 });
                 
                 peer.on('connection', (connection) => {
+                    const isModo10Players = (modoDeJogo.includes('5V5'));
                     const isModo6Players = (modoDeJogo.includes('3V3'));
                     const isModo4Players = (modoDeJogo.includes('2V2'));
-                    const maxPlayers = isModo6Players ? 6 : (isModo4Players ? 4 : 2);
+                    const maxPlayers = isModo10Players ? 10 : (isModo6Players ? 6 : (isModo4Players ? 4 : 2));
                     
                     if (clientConnections.length >= maxPlayers - 1) {
                         connection.on('open', () => { connection.send({ type: 'room_full' }); setTimeout(() => connection.close(), 500); });
@@ -896,7 +916,8 @@
 
                     let slotAssigned = 2;
                     const usedSlots = [mySlot, ...clientConnections.map(c => c.playerSlot)];
-                    for (let s of (isModo6Players ? [1,2,3,4,5,6] : isModo4Players ? [1,2,3,4] : [1,2])) {
+                    const allSlots = isModo10Players ? [1,2,3,4,5,6,7,8,9,10] : (isModo6Players ? [1,2,3,4,5,6] : (isModo4Players ? [1,2,3,4] : [1,2]));
+                    for (let s of allSlots) {
                         if (!usedSlots.includes(s)) { slotAssigned = s; break; }
                     }
                     connection.playerSlot = slotAssigned;
@@ -926,7 +947,7 @@
                             const wantsT1 = reqTeam === 1;
                             
                             if (isCurrentlyT1 !== wantsT1) {
-                                const targetSlots = wantsT1 ? [1, 3, 5].filter(s => s <= maxPlayers) : [2, 4, 6].filter(s => s <= maxPlayers);
+                                const targetSlots = wantsT1 ? [1, 3, 5, 7, 9].filter(s => s <= maxPlayers) : [2, 4, 6, 8, 10].filter(s => s <= maxPlayers);
                                 const uSlots = [mySlot, ...clientConnections.map(c => c.playerSlot)];
                                 
                                 for (let s of targetSlots) {
@@ -992,6 +1013,7 @@
             if(!cT1 || !cT2) return;
             cT1.innerHTML = ''; cT2.innerHTML = '';
             
+            const isModo10Players = (modoDeJogo.includes('5V5'));
             const isModo6Players = (modoDeJogo.includes('3V3'));
             const isModo4Players = (modoDeJogo.includes('2V2'));
             
@@ -1000,13 +1022,19 @@
                 { num: 2, name: `[C] P2 ${getLobbyName(2)}`, camisa: getLobbyNum(2), connected: mySlot===2 || clientConnections.some(c=>c.playerSlot===2) }
             ];
 
-            if (isModo4Players || isModo6Players) {
+            if (isModo4Players || isModo6Players || isModo10Players) {
                 slotsData.push({ num: 3, name: `P3 ${getLobbyName(3)}`, camisa: getLobbyNum(3), connected: mySlot===3 || clientConnections.some(c=>c.playerSlot===3) });
                 slotsData.push({ num: 4, name: `P4 ${getLobbyName(4)}`, camisa: getLobbyNum(4), connected: mySlot===4 || clientConnections.some(c=>c.playerSlot===4) });
             }
-            if (isModo6Players) {
+            if (isModo6Players || isModo10Players) {
                 slotsData.push({ num: 5, name: `P5 ${getLobbyName(5)}`, camisa: getLobbyNum(5), connected: mySlot===5 || clientConnections.some(c=>c.playerSlot===5) });
                 slotsData.push({ num: 6, name: `P6 ${getLobbyName(6)}`, camisa: getLobbyNum(6), connected: mySlot===6 || clientConnections.some(c=>c.playerSlot===6) });
+            }
+            if (isModo10Players) {
+                slotsData.push({ num: 7, name: `P7 ${getLobbyName(7)}`, camisa: getLobbyNum(7), connected: mySlot===7 || clientConnections.some(c=>c.playerSlot===7) });
+                slotsData.push({ num: 8, name: `P8 ${getLobbyName(8)}`, camisa: getLobbyNum(8), connected: mySlot===8 || clientConnections.some(c=>c.playerSlot===8) });
+                slotsData.push({ num: 9, name: `P9 ${getLobbyName(9)}`, camisa: getLobbyNum(9), connected: mySlot===9 || clientConnections.some(c=>c.playerSlot===9) });
+                slotsData.push({ num: 10, name: `P10 ${getLobbyName(10)}`, camisa: getLobbyNum(10), connected: mySlot===10 || clientConnections.some(c=>c.playerSlot===10) });
             }
 
             slotsData.forEach(s => {
@@ -1020,7 +1048,7 @@
                 if(isT1) cT1.innerHTML += html; else cT2.innerHTML += html;
             });
 
-            const max = isModo6Players ? 6 : (isModo4Players ? 4 : 2);
+            const max = isModo10Players ? 10 : (isModo6Players ? 6 : (isModo4Players ? 4 : 2));
             const totalConnected = 1 + clientConnections.length;
             const btnAvancar = document.getElementById('btn-host-avancar');
             
@@ -1034,21 +1062,28 @@
         }
 
         function broadcastLobbyState() {
+            const isModo10Players = (modoDeJogo.includes('5V5'));
             const isModo6Players = (modoDeJogo.includes('3V3'));
             const isModo4Players = (modoDeJogo.includes('2V2'));
-            const max = isModo6Players ? 6 : (isModo4Players ? 4 : 2);
+            const max = isModo10Players ? 10 : (isModo6Players ? 6 : (isModo4Players ? 4 : 2));
             
             const slotsData = [
                 { num: 1, name: `[C] P1 ${getLobbyName(1)}`, camisa: getLobbyNum(1), connected: mySlot===1 || clientConnections.some(c=>c.playerSlot===1) },
                 { num: 2, name: `[C] P2 ${getLobbyName(2)}`, camisa: getLobbyNum(2), connected: mySlot===2 || clientConnections.some(c=>c.playerSlot===2) }
             ];
-            if (isModo4Players || isModo6Players) {
+            if (isModo4Players || isModo6Players || isModo10Players) {
                 slotsData.push({ num: 3, name: `P3 ${getLobbyName(3)}`, camisa: getLobbyNum(3), connected: mySlot===3 || clientConnections.some(c=>c.playerSlot===3) });
                 slotsData.push({ num: 4, name: `P4 ${getLobbyName(4)}`, camisa: getLobbyNum(4), connected: mySlot===4 || clientConnections.some(c=>c.playerSlot===4) });
             }
-            if (isModo6Players) {
+            if (isModo6Players || isModo10Players) {
                 slotsData.push({ num: 5, name: `P5 ${getLobbyName(5)}`, camisa: getLobbyNum(5), connected: mySlot===5 || clientConnections.some(c=>c.playerSlot===5) });
                 slotsData.push({ num: 6, name: `P6 ${getLobbyName(6)}`, camisa: getLobbyNum(6), connected: mySlot===6 || clientConnections.some(c=>c.playerSlot===6) });
+            }
+            if (isModo10Players) {
+                slotsData.push({ num: 7, name: `P7 ${getLobbyName(7)}`, camisa: getLobbyNum(7), connected: mySlot===7 || clientConnections.some(c=>c.playerSlot===7) });
+                slotsData.push({ num: 8, name: `P8 ${getLobbyName(8)}`, camisa: getLobbyNum(8), connected: mySlot===8 || clientConnections.some(c=>c.playerSlot===8) });
+                slotsData.push({ num: 9, name: `P9 ${getLobbyName(9)}`, camisa: getLobbyNum(9), connected: mySlot===9 || clientConnections.some(c=>c.playerSlot===9) });
+                slotsData.push({ num: 10, name: `P10 ${getLobbyName(10)}`, camisa: getLobbyNum(10), connected: mySlot===10 || clientConnections.some(c=>c.playerSlot===10) });
             }
             broadcast({ type: 'lobby_update', slots: slotsData, total: 1 + clientConnections.length, max: max });
         }
@@ -1132,18 +1167,33 @@
                             dashP1 = data.d1; dashP2 = data.d2;
                             playerNumbers[1] = data.n1; playerNumbers[2] = data.n2;
 
-                            if ((modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3')) && data.p3 && data.p4 && player3 && player4) {
+                            if ((modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3') || modoDeJogo.includes('5V5')) && data.p3 && data.p4 && player3 && player4) {
                                 Body.setPosition(player3, data.p3); Body.setPosition(player4, data.p4);
                                 dashP3 = data.d3; dashP4 = data.d4;
                                 Body.setVelocity(player3, {x:0, y:0}); Body.setVelocity(player4, {x:0, y:0});
                                 playerNumbers[3] = data.n3; playerNumbers[4] = data.n4;
                             }
                             
-                            if (modoDeJogo.includes('3V3') && data.p5 && data.p6 && player5 && player6) {
+                            if ((modoDeJogo.includes('3V3') || modoDeJogo.includes('5V5')) && data.p5 && data.p6 && player5 && player6) {
                                 Body.setPosition(player5, data.p5); Body.setPosition(player6, data.p6);
                                 dashP5 = data.d5; dashP6 = data.d6;
                                 Body.setVelocity(player5, {x:0, y:0}); Body.setVelocity(player6, {x:0, y:0});
                                 playerNumbers[5] = data.n5; playerNumbers[6] = data.n6;
+                            }
+
+                            if (modoDeJogo.includes('5V5')) {
+                                if (data.p7 && data.p8 && player7 && player8) {
+                                    Body.setPosition(player7, data.p7); Body.setPosition(player8, data.p8);
+                                    dashP7 = data.d7; dashP8 = data.d8;
+                                    Body.setVelocity(player7, {x:0, y:0}); Body.setVelocity(player8, {x:0, y:0});
+                                    playerNumbers[7] = data.n7; playerNumbers[8] = data.n8;
+                                }
+                                if (data.p9 && data.p10 && player9 && player10) {
+                                    Body.setPosition(player9, data.p9); Body.setPosition(player10, data.p10);
+                                    dashP9 = data.d9; dashP10 = data.d10;
+                                    Body.setVelocity(player9, {x:0, y:0}); Body.setVelocity(player10, {x:0, y:0});
+                                    playerNumbers[9] = data.n9; playerNumbers[10] = data.n10;
+                                }
                             }
 
                             if (data.exp) criarExplosaoGol(data.exp.x, data.exp.y, data.exp.c);
@@ -1224,7 +1274,6 @@
             isOnline = false; isHost = true; timeTemporario = ""; mySlot = 1;
             showScreen('screen-home');
         }
-
 
         // --- 7. ESCOLHA DE TIMES ---
         const TIMES = {
@@ -1346,6 +1395,8 @@
                 frameReplay = 0; rewindIndex = 0; delayTimer = 0; onMessageEnd = null;
                 
                 dashP1 = 0; dashP2 = 0; dashP3 = 0; dashP4 = 0; dashP5 = 0; dashP6 = 0;
+                dashP7 = 0; dashP8 = 0; dashP9 = 0; dashP10 = 0;
+                
                 if (!votosPular) votosPular = new Set();
                 else votosPular.clear();
 
@@ -1424,11 +1475,11 @@
                     let ganhei = false; let perdi = false;
                     
                     if (vencedorStr === 'P1') { 
-                        if ([1, 3, 5].includes(mySlot)) ganhei = true;
-                        if ([2, 4, 6].includes(mySlot)) perdi = true;
+                        if ([1, 3, 5, 7, 9].includes(mySlot)) ganhei = true;
+                        if ([2, 4, 6, 8, 10].includes(mySlot)) perdi = true;
                     } else if (vencedorStr === 'P2') { 
-                        if ([2, 4, 6].includes(mySlot)) ganhei = true;
-                        if ([1, 3, 5].includes(mySlot)) perdi = true;
+                        if ([2, 4, 6, 8, 10].includes(mySlot)) ganhei = true;
+                        if ([1, 3, 5, 7, 9].includes(mySlot)) perdi = true;
                     }
                     
                     if (ganhei) {
@@ -1507,21 +1558,17 @@
 
             const walls = [
                 Bodies.rectangle(selCampoW/2, 10, selCampoW, 20, wallOpt), 
-                Bodies.rectangle(selCampoW/2, selCampoH - 10, selCampoW, 20, wallOpt),
-                
-                // Paredes laterais
+                Bodies.rectangle(selCampoW/2, selCampoH - 10, selCampoW, 20, wallOpt), 
                 Bodies.rectangle(30, 20 + yOff/2, 60, yOff, wallOpt), 
                 Bodies.rectangle(30, selCampoH - 20 - yOff/2, 60, yOff, wallOpt), 
                 Bodies.rectangle(selCampoW - 30, 20 + yOff/2, 60, yOff, wallOpt), 
                 Bodies.rectangle(selCampoW - 30, selCampoH - 20 - yOff/2, 60, yOff, wallOpt), 
                 
-                // SEMICÍRCULOS NOS CANTOS PARA BOLA DESLIZAR
                 Bodies.circle(60, 30, 45, { isStatic: true, restitution: 1, friction: 0, render: { fillStyle: '#333' } }),
                 Bodies.circle(selCampoW - 60, 30, 45, { isStatic: true, restitution: 1, friction: 0, render: { fillStyle: '#333' } }),
                 Bodies.circle(60, selCampoH - 30, 45, { isStatic: true, restitution: 1, friction: 0, render: { fillStyle: '#333' } }),
                 Bodies.circle(selCampoW - 60, selCampoH - 30, 45, { isStatic: true, restitution: 1, friction: 0, render: { fillStyle: '#333' } }),
 
-                // Redes
                 Bodies.rectangle(10, selCampoH/2, 20, golSize + 20, netOpt), 
                 Bodies.rectangle(30, selCampoH/2 - golSize/2 - 10, 60, 20, netOpt), 
                 Bodies.rectangle(30, selCampoH/2 + golSize/2 + 10, 60, 20, netOpt),
@@ -1536,8 +1583,9 @@
             player2 = Bodies.circle(selCampoW * 0.75, selCampoH/2, 22, { label: 'p2', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP2.cores?.bg||'#e74c3c', strokeStyle: cfgP2.cores?.line||'#fff', lineWidth: 3 } });
 
             let bodiesToAdd = [...walls, bola, player1, player2];
-            const isModo4Players = (modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3'));
-            const isModo6Players = (modoDeJogo.includes('3V3'));
+            const isModo4Players = (modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3') || modoDeJogo.includes('5V5'));
+            const isModo6Players = (modoDeJogo.includes('3V3') || modoDeJogo.includes('5V5'));
+            const isModo10Players = (modoDeJogo.includes('5V5'));
 
             if (isModo4Players) {
                 player3 = Bodies.circle(selCampoW * 0.25, selCampoH * 0.7, 22, { label: 'p3', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP1.cores?.bg||'#3498db', strokeStyle: cfgP1.cores?.line||'#fff', lineWidth: 3 } });
@@ -1548,6 +1596,13 @@
                 player5 = Bodies.circle(selCampoW * 0.25, selCampoH * 0.25, 22, { label: 'p5', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP1.cores?.bg||'#3498db', strokeStyle: cfgP1.cores?.line||'#fff', lineWidth: 3 } });
                 player6 = Bodies.circle(selCampoW * 0.75, selCampoH * 0.25, 22, { label: 'p6', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP2.cores?.bg||'#e74c3c', strokeStyle: cfgP2.cores?.line||'#fff', lineWidth: 3 } });
                 bodiesToAdd.push(player5, player6);
+            }
+            if (isModo10Players) {
+                player7 = Bodies.circle(selCampoW * 0.35, selCampoH * 0.5, 22, { label: 'p7', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP1.cores?.bg||'#3498db', strokeStyle: cfgP1.cores?.line||'#fff', lineWidth: 3 } });
+                player8 = Bodies.circle(selCampoW * 0.65, selCampoH * 0.5, 22, { label: 'p8', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP2.cores?.bg||'#e74c3c', strokeStyle: cfgP2.cores?.line||'#fff', lineWidth: 3 } });
+                player9 = Bodies.circle(selCampoW * 0.45, selCampoH * 0.5, 22, { label: 'p9', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP1.cores?.bg||'#3498db', strokeStyle: cfgP1.cores?.line||'#fff', lineWidth: 3 } });
+                player10 = Bodies.circle(selCampoW * 0.55, selCampoH * 0.5, 22, { label: 'p10', restitution: 0.2, frictionAir: 0.04, density: 0.004, render: { fillStyle: cfgP2.cores?.bg||'#e74c3c', strokeStyle: cfgP2.cores?.line||'#fff', lineWidth: 3 } });
+                bodiesToAdd.push(player7, player8, player9, player10);
             }
 
             Composite.add(engine.world, bodiesToAdd);
@@ -1577,7 +1632,6 @@
             Events.on(render, 'afterRender', () => {
                 const ctx = render.context; desenharTorcida(ctx);
                 
-                // >>> ESTA É A FUNÇÃO DESENHAR TORCIDA (AGORA ESTÁ AQUI!) <<<
                 function desenharTorcida(ctx) {
                     const time = Date.now() / 150; const size = 18;
                     for(let i=0; i< (selCampoW/2)/25; i++) {
@@ -1592,21 +1646,32 @@
                     }
                 }
 
-                const isModo4Players = (modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3'));
-                const isModo6Players = (modoDeJogo.includes('3V3'));
+                const isModo4Players = (modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3') || modoDeJogo.includes('5V5'));
+                const isModo6Players = (modoDeJogo.includes('3V3') || modoDeJogo.includes('5V5'));
+                const isModo10Players = (modoDeJogo.includes('5V5'));
 
                 let playersToRender = [ 
                     {p: player1, cfg: cfgP1.cores, dash: dashP1, num: playerNumbers[1] || 10, name: playerNames[1] || 'P1'}, 
                     {p: player2, cfg: cfgP2.cores, dash: dashP2, num: playerNumbers[2] || 10, name: playerNames[2] || 'P2'} 
                 ];
                 
-                if (isModo4Players) {
+                if (isModo4Players && player3 && player4) {
                     playersToRender.push({p: player3, cfg: cfgP1.cores, dash: dashP3, num: playerNumbers[3] || 7, name: playerNames[3] || 'P3'});
                     playersToRender.push({p: player4, cfg: cfgP2.cores, dash: dashP4, num: playerNumbers[4] || 7, name: playerNames[4] || 'P4'});
                 }
-                if (isModo6Players) {
+                if (isModo6Players && player5 && player6) {
                     playersToRender.push({p: player5, cfg: cfgP1.cores, dash: dashP5, num: playerNumbers[5] || 11, name: playerNames[5] || 'P5'});
                     playersToRender.push({p: player6, cfg: cfgP2.cores, dash: dashP6, num: playerNumbers[6] || 11, name: playerNames[6] || 'P6'});
+                }
+                if (isModo10Players) {
+                    if (player7 && player8) {
+                        playersToRender.push({p: player7, cfg: cfgP1.cores, dash: dashP7, num: playerNumbers[7] || 8, name: playerNames[7] || 'P7'});
+                        playersToRender.push({p: player8, cfg: cfgP2.cores, dash: dashP8, num: playerNumbers[8] || 8, name: playerNames[8] || 'P8'});
+                    }
+                    if (player9 && player10) {
+                        playersToRender.push({p: player9, cfg: cfgP1.cores, dash: dashP9, num: playerNumbers[9] || 9, name: playerNames[9] || 'P9'});
+                        playersToRender.push({p: player10, cfg: cfgP2.cores, dash: dashP10, num: playerNumbers[10] || 9, name: playerNames[10] || 'P10'});
+                    }
                 }
 
                 playersToRender.forEach(jog => {
@@ -1676,12 +1741,17 @@
                     else if (estadoJogo === 'REPLAY') { tocarReplay(); }
                     else if (estadoJogo === 'JOGANDO') {
                         framesDesdeUltimoToque++;
-                        const isModo4Players = (modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3'));
-                        const isModo6Players = (modoDeJogo.includes('3V3'));
+                        const isModo4Players = (modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3') || modoDeJogo.includes('5V5'));
+                        const isModo6Players = (modoDeJogo.includes('3V3') || modoDeJogo.includes('5V5'));
+                        const isModo10Players = (modoDeJogo.includes('5V5'));
                         
                         if (dashP1 > 0) dashP1--; if (dashP2 > 0) dashP2--;
                         if (isModo4Players) { if (dashP3 > 0) dashP3--; if (dashP4 > 0) dashP4--; }
                         if (isModo6Players) { if (dashP5 > 0) dashP5--; if (dashP6 > 0) dashP6--; }
+                        if (isModo10Players) { 
+                            if (dashP7 > 0) dashP7--; if (dashP8 > 0) dashP8--; 
+                            if (dashP9 > 0) dashP9--; if (dashP10 > 0) dashP10--; 
+                        }
 
                         if (isHost || !isOnline) {
                             const golSize = selCampoH * 0.35;
@@ -1713,7 +1783,8 @@
                                             mostrarMensagemEspecial("PRORROGAÇÃO!", 150, () => { estadoJogo = 'JOGANDO'; forceFocus(); });
                                         } else {
                                             mostrarMensagemEspecial("PÊNALTIS!", 180, () => {
-                                                if(modoDeJogo.includes('3V3')) modoDeJogo = 'PENALTI_3V3';
+                                                if(modoDeJogo.includes('5V5')) modoDeJogo = 'PENALTI_5V5';
+                                                else if(modoDeJogo.includes('3V3')) modoDeJogo = 'PENALTI_3V3';
                                                 else if(modoDeJogo.includes('2V2')) modoDeJogo = 'PENALTI_2V2';
                                                 else modoDeJogo = 'PENALTI';
                                                 
@@ -1725,13 +1796,23 @@
                             }
 
                             let frameData = { b: {x: bola.position.x, y: bola.position.y}, p1: {x: player1.position.x, y: player1.position.y}, p2: {x: player2.position.x, y: player2.position.y} };
-                            if (isModo4Players) {
+                            if (isModo4Players && player3 && player4) {
                                 frameData.p3 = {x: player3.position.x, y: player3.position.y};
                                 frameData.p4 = {x: player4.position.x, y: player4.position.y};
                             }
-                            if (isModo6Players) {
+                            if (isModo6Players && player5 && player6) {
                                 frameData.p5 = {x: player5.position.x, y: player5.position.y};
                                 frameData.p6 = {x: player6.position.x, y: player6.position.y};
+                            }
+                            if (isModo10Players) {
+                                if (player7 && player8) {
+                                    frameData.p7 = {x: player7.position.x, y: player7.position.y};
+                                    frameData.p8 = {x: player8.position.x, y: player8.position.y};
+                                }
+                                if (player9 && player10) {
+                                    frameData.p9 = {x: player9.position.x, y: player9.position.y};
+                                    frameData.p10 = {x: player10.position.x, y: player10.position.y};
+                                }
                             }
                             historicoPosicoes.push(frameData);
                             if (historicoPosicoes.length > 400) historicoPosicoes.shift();
@@ -1755,17 +1836,35 @@
                             msg: currentStatusMsg, msgC: currentStatusMsgColor,
                             hp1: historicoPenaltisP1, hp2: historicoPenaltisP2
                         };
-                        if (modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3')) {
-                            syncPayload.p3 = {x: player3.position.x, y: player3.position.y};
-                            syncPayload.p4 = {x: player4.position.x, y: player4.position.y};
-                            syncPayload.d3 = dashP3; syncPayload.d4 = dashP4;
-                            syncPayload.n3 = playerNumbers[3]; syncPayload.n4 = playerNumbers[4];
+                        if (modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3') || modoDeJogo.includes('5V5')) {
+                            if (player3 && player4) {
+                                syncPayload.p3 = {x: player3.position.x, y: player3.position.y};
+                                syncPayload.p4 = {x: player4.position.x, y: player4.position.y};
+                                syncPayload.d3 = dashP3; syncPayload.d4 = dashP4;
+                                syncPayload.n3 = playerNumbers[3]; syncPayload.n4 = playerNumbers[4];
+                            }
                         }
-                        if (modoDeJogo.includes('3V3')) {
-                            syncPayload.p5 = {x: player5.position.x, y: player5.position.y};
-                            syncPayload.p6 = {x: player6.position.x, y: player6.position.y};
-                            syncPayload.d5 = dashP5; syncPayload.d6 = dashP6;
-                            syncPayload.n5 = playerNumbers[5]; syncPayload.n6 = playerNumbers[6];
+                        if (modoDeJogo.includes('3V3') || modoDeJogo.includes('5V5')) {
+                            if (player5 && player6) {
+                                syncPayload.p5 = {x: player5.position.x, y: player5.position.y};
+                                syncPayload.p6 = {x: player6.position.x, y: player6.position.y};
+                                syncPayload.d5 = dashP5; syncPayload.d6 = dashP6;
+                                syncPayload.n5 = playerNumbers[5]; syncPayload.n6 = playerNumbers[6];
+                            }
+                        }
+                        if (modoDeJogo.includes('5V5')) {
+                            if (player7 && player8) {
+                                syncPayload.p7 = {x: player7.position.x, y: player7.position.y};
+                                syncPayload.p8 = {x: player8.position.x, y: player8.position.y};
+                                syncPayload.d7 = dashP7; syncPayload.d8 = dashP8;
+                                syncPayload.n7 = playerNumbers[7]; syncPayload.n8 = playerNumbers[8];
+                            }
+                            if (player9 && player10) {
+                                syncPayload.p9 = {x: player9.position.x, y: player9.position.y};
+                                syncPayload.p10 = {x: player10.position.x, y: player10.position.y};
+                                syncPayload.d9 = dashP9; syncPayload.d10 = dashP10;
+                                syncPayload.n9 = playerNumbers[9]; syncPayload.n10 = playerNumbers[10];
+                            }
                         }
                         broadcast(syncPayload);
                     }
@@ -1776,6 +1875,14 @@
         }
 
         function getJogadoresRodadaPenalti() {
+            if(modoDeJogo.includes('5V5')) {
+                const mod = ((rodadaPenalti - 1) % 5);
+                if(mod === 0) return { pT1: player1, pT2: player2, id1: 1, id2: 2 };
+                if(mod === 1) return { pT1: player3, pT2: player4, id1: 3, id2: 4 };
+                if(mod === 2) return { pT1: player5, pT2: player6, id1: 5, id2: 6 };
+                if(mod === 3) return { pT1: player7, pT2: player8, id1: 7, id2: 8 };
+                return { pT1: player9, pT2: player10, id1: 9, id2: 10 };
+            }
             if(modoDeJogo.includes('3V3')) {
                 if(rodadaPenalti % 3 === 1) return { pT1: player1, pT2: player2, id1: 1, id2: 2 };
                 if(rodadaPenalti % 3 === 2) return { pT1: player3, pT2: player4, id1: 3, id2: 4 };
@@ -1788,32 +1895,92 @@
             return { pT1: player1, pT2: player2, id1: 1, id2: 2 };
         }
 
+        function atualizarBotIA(jogador, teamId, role, id) {
+            if (!jogador) return;
+            const forceNormal = 0.0034;
+            const isT1 = teamId === 1;
+            const targetGoalX = isT1 ? selCampoW - 40 : 40;
+            const ownGoalX = isT1 ? 40 : selCampoW - 40;
+            const midY = selCampoH / 2;
+
+            let targetX = selCampoW / 2;
+            let targetY = selCampoH / 2;
+
+            if (role === 'goleiro') {
+                targetX = isT1 ? selCampoW * 0.12 : selCampoW * 0.88;
+                targetY = Math.max(selCampoH * 0.35, Math.min(selCampoH * 0.65, bola.position.y));
+            } else if (role === 'ala_esq') {
+                targetX = isT1 ? selCampoW * 0.35 + (bola.position.x - selCampoW/2) * 0.4 : selCampoW * 0.65 + (bola.position.x - selCampoW/2) * 0.4;
+                targetY = selCampoH * 0.22 + (bola.position.y - selCampoH/2) * 0.25;
+            } else if (role === 'ala_dir') {
+                targetX = isT1 ? selCampoW * 0.35 + (bola.position.x - selCampoW/2) * 0.4 : selCampoW * 0.65 + (bola.position.x - selCampoW/2) * 0.4;
+                targetY = selCampoH * 0.78 + (bola.position.y - selCampoH/2) * 0.25;
+            } else if (role === 'meio') {
+                targetX = isT1 ? selCampoW * 0.38 + (bola.position.x - selCampoW/2) * 0.5 : selCampoW * 0.62 + (bola.position.x - selCampoW/2) * 0.5;
+                targetY = midY + (bola.position.y - midY) * 0.35;
+            } else if (role === 'pivo') {
+                targetX = isT1 ? selCampoW * 0.48 + (bola.position.x - selCampoW/2) * 0.6 : selCampoW * 0.52 + (bola.position.x - selCampoW/2) * 0.6;
+                targetY = midY + (bola.position.y - midY) * 0.45;
+            }
+
+            const distBola = Math.hypot(bola.position.x - jogador.position.x, bola.position.y - jogador.position.y);
+            
+            // Se a bola estiver perto ou na zona do jogador, vai na bola!
+            if (distBola < (role === 'pivo' ? 260 : 180)) {
+                targetX = bola.position.x;
+                targetY = bola.position.y;
+            }
+
+            const dx = targetX - jogador.position.x;
+            const dy = targetY - jogador.position.y;
+            const dist = Math.hypot(dx, dy);
+
+            if (dist > 10) {
+                Body.applyForce(jogador, jogador.position, {
+                    x: (dx / dist) * forceNormal,
+                    y: (dy / dist) * forceNormal
+                });
+            }
+
+            if (distBola < jogador.circleRadius + bola.circleRadius + 18) {
+                tentarChutar(jogador);
+                if (Math.random() < 0.05) darArrancada(jogador, id);
+            }
+        }
+
         function processarControles() {
             const forceNormal = 0.0037; const forceKicker = forceNormal * 0.6; 
             
-            let p1 = {w:false, s:false, a:false, d:false, shoot:false, dash:false};
-            let p2 = {up:false, down:false, left:false, right:false, shoot:false, dash:false};
-            let p3 = {up:false, down:false, left:false, right:false, shoot:false, dash:false};
-            let p4 = {up:false, down:false, left:false, right:false, shoot:false, dash:false};
-            let p5 = {up:false, down:false, left:false, right:false, shoot:false, dash:false};
-            let p6 = {up:false, down:false, left:false, right:false, shoot:false, dash:false};
+            let inputs = {
+                1: {up:false, down:false, left:false, right:false, shoot:false, dash:false},
+                2: {up:false, down:false, left:false, right:false, shoot:false, dash:false},
+                3: {up:false, down:false, left:false, right:false, shoot:false, dash:false},
+                4: {up:false, down:false, left:false, right:false, shoot:false, dash:false},
+                5: {up:false, down:false, left:false, right:false, shoot:false, dash:false},
+                6: {up:false, down:false, left:false, right:false, shoot:false, dash:false},
+                7: {up:false, down:false, left:false, right:false, shoot:false, dash:false},
+                8: {up:false, down:false, left:false, right:false, shoot:false, dash:false},
+                9: {up:false, down:false, left:false, right:false, shoot:false, dash:false},
+                10: {up:false, down:false, left:false, right:false, shoot:false, dash:false}
+            };
 
             if (isOnline && isHost) {
                 const hostInputs = getPlayerClientInputs();
-                p1 = {w: hostInputs.up, s: hostInputs.down, a: hostInputs.left, d: hostInputs.right, shoot: hostInputs.shoot, dash: hostInputs.dash};
+                inputs[mySlot] = hostInputs;
                 
-                const rem2 = remoteInputs[2] || {}; p2 = {up: rem2.up, down: rem2.down, left: rem2.left, right: rem2.right, shoot: rem2.shoot, dash: rem2.dash};
-                const rem3 = remoteInputs[3] || {}; p3 = {up: rem3.up, down: rem3.down, left: rem3.left, right: rem3.right, shoot: rem3.shoot, dash: rem3.dash};
-                const rem4 = remoteInputs[4] || {}; p4 = {up: rem4.up, down: rem4.down, left: rem4.left, right: rem4.right, shoot: rem4.shoot, dash: rem4.dash};
-                const rem5 = remoteInputs[5] || {}; p5 = {up: rem5.up, down: rem5.down, left: rem5.left, right: rem5.right, shoot: rem5.shoot, dash: rem5.dash};
-                const rem6 = remoteInputs[6] || {}; p6 = {up: rem6.up, down: rem6.down, left: rem6.left, right: rem6.right, shoot: rem6.shoot, dash: rem6.dash};
+                for(let s = 1; s <= 10; s++) {
+                    if (s !== mySlot && remoteInputs[s]) {
+                        inputs[s] = remoteInputs[s];
+                    }
+                }
             } else {
-                const local1 = getLocalInputsP1(); const local2 = getLocalInputsP2();
-                const local3 = getLocalInputsP3(); const local4 = getLocalInputsP4();
-                p1 = {w: local1.w, s: local1.s, a: local1.a, d: local1.d, shoot: local1.shoot, dash: local1.dash};
-                p2 = {up: local2.up, down: local2.down, left: local2.left, right: local2.right, shoot: local2.shoot, dash: local2.dash};
-                p3 = {up: local3.up, down: local3.down, left: local3.left, right: local3.right, shoot: local3.shoot, dash: local3.dash};
-                p4 = {up: local4.up, down: local4.down, left: local4.left, right: local4.right, shoot: local4.shoot, dash: local4.dash};
+                const l1 = getLocalInputsP1(); const l2 = getLocalInputsP2();
+                const l3 = getLocalInputsP3(); const l4 = getLocalInputsP4();
+
+                inputs[1] = { up: l1.w, down: l1.s, left: l1.a, right: l1.d, shoot: l1.shoot, dash: l1.dash };
+                inputs[2] = { up: l2.up, down: l2.down, left: l2.left, right: l2.right, shoot: l2.shoot, dash: l2.dash };
+                inputs[3] = { up: l3.up, down: l3.down, left: l3.left, right: l3.right, shoot: l3.shoot, dash: l3.dash };
+                inputs[4] = { up: l4.up, down: l4.down, left: l4.left, right: l4.right, shoot: l4.shoot, dash: l4.dash };
             }
             
             if(modoDeJogo.includes('PENALTI')) {
@@ -1821,95 +1988,72 @@
                 
                 if(turnoPenalti === 1) { 
                     if(toquesNaBolaPenalti < 2) {
-                        let btnW = p1.w || p3.w || p5.w; let btnS = p1.s || p3.s || p5.s;
-                        let btnA = p1.a || p3.a || p5.a; let btnD = p1.d || p3.d || p5.d;
-                        let btnSht = p1.shoot || p3.shoot || p5.shoot; let btnDsh = p1.dash || p3.dash || p5.dash;
-                        
-                        if (btnW) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: 0, y: -forceKicker });
-                        if (btnS) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: 0, y: forceKicker });
-                        if (btnA) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: -forceKicker, y: 0 });
-                        if (btnD) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: forceKicker, y: 0 });
-                        if (btnSht) tentarChutar(ativos.pT1);
-                        if (btnDsh) darArrancada(ativos.pT1, ativos.id1);
+                        let kickerIn = inputs[ativos.id1];
+                        if (kickerIn.up) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: 0, y: -forceKicker });
+                        if (kickerIn.down) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: 0, y: forceKicker });
+                        if (kickerIn.left) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: -forceKicker, y: 0 });
+                        if (kickerIn.right) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: forceKicker, y: 0 });
+                        if (kickerIn.shoot) tentarChutar(ativos.pT1);
+                        if (kickerIn.dash) darArrancada(ativos.pT1, ativos.id1);
                     }
-                    let btnUp = p2.up || p4.up || p6.up; let btnDn = p2.down || p4.down || p6.down;
-                    if (btnUp) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: 0, y: -forceNormal });
-                    if (btnDn) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: 0, y: forceNormal });
+                    let gkIn = inputs[ativos.id2];
+                    if (gkIn.up) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: 0, y: -forceNormal });
+                    if (gkIn.down) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: 0, y: forceNormal });
                     Body.setPosition(ativos.pT2, { x: selCampoW - 55, y: ativos.pT2.position.y });
                     Body.setVelocity(ativos.pT2, { x: 0, y: ativos.pT2.velocity.y });
                 } else { 
                     if(toquesNaBolaPenalti < 2) {
-                        let btnUp = p2.up || p4.up || p6.up; let btnDn = p2.down || p4.down || p6.down;
-                        let btnLf = p2.left || p4.left || p6.left; let btnRt = p2.right || p4.right || p6.right;
-                        let btnSht = p2.shoot || p4.shoot || p6.shoot; let btnDsh = p2.dash || p4.dash || p6.dash;
-
-                        if (btnUp) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: 0, y: -forceKicker });
-                        if (btnDn) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: 0, y: forceKicker });
-                        if (btnLf) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: -forceKicker, y: 0 });
-                        if (btnRt) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: forceKicker, y: 0 });
-                        if (btnSht) tentarChutar(ativos.pT2);
-                        if (btnDsh) darArrancada(ativos.pT2, ativos.id2);
+                        let kickerIn = inputs[ativos.id2];
+                        if (kickerIn.up) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: 0, y: -forceKicker });
+                        if (kickerIn.down) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: 0, y: forceKicker });
+                        if (kickerIn.left) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: -forceKicker, y: 0 });
+                        if (kickerIn.right) Body.applyForce(ativos.pT2, ativos.pT2.position, { x: forceKicker, y: 0 });
+                        if (kickerIn.shoot) tentarChutar(ativos.pT2);
+                        if (kickerIn.dash) darArrancada(ativos.pT2, ativos.id2);
                     }
-                    let btnW = p1.w || p3.w || p5.w; let btnS = p1.s || p3.s || p5.s;
-                    if (btnW) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: 0, y: -forceNormal });
-                    if (btnS) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: 0, y: forceNormal });
+                    let gkIn = inputs[ativos.id1];
+                    if (gkIn.up) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: 0, y: -forceNormal });
+                    if (gkIn.down) Body.applyForce(ativos.pT1, ativos.pT1.position, { x: 0, y: forceNormal });
                     Body.setPosition(ativos.pT1, { x: 55, y: ativos.pT1.position.y });
                     Body.setVelocity(ativos.pT1, { x: 0, y: ativos.pT1.velocity.y });
                 }
                 return;
             }
 
-            if (p1.w) Body.applyForce(player1, player1.position, { x: 0, y: -forceNormal });
-            if (p1.s) Body.applyForce(player1, player1.position, { x: 0, y: forceNormal });
-            if (p1.a) Body.applyForce(player1, player1.position, { x: -forceNormal, y: 0 });
-            if (p1.d) Body.applyForce(player1, player1.position, { x: forceNormal, y: 0 });
-            if (p1.shoot) tentarChutar(player1);
-            if (p1.dash) darArrancada(player1, 1);
+            const playersList = [
+                { p: player1, id: 1, team: 1, role: 'goleiro' },
+                { p: player2, id: 2, team: 2, role: 'goleiro' },
+                { p: player3, id: 3, team: 1, role: 'ala_esq' },
+                { p: player4, id: 4, team: 2, role: 'ala_esq' },
+                { p: player5, id: 5, team: 1, role: 'ala_dir' },
+                { p: player6, id: 6, team: 2, role: 'ala_dir' },
+                { p: player7, id: 7, team: 1, role: 'meio' },
+                { p: player8, id: 8, team: 2, role: 'meio' },
+                { p: player9, id: 9, team: 1, role: 'pivo' },
+                { p: player10, id: 10, team: 2, role: 'pivo' }
+            ];
 
-            if (p2.up) Body.applyForce(player2, player2.position, { x: 0, y: -forceNormal });
-            if (p2.down) Body.applyForce(player2, player2.position, { x: 0, y: forceNormal });
-            if (p2.left) Body.applyForce(player2, player2.position, { x: -forceNormal, y: 0 });
-            if (p2.right) Body.applyForce(player2, player2.position, { x: forceNormal, y: 0 });
-            if (p2.shoot) tentarChutar(player2);
-            if (p2.dash) darArrancada(player2, 2);
+            playersList.forEach(item => {
+                if (!item.p) return;
+                const inData = inputs[item.id];
+                const hasInput = inData && (inData.up || inData.down || inData.left || inData.right || inData.shoot || inData.dash);
 
-            const isModo4Players = (modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3'));
-            const isModo6Players = (modoDeJogo.includes('3V3'));
-
-            if (isModo4Players) {
-                if (p3.up) Body.applyForce(player3, player3.position, { x: 0, y: -forceNormal });
-                if (p3.down) Body.applyForce(player3, player3.position, { x: 0, y: forceNormal });
-                if (p3.left) Body.applyForce(player3, player3.position, { x: -forceNormal, y: 0 });
-                if (p3.right) Body.applyForce(player3, player3.position, { x: forceNormal, y: 0 });
-                if (p3.shoot) tentarChutar(player3);
-                if (p3.dash) darArrancada(player3, 3);
-
-                if (p4.up) Body.applyForce(player4, player4.position, { x: 0, y: -forceNormal });
-                if (p4.down) Body.applyForce(player4, player4.position, { x: 0, y: forceNormal });
-                if (p4.left) Body.applyForce(player4, player4.position, { x: -forceNormal, y: 0 });
-                if (p4.right) Body.applyForce(player4, player4.position, { x: forceNormal, y: 0 });
-                if (p4.shoot) tentarChutar(player4);
-                if (p4.dash) darArrancada(player4, 4);
-            }
-
-            if (isModo6Players) {
-                if (p5.up) Body.applyForce(player5, player5.position, { x: 0, y: -forceNormal });
-                if (p5.down) Body.applyForce(player5, player5.position, { x: 0, y: forceNormal });
-                if (p5.left) Body.applyForce(player5, player5.position, { x: -forceNormal, y: 0 });
-                if (p5.right) Body.applyForce(player5, player5.position, { x: forceNormal, y: 0 });
-                if (p5.shoot) tentarChutar(player5);
-                if (p5.dash) darArrancada(player5, 5);
-
-                if (p6.up) Body.applyForce(player6, player6.position, { x: 0, y: -forceNormal });
-                if (p6.down) Body.applyForce(player6, player6.position, { x: 0, y: forceNormal });
-                if (p6.left) Body.applyForce(player6, player6.position, { x: -forceNormal, y: 0 });
-                if (p6.right) Body.applyForce(player6, player6.position, { x: forceNormal, y: 0 });
-                if (p6.shoot) tentarChutar(player6);
-                if (p6.dash) darArrancada(player6, 6);
-            }
+                if (hasInput) {
+                    if (inData.up) Body.applyForce(item.p, item.p.position, { x: 0, y: -forceNormal });
+                    if (inData.down) Body.applyForce(item.p, item.p.position, { x: 0, y: forceNormal });
+                    if (inData.left) Body.applyForce(item.p, item.p.position, { x: -forceNormal, y: 0 });
+                    if (inData.right) Body.applyForce(item.p, item.p.position, { x: forceNormal, y: 0 });
+                    if (inData.shoot) tentarChutar(item.p);
+                    if (inData.dash) darArrancada(item.p, item.id);
+                } else if (!isOnline && (modoDeJogo.includes('5V5') || modoDeJogo.includes('3V3') || modoDeJogo.includes('2V2'))) {
+                    // Bot IA nos slots locais não controlados por humano!
+                    atualizarBotIA(item.p, item.team, item.role, item.id);
+                }
+            });
         }
 
         function tentarChutar(jogador) {
+            if (!jogador) return;
             if (modoDeJogo.includes('PENALTI') && toquesNaBolaPenalti >= 2) return; 
             const dx = bola.position.x - jogador.position.x, dy = bola.position.y - jogador.position.y;
             const dist = Math.sqrt(dx*dx + dy*dy);
@@ -1926,9 +2070,12 @@
         }
         
         function darArrancada(jogador, id) {
+            if (!jogador) return;
             if (id === 1 && dashP1 > 0) return; if (id === 2 && dashP2 > 0) return;
             if (id === 3 && dashP3 > 0) return; if (id === 4 && dashP4 > 0) return;
             if (id === 5 && dashP5 > 0) return; if (id === 6 && dashP6 > 0) return;
+            if (id === 7 && dashP7 > 0) return; if (id === 8 && dashP8 > 0) return;
+            if (id === 9 && dashP9 > 0) return; if (id === 10 && dashP10 > 0) return;
             if (modoDeJogo.includes('PENALTI') && toquesNaBolaPenalti >= 2) return;
             const vel = jogador.velocity; const speed = Math.sqrt(vel.x*vel.x + vel.y*vel.y);
             if (speed > 0.5) { 
@@ -1936,6 +2083,8 @@
                 if (id === 1) dashP1 = DASH_COOLDOWN; if (id === 2) dashP2 = DASH_COOLDOWN;
                 if (id === 3) dashP3 = DASH_COOLDOWN; if (id === 4) dashP4 = DASH_COOLDOWN;
                 if (id === 5) dashP5 = DASH_COOLDOWN; if (id === 6) dashP6 = DASH_COOLDOWN;
+                if (id === 7) dashP7 = DASH_COOLDOWN; if (id === 8) dashP8 = DASH_COOLDOWN;
+                if (id === 9) dashP9 = DASH_COOLDOWN; if (id === 10) dashP10 = DASH_COOLDOWN;
             }
         }
 
@@ -1986,10 +2135,12 @@
         }
 
         function reposicionarJogadores() {
-            Body.setVelocity(bola, { x: 0, y: 0 }); Body.setVelocity(player1, { x: 0, y: 0 }); Body.setVelocity(player2, { x: 0, y: 0 });
+            Body.setVelocity(bola, { x: 0, y: 0 }); 
+            if(player1) Body.setVelocity(player1, { x: 0, y: 0 }); 
+            if(player2) Body.setVelocity(player2, { x: 0, y: 0 });
             
             if(modoDeJogo.includes('PENALTI')) {
-                [player1, player2, player3, player4, player5, player6].forEach(p => { if(p) Body.setPosition(p, {x: -100, y: -100}); });
+                [player1, player2, player3, player4, player5, player6, player7, player8, player9, player10].forEach(p => { if(p) Body.setPosition(p, {x: -100, y: -100}); });
 
                 let ativos = getJogadoresRodadaPenalti();
 
@@ -2002,6 +2153,23 @@
                     Body.setPosition(ativos.pT2, { x: selCampoW * 0.40, y: selCampoH/2 });
                     Body.setPosition(ativos.pT1, { x: 55, y: selCampoH/2 });
                 }
+            } else if (modoDeJogo.includes('5V5')) {
+                [player1, player2, player3, player4, player5, player6, player7, player8, player9, player10].forEach(p => { if(p) Body.setVelocity(p, {x: 0, y: 0}); });
+                Body.setPosition(bola, { x: selCampoW/2, y: selCampoH/2 });
+                
+                // Formação Tática 5v5 Time 1 (Azul)
+                Body.setPosition(player1, { x: selCampoW * 0.18, y: selCampoH * 0.50 }); // Goleiro/Zagueiro
+                Body.setPosition(player3, { x: selCampoW * 0.32, y: selCampoH * 0.22 }); // Ala Esquerdo
+                Body.setPosition(player5, { x: selCampoW * 0.32, y: selCampoH * 0.78 }); // Ala Direito
+                Body.setPosition(player7, { x: selCampoW * 0.38, y: selCampoH * 0.50 }); // Meia
+                Body.setPosition(player9, { x: selCampoW * 0.45, y: selCampoH * 0.50 }); // Pivô
+
+                // Formação Tática 5v5 Time 2 (Vermelho)
+                Body.setPosition(player2, { x: selCampoW * 0.82, y: selCampoH * 0.50 }); // Goleiro/Zagueiro
+                Body.setPosition(player4, { x: selCampoW * 0.68, y: selCampoH * 0.22 }); // Ala Esquerdo
+                Body.setPosition(player6, { x: selCampoW * 0.68, y: selCampoH * 0.78 }); // Ala Direito
+                Body.setPosition(player8, { x: selCampoW * 0.62, y: selCampoH * 0.50 }); // Meia
+                Body.setPosition(player10, { x: selCampoW * 0.55, y: selCampoH * 0.50 }); // Pivô
             } else if (modoDeJogo.includes('3V3')) {
                 Body.setVelocity(player3, { x: 0, y: 0 }); Body.setVelocity(player4, { x: 0, y: 0 });
                 Body.setVelocity(player5, { x: 0, y: 0 }); Body.setVelocity(player6, { x: 0, y: 0 });
@@ -2104,13 +2272,21 @@
                 if (e && e.b && e.p1 && e.p2) {
                     Body.setPosition(bola, e.b); Body.setPosition(player1, e.p1); Body.setPosition(player2, e.p2);
                     Body.setVelocity(bola, { x: 0, y: 0 }); Body.setVelocity(player1, { x: 0, y: 0 }); Body.setVelocity(player2, { x: 0, y: 0 });
-                    if ((modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3')) && e.p3 && e.p4 && player3 && player4) {
+                    if (e.p3 && e.p4 && player3 && player4) {
                         Body.setPosition(player3, e.p3); Body.setPosition(player4, e.p4);
                         Body.setVelocity(player3, { x: 0, y: 0 }); Body.setVelocity(player4, { x: 0, y: 0 });
                     }
-                    if (modoDeJogo.includes('3V3') && e.p5 && e.p6 && player5 && player6) {
+                    if (e.p5 && e.p6 && player5 && player6) {
                         Body.setPosition(player5, e.p5); Body.setPosition(player6, e.p6);
                         Body.setVelocity(player5, { x: 0, y: 0 }); Body.setVelocity(player6, { x: 0, y: 0 });
+                    }
+                    if (e.p7 && e.p8 && player7 && player8) {
+                        Body.setPosition(player7, e.p7); Body.setPosition(player8, e.p8);
+                        Body.setVelocity(player7, { x: 0, y: 0 }); Body.setVelocity(player8, { x: 0, y: 0 });
+                    }
+                    if (e.p9 && e.p10 && player9 && player10) {
+                        Body.setPosition(player9, e.p9); Body.setPosition(player10, e.p10);
+                        Body.setVelocity(player9, { x: 0, y: 0 }); Body.setVelocity(player10, { x: 0, y: 0 });
                     }
                 }
             }
@@ -2134,13 +2310,21 @@
                 if (e && e.b && e.p1 && e.p2) {
                     Body.setPosition(bola, e.b); Body.setPosition(player1, e.p1); Body.setPosition(player2, e.p2);
                     Body.setVelocity(bola, { x: 0, y: 0 }); Body.setVelocity(player1, { x: 0, y: 0 }); Body.setVelocity(player2, { x: 0, y: 0 });
-                    if ((modoDeJogo.includes('2V2') || modoDeJogo.includes('3V3')) && e.p3 && e.p4 && player3 && player4) {
+                    if (e.p3 && e.p4 && player3 && player4) {
                         Body.setPosition(player3, e.p3); Body.setPosition(player4, e.p4);
                         Body.setVelocity(player3, { x: 0, y: 0 }); Body.setVelocity(player4, { x: 0, y: 0 });
                     }
-                    if (modoDeJogo.includes('3V3') && e.p5 && e.p6 && player5 && player6) {
+                    if (e.p5 && e.p6 && player5 && player6) {
                         Body.setPosition(player5, e.p5); Body.setPosition(player6, e.p6);
                         Body.setVelocity(player5, { x: 0, y: 0 }); Body.setVelocity(player6, { x: 0, y: 0 });
+                    }
+                    if (e.p7 && e.p8 && player7 && player8) {
+                        Body.setPosition(player7, e.p7); Body.setPosition(player8, e.p8);
+                        Body.setVelocity(player7, { x: 0, y: 0 }); Body.setVelocity(player8, { x: 0, y: 0 });
+                    }
+                    if (e.p9 && e.p10 && player9 && player10) {
+                        Body.setPosition(player9, e.p9); Body.setPosition(player10, e.p10);
+                        Body.setVelocity(player9, { x: 0, y: 0 }); Body.setVelocity(player10, { x: 0, y: 0 });
                     }
                 }
                 frameReplay += 0.5; 
@@ -2151,3 +2335,4 @@
     </script>
 </body>
 </html>
+```
