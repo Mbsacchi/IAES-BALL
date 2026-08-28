@@ -35,23 +35,24 @@
             font-family: 'Montserrat', sans-serif; color: white; user-select: none;
         }
 
-        /* HEADER NAV */
+        /* HEADER GLOBAL */
         #top-nav-bar {
             position: fixed; top: 0; left: 0; width: 100vw; height: 60px;
-            background: rgba(4, 18, 10, 0.92); backdrop-filter: blur(12px);
-            border-bottom: 2px solid rgba(16, 185, 129, 0.3);
+            background: rgba(4, 18, 10, 0.94); backdrop-filter: blur(12px);
+            border-bottom: 2px solid rgba(16, 185, 129, 0.35);
             display: none; align-items: center; justify-content: space-between;
             padding: 0 25px; z-index: 500;
         }
         .nav-brand {
-            display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 900;
+            display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 900;
             color: #fff; font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;
         }
-        .nav-stats-group { display: flex; align-items: center; gap: 14px; }
+        .nav-brand span { color: var(--pitch-emerald); }
+        .nav-stats-group { display: flex; align-items: center; gap: 12px; }
 
         .nav-badge-pill {
-            background: rgba(10, 36, 20, 0.85); border: 1px solid rgba(16, 185, 129, 0.4);
-            padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;
+            background: rgba(10, 36, 20, 0.85); border: 1.5px solid rgba(16, 185, 129, 0.4);
+            padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 800;
             display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s;
         }
         .nav-badge-pill:hover { border-color: var(--pitch-emerald); background: rgba(16, 55, 30, 0.95); transform: translateY(-1px); }
@@ -64,9 +65,9 @@
         }
 
         .screen-card {
-            width: 100%; max-width: 1120px; background: rgba(6, 26, 15, 0.94);
+            width: 100%; max-width: 1150px; background: rgba(6, 26, 15, 0.95);
             backdrop-filter: blur(16px); border: 1.5px solid rgba(16, 185, 129, 0.35);
-            border-radius: 16px; padding: 26px; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(16,185,129,0.15);
+            border-radius: 16px; padding: 26px; box-shadow: 0 20px 50px rgba(0,0,0,0.85), 0 0 30px rgba(16,185,129,0.15);
             text-align: center;
         }
 
@@ -144,7 +145,7 @@
             background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* MODAIS DESACOPLADOS */
+        /* MODAIS */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
@@ -152,10 +153,17 @@
         }
         .modal-box {
             background: #082012; border: 2px solid #10b981; border-radius: 14px; padding: 22px;
-            width: 90vw; max-width: 720px; text-align: left; box-shadow: 0 25px 60px rgba(0,0,0,0.95);
+            width: 90vw; max-width: 780px; text-align: left; box-shadow: 0 25px 60px rgba(0,0,0,0.95);
             max-height: 88vh; overflow-y: auto; overflow-x: hidden;
         }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+
+        /* ABAS DO PAINEL ADMIN MASTER */
+        .admin-tabs { display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid #1a4a2e; padding-bottom: 8px; flex-wrap: wrap; }
+        .admin-tab-btn { background: #061c10; border: 1px solid #1a4a2e; color: #cbd5e1; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; }
+        .admin-tab-btn.active { background: #f39c12; color: #000; border-color: #f39c12; font-weight: 900; }
+        .admin-tab-content { display: none; }
+        .admin-tab-content.active { display: block; animation: fadeIn 0.2s ease; }
 
         .pix-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0; }
         .pix-card {
@@ -348,7 +356,6 @@
         <!-- LOBBY PRINCIPAL COM TABELA DE RANKS & PDL -->
         <div id="screen-home" class="screen">
             <div class="screen-card">
-                <!-- BANNER DE RANKS E PDL NECESSÁRIO -->
                 <div class="ranks-pdl-banner">
                     <div style="font-size:11px; font-weight:900; color:var(--primary-gold); width:100%; text-align:left; margin-bottom:2px;">
                         🏆 SISTEMA DE CLASSIFICAÇÃO RANKED (PDL POR PATENTE):
@@ -429,25 +436,25 @@
 
         <!-- MATCHMAKING -->
         <div id="screen-matchmaking" class="screen">
-            <div class="screen-card" style="max-width: 580px;">
-                <h1 style="color: #d2a8ff; font-family:'Rajdhani';">⚔️ FILA RANKED COMPETITIVA</h1>
-                <p style="color:#a7f3d0; font-size:12px; margin-bottom:15px;">Partidas competitivas valendo PDL nos mapas oficiais</p>
+            <div class="screen-card" style="max-width: 650px;">
+                <h1 style="color: #d2a8ff; font-family:'Rajdhani'; font-size:32px;">⚔️ FILA RANKED COMPETITIVA</h1>
+                <p style="color:#a7f3d0; font-size:12.5px; margin-bottom:18px;">Partidas competitivas valendo PDL nos mapas oficiais</p>
 
-                <div style="background: #082012; border: 2px solid #8e44ad; border-radius: 10px; padding: 18px; margin-bottom: 15px;">
-                    <div style="display:flex; justify-content:space-around; margin-bottom:12px; font-size:12px; font-weight:bold;">
+                <div style="background: #082012; border: 2px solid #8e44ad; border-radius: 12px; padding: 22px; margin-bottom: 18px;">
+                    <div style="display:flex; justify-content:space-around; margin-bottom:16px; font-size:13px; font-weight:bold;">
                         <label><input type="radio" name="ranked-mode-select" value="1V1" checked> 1v1 (Padrão)</label>
                         <label><input type="radio" name="ranked-mode-select" value="2V2"> 2v2 (Maracanã)</label>
                         <label><input type="radio" name="ranked-mode-select" value="3V3"> 3v3 (Titã)</label>
                     </div>
 
                     <div id="mm-status-box" style="text-align:center;">
-                        <div id="mm-status-txt" style="font-size:15px; font-weight:900; color:#cbd5e1;">Pronto para buscar partida</div>
-                        <div id="mm-timer-txt" style="font-size:28px; font-weight:900; color:var(--primary-gold); font-family:'Rajdhani'; margin:8px 0; display:none;">00:00</div>
-                        <div id="mm-detail-txt" style="font-size:11px; color:#a7f3d0;"></div>
+                        <div id="mm-status-txt" style="font-size:16px; font-weight:900; color:#cbd5e1;">Pronto para buscar partida</div>
+                        <div id="mm-timer-txt" style="font-size:34px; font-weight:900; color:var(--primary-gold); font-family:'Rajdhani'; margin:10px 0; display:none;">00:00</div>
+                        <div id="mm-detail-txt" style="font-size:12px; color:#a7f3d0;"></div>
                     </div>
 
-                    <button class="btn btn-ranked" id="btn-iniciar-mm" style="width:100%; margin-top:12px;" onclick="iniciarBuscaRanked()">🔍 BUSCAR PARTIDA</button>
-                    <button class="btn btn-voltar" id="btn-cancelar-mm" style="width:100%; margin-top:12px; display:none;" onclick="cancelarBuscaRanked()">CANCELAR BUSCA</button>
+                    <button class="btn btn-ranked" id="btn-iniciar-mm" style="width:100%; margin-top:14px; padding:14px; font-size:13px;" onclick="iniciarBuscaRanked()">🔍 BUSCAR PARTIDA</button>
+                    <button class="btn btn-voltar" id="btn-cancelar-mm" style="width:100%; margin-top:14px; padding:14px; font-size:13px; display:none;" onclick="cancelarBuscaRanked()">CANCELAR BUSCA</button>
                 </div>
 
                 <button class="btn btn-voltar" onclick="sairTelaMatchmaking()">⏴ VOLTAR AO MENU</button>
@@ -494,7 +501,7 @@
             </div>
         </div>
 
-        <!-- UNIFORME COM ESCOLHA DE NÚMERO DE CAMISA (1 A 99) -->
+        <!-- UNIFORME -->
         <div id="screen-uniform" class="screen">
             <div class="screen-card" style="max-width: 480px;">
                 <h2 id="title-jogador-uniform" style="color:var(--primary-gold);">CAPITÃO: UNIFORME OFICIAL</h2>
@@ -554,7 +561,7 @@
             </div>
         </div>
 
-        <!-- LOBBY HOST ONLINE -->
+        <!-- LOBBY HOST -->
         <div id="screen-online-host" class="screen">
             <div class="screen-card" style="max-width: 650px;">
                 <h2>SALA CRIADA</h2>
@@ -596,7 +603,7 @@
             </div>
         </div>
 
-        <!-- MERCADO EXPANDIDO -->
+        <!-- MERCADO -->
         <div id="screen-shop" class="screen">
             <div class="screen-card">
                 <h1 style="color:var(--primary-gold); font-family:'Rajdhani';">🛒 MERCADO DA BOLA EXPANDIDO</h1>
@@ -702,31 +709,116 @@
         </div>
     </div>
 
-    <!-- MODAL ADMIN -->
+    <!-- MODAL ADMIN MASTER ULTRA COMPLETO -->
     <div id="modal-admin" class="modal-overlay">
-        <div class="modal-box" style="border-color: #e67e22;">
+        <div class="modal-box" style="border-color: #e67e22; max-width: 820px;">
             <div class="modal-header">
-                <h2 style="color:#f39c12; margin:0;">👑 PAINEL MASTER ADMIN</h2>
-                <span style="font-size:10px; background:#e74c3c; padding:3px 8px; border-radius:4px; font-weight:bold;">AUTORIZADO</span>
+                <h2 style="color:#f39c12; margin:0; font-family:'Rajdhani';">👑 PAINEL MASTER ADMIN</h2>
+                <span style="font-size:11px; background:#e74c3c; padding:3px 10px; border-radius:4px; font-weight:bold;">SUPERUSUÁRIO</span>
             </div>
-            <div style="background:rgba(10,36,20,0.85); border:1px solid #00f2fe; border-radius:8px; padding:12px; margin-bottom:10px;">
-                <div style="font-size:11px; font-weight:900; color:#00f2fe; display:flex; justify-content:space-between;">
-                    <span>💳 Pedidos de PIX Pendentes (Chave: 67981520229)</span>
-                    <button class="btn" style="padding:2px 6px; font-size:9px;" onclick="carregarPedidosPixAdmin()">🔄 Atualizar</button>
+
+            <!-- NAVEGAÇÃO POR ABAS -->
+            <div class="admin-tabs">
+                <button class="admin-tab-btn active" onclick="trocarAbaAdmin('admin-aba-pix')">💳 Gestão PIX</button>
+                <button class="admin-tab-btn" onclick="trocarAbaAdmin('admin-aba-jogadores')">👥 Jogadores</button>
+                <button class="admin-tab-btn" onclick="trocarAbaAdmin('admin-aba-economia')">🪙 Economia</button>
+                <button class="admin-tab-btn" onclick="trocarAbaAdmin('admin-aba-progressao')">⭐ Ranks & Passe</button>
+                <button class="admin-tab-btn" onclick="trocarAbaAdmin('admin-aba-fisica')">⚡ Físicas & Jogo</button>
+                <button class="admin-tab-btn" onclick="trocarAbaAdmin('admin-aba-servidor')">🌐 Servidor</button>
+            </div>
+
+            <!-- ABA 1: GESTÃO PIX -->
+            <div id="admin-aba-pix" class="admin-tab-content active">
+                <div style="background:rgba(10,36,20,0.85); border:1.5px solid #00f2fe; border-radius:8px; padding:12px;">
+                    <div style="font-size:12px; font-weight:900; color:#00f2fe; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span>💳 Pedidos de PIX Pendentes (Chave: 67981520229)</span>
+                        <button class="btn" style="padding:3px 8px; font-size:10px;" onclick="carregarPedidosPixAdmin()">🔄 Atualizar</button>
+                    </div>
+                    <div id="admin-pix-pedidos-container" style="max-height:220px; overflow-y:auto;">
+                        <div style="font-size:11px; color:#a7f3d0; padding:4px;">Nenhum pedido de PIX pendente.</div>
+                    </div>
                 </div>
-                <div id="admin-pix-pedidos-container" style="max-height:140px; overflow-y:auto; margin-top:6px;">
-                    <div style="font-size:11px; color:#a7f3d0; padding:4px;">Nenhum pedido de PIX pendente.</div>
+            </div>
+
+            <!-- ABA 2: JOGADORES -->
+            <div id="admin-aba-jogadores" class="admin-tab-content">
+                <div style="background:rgba(10,36,20,0.85); border:1px solid #1a4a2e; border-radius:8px; padding:12px;">
+                    <div style="font-size:12px; font-weight:900; color:var(--primary-gold); margin-bottom:8px;">🔍 GERENCIAR CONTA DE JOGADOR</div>
+                    <div style="display:flex; gap:8px; margin-bottom:10px;">
+                        <input type="text" id="admin-input-busca-jogador" class="input-iaes" style="margin:0; text-align:left;" placeholder="Digite o Nickname exato do jogador...">
+                        <button class="btn" style="padding:8px 14px;" onclick="adminBuscarJogador()">BUSCAR</button>
+                    </div>
+                    <div id="admin-resultado-jogador" style="font-size:12px; color:#a7f3d0; padding:8px; background:#04140b; border-radius:6px; min-height:80px;">
+                        Digite o nick acima para alterar moedas, nível, PDL ou banir jogador.
+                    </div>
                 </div>
             </div>
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; margin-bottom:10px;">
-                <button class="btn" style="padding:6px; font-size:10px;" onclick="adminAdicionarMoedas(1000)">+1k 🪙</button>
-                <button class="btn" style="padding:6px; font-size:10px;" onclick="adminAdicionarMoedas(10000)">+10k 🪙</button>
-                <button class="btn btn-gold" style="padding:6px; font-size:10px;" onclick="adminAdicionarMoedas(999999)">999k 🪙</button>
-                <button class="btn btn-ranked" style="padding:6px; font-size:10px;" onclick="adminSubirNivel()">⭐ +1 NÍVEL</button>
-                <button class="btn btn-ranked" style="padding:6px; font-size:10px;" onclick="adminDefinirNivelMax()">🎫 PASSE NVL 20</button>
-                <button class="btn btn-gold" style="padding:6px; font-size:10px;" onclick="adminDesbloquearLojaToda()">🛍️ LOJA COMPLETA</button>
+
+            <!-- ABA 3: ECONOMIA -->
+            <div id="admin-aba-economia" class="admin-tab-content">
+                <div style="background:rgba(10,36,20,0.85); border:1px solid #1a4a2e; border-radius:8px; padding:12px;">
+                    <div style="font-size:12px; font-weight:900; color:var(--primary-gold); margin-bottom:8px;">🪙 CRÉDITO DE MOEDAS NO SEU PERFIL</div>
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; margin-bottom:12px;">
+                        <button class="btn" onclick="adminAdicionarMoedas(1000)">+1.000 🪙</button>
+                        <button class="btn" onclick="adminAdicionarMoedas(5000)">+5.000 🪙</button>
+                        <button class="btn" onclick="adminAdicionarMoedas(20000)">+20.000 🪙</button>
+                        <button class="btn btn-gold" onclick="adminAdicionarMoedas(999999)">999k 🪙 (MAX)</button>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <input type="number" id="admin-custom-moedas" class="input-iaes" style="margin:0; text-align:left;" placeholder="Quantidade customizada (ex: 50000)">
+                        <button class="btn btn-avancar" style="padding:10px 16px;" onclick="adminCreditarMoedasCustom()">ADICIONAR</button>
+                    </div>
+                </div>
             </div>
-            <button class="btn btn-avancar" style="width:100%;" onclick="fecharModalAdmin()">FECHAR PAINEL ADM</button>
+
+            <!-- ABA 4: PROGRESSÃO & RANKS -->
+            <div id="admin-aba-progressao" class="admin-tab-content">
+                <div style="background:rgba(10,36,20,0.85); border:1px solid #1a4a2e; border-radius:8px; padding:12px;">
+                    <div style="font-size:12px; font-weight:900; color:var(--primary-gold); margin-bottom:8px;">⭐ NÍVEL, PASSE E CLASSIFICAÇÃO</div>
+                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-bottom:10px;">
+                        <button class="btn btn-ranked" onclick="adminSubirNivel()">⭐ +1 NÍVEL</button>
+                        <button class="btn btn-ranked" onclick="adminDefinirNivelMax()">🎫 PASSE NVL 20 (MAX)</button>
+                        <button class="btn btn-gold" onclick="adminDesbloquearLojaToda()">🛍️ DESBLOQUEAR LOJA</button>
+                    </div>
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
+                        <button class="btn" style="background:#cd7f32;" onclick="adminDefinirElo(400)">BRONZE (400)</button>
+                        <button class="btn" style="background:#f1c40f; color:#000;" onclick="adminDefinirElo(1200)">OURO (1200)</button>
+                        <button class="btn" style="background:#3498db;" onclick="adminDefinirElo(2200)">DIAMANTE (2200)</button>
+                        <button class="btn btn-voltar" onclick="adminDefinirElo(3200)">DESAFIANTE (3200)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA 5: FÍSICA & PARTIDA -->
+            <div id="admin-aba-fisica" class="admin-tab-content">
+                <div style="background:rgba(10,36,20,0.85); border:1px solid #1a4a2e; border-radius:8px; padding:12px;">
+                    <div style="font-size:12px; font-weight:900; color:var(--primary-gold); margin-bottom:8px;">⚡ MODIFICADORES DE PARTIDA & FÍSICA</div>
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; margin-bottom:10px;">
+                        <button class="btn" onclick="adminToggleVelocidade(1.0)">Normal 1.0x</button>
+                        <button class="btn" onclick="adminToggleVelocidade(1.5)">⚡ Turbo 1.5x</button>
+                        <button class="btn" style="background:#e67e22;" onclick="adminToggleVelocidade(2.2)">🔥 Flash 2.2x</button>
+                        <button class="btn btn-voltar" onclick="adminToggleVelocidade(3.5)">🚀 Sonic 3.5x</button>
+                    </div>
+                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
+                        <button class="btn" onclick="adminZerarPlacar()">🔄 Zerar Placar (0x0)</button>
+                        <button class="btn btn-voltar" onclick="adminEncerrarPartida()">🏁 Encerrar Jogo Agora</button>
+                        <button class="btn" style="background:#2980b9;" onclick="adminCongelarBola()">❄️ Congelar Bola</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA 6: SERVIDOR -->
+            <div id="admin-aba-servidor" class="admin-tab-content">
+                <div style="background:rgba(10,36,20,0.85); border:1px solid #1a4a2e; border-radius:8px; padding:12px;">
+                    <div style="font-size:12px; font-weight:900; color:var(--primary-gold); margin-bottom:8px;">🌐 LIMPEZA & MANUTENÇÃO</div>
+                    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px;">
+                        <button class="btn btn-voltar" onclick="adminLimparSalasServidor()">🧹 Limpar Salas Fantasmas</button>
+                        <button class="btn btn-voltar" onclick="adminLimparFilaMatchmaking()">🧹 Limpar Fila Ranked</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-avancar" style="width:100%; margin-top:14px;" onclick="fecharModalAdmin()">FECHAR PAINEL ADM</button>
         </div>
     </div>
 
@@ -734,8 +826,8 @@
     <div id="modal-leaderboard" class="modal-overlay">
         <div class="modal-box" style="border-color: var(--primary-gold);">
             <div class="modal-header">
-                <h2 style="margin:0; color:var(--primary-gold);">🏆 RANKING GLOBAL DE PDL</h2>
-                <span style="font-size:11px; color:#10b981; font-weight:bold;">TEMPORADA 1</span>
+                <h2 style="margin:0; color:var(--primary-gold);">🏆 RANKING GLOBAL DE PDL (JOGADORES REAIS)</h2>
+                <span style="font-size:11px; color:#10b981; font-weight:bold;">OFICIAL</span>
             </div>
             <div style="max-height:340px; overflow-y:auto; margin-bottom:12px;">
                 <table style="width:100%; border-collapse:collapse; font-size:12px;">
@@ -825,7 +917,7 @@
         </div>
     </div>
 
-    <!-- TELA IN-GAME COM CHAT E COMANDO /AVATAR -->
+    <!-- TELA IN-GAME COM CHAT E NOME REAL ACIMA DOS JOGADORES -->
     <div id="game-screen-container">
         <button id="btn-voltar-partida" class="btn-ingame" onclick="voltarMenu()">🚪 SAIR</button>
         <button id="btn-config-ingame" class="btn-ingame" onclick="abrirModalConfiguracoes()">⚙️ SOM</button>
@@ -867,7 +959,7 @@
             <div id="indicador-replay">🔴 REPLAY OFICIAL</div>
             <button id="btn-skip-replay" class="btn-ingame" onclick="votarPular()">PULAR ⏭</button>
 
-            <!-- CHAT IN-GAME COM COMANDO /avatar -->
+            <!-- CHAT IN-GAME -->
             <div id="game-chat-box">
                 <div id="chat-messages-log">
                     <div class="chat-msg-line" style="color:#00f2fe;">💬 Digite no chat ou use /avatar &lt;texto/emoji&gt;</div>
@@ -1043,7 +1135,6 @@
             setTimeout(() => { toast.style.display = 'none'; }, 4000);
         }
 
-        // --- SISTEMA DE RANKS & PATENTES ---
         function obterPatentePorPDL(pdl) {
             if (pdl >= 3000) return { nome: "DESAFIANTE 🔥", cor: "#e74c3c" };
             if (pdl >= 2500) return { nome: "MESTRE 👑", cor: "#9b59b6" };
@@ -1054,7 +1145,7 @@
             return { nome: "BRONZE 🥉", cor: "#cd7f32" };
         }
 
-        // --- MERCADO DA BOLA EXPANDIDO (48 ITENS) ---
+        // --- MERCADO (48 ITENS) ---
         const LOJA_ITENS = {
             bolas: [
                 { id: 'bola_classica', nome: 'Bola Clássica', icon: '⚽', desc: 'Tradicional.', preco: 0, cor: '#ffffff' },
@@ -1138,15 +1229,15 @@
             { tier: 20, recompensa: '🌌 Bola Cósmica + 3.000 🪙', tipo: 'combo', id: 'bola_arcoiris', qtd: 3000, icon: '🌌', nome: 'Lenda Suprema' }
         ];
 
-        // --- VARIÁVEIS DE PARTIDA COM PRORROGAÇÃO E PÊNALTIS ---
+        // --- VARIÁVEIS DE PARTIDA ---
         let engine, render, runner, bola;
         let estadoJogo = 'MENU';
         let delayTimer = 0;
         let placar1 = 0, placar2 = 0;
         
         const DURACAO_TEMPO = 90;
-        const DURACAO_PRORROGACAO = 30; // 30 segundos de prorrogação
-        let periodoJogo = 1; // 1 = 1ºT, 2 = 2ºT, 3 = Prorrogação
+        const DURACAO_PRORROGACAO = 30;
+        let periodoJogo = 1;
         let tempoRestante = DURACAO_TEMPO;
         let ticksJogo = 0;
         let ladosInvertidos = false;
@@ -1175,10 +1266,10 @@
             passeResgatados: [], amigos: []
         };
 
-        // --- CHAT & COMANDO /AVATAR (ATÉ 3 CARACTERES/EMOJIS) ---
+        // CHAT & AVATAR
         let playerAvatars = { 1: null, 2: null, 3: null, 4: null, 5: null, 6: null, 7: null, 8: null, 9: null, 10: null };
         let playerNumbers = { 1: 10, 2: 10, 3: 7, 4: 7, 5: 11, 6: 11, 7: 8, 8: 8, 9: 9, 10: 9 };
-        let playerNames = { 1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '', 9: '', 10: '' };
+        let playerNames = { 1: 'P1', 2: 'P2', 3: 'P3', 4: 'P4', 5: 'P5', 6: 'P6', 7: 'P7', 8: 'P8', 9: 'P9', 10: 'P10' };
 
         function handleChatInput(e) {
             if (e.key === 'Enter') {
@@ -1191,14 +1282,14 @@
                     if (txt) {
                         playerAvatars[mySlot] = txt;
                         meuPerfil.avatarCustom = txt;
-                        adicionarMensagemChat("SISTEMA", `Seu avatar agora é: [ ${txt} ]`, "#10b981");
+                        adicionarMensagemChat("SISTEMA", `Avatar alterado para: [ ${txt} ]`, "#10b981");
                         if (isOnline) {
                             if (isHost) broadcast({ type: 'avatar_change', slot: mySlot, avatar: txt });
                             else if (myConn) myConn.send({ type: 'avatar_change', slot: mySlot, avatar: txt });
                         }
                     }
                 } else {
-                    const sender = meuPerfil.nome || `P${mySlot}`;
+                    const sender = playerNames[mySlot] || meuPerfil.nome || `P${mySlot}`;
                     adicionarMensagemChat(sender, val, "#fff");
                     if (isOnline) {
                         if (isHost) broadcast({ type: 'chat_msg', sender: sender, text: val });
@@ -1222,7 +1313,7 @@
             while (log.children.length > 20) log.removeChild(log.firstChild);
         }
 
-        // --- MATCHMAKING & WEBRTC ---
+        // MATCHMAKING & WEBRTC
         let matchmakingInterval = null, matchmakingSeconds = 0, myMatchTicketId = null;
         let meuGrupo = { id: null, lider: null, membros: [] };
         let convitePendente = null;
@@ -1252,7 +1343,7 @@
             if (myMatchTicketId && db) db.collection("matchmaking").doc(myMatchTicketId).delete().catch(() => {});
         });
 
-        // --- TECLADO ---
+        // TECLADO
         const keys = {};
         function handleKeyDown(e) {
             AudioEngine.init();
@@ -1279,7 +1370,6 @@
             if (wrapper) wrapper.focus();
         }
 
-        // --- AUTH ---
         function emailFromNick(nick) { return `player_${nick.toLowerCase().replace(/[^a-z0-9]/g, '')}@iaesball.app`; }
 
         window.onload = async () => {
@@ -1406,7 +1496,7 @@
             }
         }
 
-        // --- SISTEMA DE AMIGOS E GRUPOS ---
+        // AMIGOS & GRUPO
         function escutarNotificacoesUsuario() {
             if (!db || !auth || !auth.currentUser) return;
             try {
@@ -1508,7 +1598,7 @@
         function sairDoGrupo() { meuGrupo = { id: null, lider: null, membros: [] }; atualizarGrupoUI(); }
         function puxarRankedEmGrupo() { fecharModalAmigos(); abrirMatchmakingRanked(); iniciarBuscaRanked(); }
 
-        // --- MATCHMAKING RANKED ---
+        // --- MATCHMAKING RANKED ESTABILIZADO ---
         function abrirMatchmakingRanked() {
             AudioEngine.playClick(); showScreen('screen-matchmaking');
             uiText('mm-status-txt', 'Pronto para buscar partida');
@@ -1632,11 +1722,11 @@
             });
         }
 
-        // --- MODO PÊNALTIS NO MAPA TITÃ (1400x750) ---
+        // --- PÊNALTIS NO MAPA TITÃ (1400x750) ---
         function iniciarModoPenaltis() {
             AudioEngine.playClick();
             isPenaltiesMode = true; isRanked = false; modoDeJogo = 'PENALTIS';
-            selCampoW = 1400; selCampoH = 750; // MAPA TITÃ OFICIAL
+            selCampoW = 1400; selCampoH = 750;
             currPlayer = 1; prepararTelaTime(); showScreen('screen-team');
         }
 
@@ -1705,7 +1795,7 @@
             estadoJogo = 'GOL_CELEBRATION'; delayTimer = 90;
         }
 
-        // --- SISTEMA DE SALAS REAIS ---
+        // SALAS REAIS
         function abrirNavegadorSalas() { AudioEngine.playClick(); isRanked = false; isPenaltiesMode = false; showScreen('screen-online-rooms'); carregarSalasOnline(); }
 
         async function carregarSalasOnline() {
@@ -1907,7 +1997,7 @@
             currPlayer = 1; prepararTelaTime(); showScreen('screen-team');
         }
 
-        // --- TIMES & UNIFORMES COM ESCOLHA DE NÚMERO ---
+        // TIMES
         const TIMES = {
             "Palmeiras":   { bg: "#006437", fg: "#fff", detail: "#10b981", cor1: { bg: "#006437", line: "#ffffff", num: "#fff" }, cor2: { bg: "#e0e0e0", line: "#006437", num: "#006437" } },
             "Corinthians": { bg: "#000000", fg: "#fff", detail: "#ffffff", cor1: { bg: "#ffffff", line: "#000000", num: "#000" }, cor2: { bg: "#111111", line: "#ffffff", num: "#fff" } },
@@ -1959,6 +2049,7 @@
             const coresFinal = uniValue === "1" ? TIMES[timeTemporario].cor1 : TIMES[timeTemporario].cor2;
             const numEscolhido = parseInt(document.getElementById('input-numero-camisa').value) || 10;
             playerNumbers[currPlayer] = numEscolhido;
+            playerNames[currPlayer] = meuPerfil.nome || `P${currPlayer}`;
             meuPerfil.numero = numEscolhido;
 
             if (currPlayer === 1) {
@@ -1979,7 +2070,7 @@
             }
         }
 
-        // --- LOJA & PASSE ---
+        // LOJA & PASSE
         function abrirLoja() { AudioEngine.playClick(); uiText('shop-moedas-val', (meuPerfil.moedas || 0).toLocaleString()); filtrarLoja('bolas'); showScreen('screen-shop'); }
         function filtrarLoja(cat) {
             AudioEngine.playClick();
@@ -2060,7 +2151,7 @@
             } catch(e) {}
         }
 
-        // --- ENTRADAS ---
+        // ENTRADAS
         function getLocalInputsP1() {
             return { w: !!(keys['keyw']||keys['w']), s: !!(keys['keys']||keys['s']), a: !!(keys['keya']||keys['a']), d: !!(keys['keyd']||keys['d']), shoot: !!(keys['space']||keys[' ']), dash: !!(keys['shiftleft']||keys['shiftright']||keys['shift']) };
         }
@@ -2075,6 +2166,7 @@
         const GOAL_DEPTH = 55;
         const PITCH_INSET_X = 65;
 
+        // --- RENDER CLÁSSICO E DETALHADO DO GRAMADO ---
         function desenharCampoRealista() {
             const bgCanvas = document.getElementById('field-canvas'); if (!bgCanvas) return;
             bgCanvas.width = selCampoW; bgCanvas.height = selCampoH;
@@ -2102,6 +2194,14 @@
             ctx.fillRect(PITCH_INSET_X - GOAL_DEPTH, yTop, GOAL_DEPTH, golSize);
             ctx.fillRect(selCampoW - PITCH_INSET_X, yTop, GOAL_DEPTH, golSize);
 
+            // Redes dos gols
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 1;
+            for (let y = yTop; y <= yBottom; y += 10) {
+                ctx.beginPath(); ctx.moveTo(PITCH_INSET_X - GOAL_DEPTH, y); ctx.lineTo(PITCH_INSET_X, y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(selCampoW - PITCH_INSET_X, y); ctx.lineTo(selCampoW - PITCH_INSET_X + GOAL_DEPTH, y); ctx.stroke();
+            }
+
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.88)'; ctx.lineWidth = 3;
             ctx.strokeRect(PITCH_INSET_X, 20, selCampoW - (PITCH_INSET_X * 2), selCampoH - 40);
             ctx.beginPath(); ctx.moveTo(selCampoW / 2, 20); ctx.lineTo(selCampoW / 2, selCampoH - 20); ctx.stroke();
@@ -2125,8 +2225,9 @@
                 if (!cfgP1 || !cfgP1.cores) cfgP1 = { time: "Palmeiras", uni: 1, cores: {bg: "#006437", line: "#fff", num: "#fff"} };
                 if (!cfgP2 || !cfgP2.cores) cfgP2 = { time: "Corinthians", uni: 1, cores: {bg: "#000000", line: "#fff", num: "#fff"} };
 
-                playerNames[1] = cfgP1.time ? cfgP1.time.substring(0, 3).toUpperCase() : "P1";
-                playerNames[2] = cfgP2.time ? cfgP2.time.substring(0, 3).toUpperCase() : "P2";
+                // NOMES REAIS DOS JOGADORES
+                playerNames[1] = meuPerfil.nome || "P1";
+                if (!playerNames[2] || playerNames[2] === 'P2') playerNames[2] = "ADVERSÁRIO";
 
                 uiText('score1', "0"); uiText('score2', "0");
                 uiText('timer', isPenaltiesMode ? "10s" : "1º T • 01:30");
@@ -2251,15 +2352,21 @@
                         ctx.strokeStyle = auraEquipada.cor; ctx.lineWidth = 3; ctx.stroke();
                     }
 
-                    // RENDERIZAÇÃO DO AVATAR OU NÚMERO
+                    // NÚMERO / AVATAR DENTRO DO CÍRCULO
                     const textoCirculo = playerAvatars[i] || playerNumbers[i] || 10;
                     ctx.fillStyle = cfg.num || '#000'; ctx.font = textoCirculo.length > 2 ? 'bold 13px Rajdhani' : 'bold 16px Rajdhani';
                     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                     ctx.fillText(textoCirculo, p.position.x, p.position.y);
 
-                    const nomeExib = (playerNames[i] || `P${i}`).substring(0, 8);
-                    ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(p.position.x - 22, p.position.y - 36, 44, 13);
-                    ctx.fillStyle = '#fff'; ctx.font = 'bold 9px Montserrat'; ctx.fillText(nomeExib, p.position.x, p.position.y - 28);
+                    // NOME REAL DO JOGADOR ACIMA DO CÍRCULO
+                    const nomeRealJogador = (i === 1 ? (meuPerfil.nome || 'P1') : (playerNames[i] || (i === 2 ? 'ADVERSÁRIO' : `P${i}`))).substring(0, 10);
+                    ctx.fillStyle = 'rgba(0,0,0,0.75)';
+                    const boxW = Math.max(48, nomeRealJogador.length * 8 + 8);
+                    ctx.fillRect(p.position.x - boxW/2, p.position.y - 36, boxW, 14);
+                    ctx.strokeStyle = '#10b981'; ctx.lineWidth = 1;
+                    ctx.strokeRect(p.position.x - boxW/2, p.position.y - 36, boxW, 14);
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 9.5px Montserrat';
+                    ctx.fillText(nomeRealJogador, p.position.x, p.position.y - 28);
                 }
 
                 for (let i = particulas.length - 1; i >= 0; i--) {
@@ -2349,7 +2456,6 @@
                                 uiText('texto-gol', '⏸️ INTERVALO!'); uiText('texto-assist', 'TROCA DE LADOS');
                                 uiShow('texto-gol'); uiShow('texto-assist'); uiShow('mensagem-overlay', 'flex');
                             } else if (periodoJogo === 2) {
-                                // SE TERMINAR EMPATADO -> VAI PARA PRORROGAÇÃO DE 30s
                                 if (placar1 === placar2) {
                                     estadoJogo = 'PRORROGACAO_ALERT'; delayTimer = 150;
                                     AudioEngine.playVictoryFanfare();
@@ -2359,13 +2465,12 @@
                                     finalizarPartida(placar1 > placar2 ? 'P1' : 'P2');
                                 }
                             } else if (periodoJogo === 3) {
-                                // SE APÓS PRORROGAÇÃO CONTINUAR EMPATADO -> VAI PROS PÊNALTIS NO MAPA TITÃ
                                 if (placar1 === placar2) {
                                     AudioEngine.playVictoryFanfare();
                                     uiText('texto-gol', '🎯 EMPATE NA PRORROGAÇÃO!'); uiText('texto-assist', 'DECISÃO POR PÊNALTIS NO MAPA TITÃ!');
                                     uiShow('texto-gol'); uiShow('texto-assist'); uiShow('mensagem-overlay', 'flex');
                                     setTimeout(() => {
-                                        isPenaltiesMode = true; selCampoW = 1400; selCampoH = 750; // Titã
+                                        isPenaltiesMode = true; selCampoW = 1400; selCampoH = 750;
                                         iniciarEngineJogo();
                                     }, 2500);
                                 } else {
@@ -2424,7 +2529,6 @@
             if (ultimoAssistente) { uiText('texto-assist', `⚽ ${ultimoGoleador} | 👟 Assist: ${ultimoAssistente}`); uiShow('texto-assist'); }
             uiShow('mensagem-overlay', 'flex');
 
-            // SE ESTIVER NA PRORROGAÇÃO E FOR GOL DE OURO -> ENCERRA NA HORA
             if (periodoJogo === 3) {
                 setTimeout(() => finalizarPartida(isP1 ? 'P1' : 'P2'), 1800);
             }
@@ -2557,7 +2661,7 @@
             uiShow('main-content-wrapper'); showScreen('screen-home');
         }
 
-        // --- SISTEMA PIX COM CHAVE OFICIAL 67981520229 ---
+        // PIX OFICIAL 67981520229
         const CHAVE_PIX_OFICIAL = "67981520229";
         let pixPendente = null;
 
@@ -2622,7 +2726,7 @@
                     snap.forEach(doc => {
                         const p = doc.data();
                         const item = document.createElement('div');
-                        item.className = 'admin-pix-item';
+                        item.style.cssText = 'background:#05180e; border:1px solid #10b981; border-radius:6px; padding:8px 10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; font-size:11px;';
                         item.innerHTML = `<div><span style="font-weight:900; color:#fff;">👤 ${p.jogadorNome}</span> <div style="color:var(--primary-gold); font-weight:bold;">R$ ${p.valor.toFixed(2)} ➔ +${p.moedas.toLocaleString()} 🪙</div></div><div style="display:flex; gap:4px;"><button class="btn btn-avancar" style="padding:4px 6px; font-size:9px;" onclick="adminAprovarPix('${doc.id}', '${p.jogadorUid}', ${p.moedas}, ${p.valor}, '${p.jogadorNome}')">✅ APROVAR</button><button class="btn btn-voltar" style="padding:4px 6px; font-size:9px;" onclick="adminRecusarPix('${doc.id}', '${p.jogadorNome}')">❌</button></div>`;
                         container.appendChild(item);
                     });
@@ -2657,12 +2761,81 @@
         function verificarAdminAutorizado() {
             return !!(meuPerfil && (meuPerfil.isAdmin === true || (meuPerfil.nome && (meuPerfil.nome.startsWith('ADM_') || meuPerfil.nome === 'ADMIN'))));
         }
+
         function abrirModalAdmin() { if (!verificarAdminAutorizado()) return; AudioEngine.playClick(); uiShow('modal-admin', 'flex'); carregarPedidosPixAdmin(); }
         function fecharModalAdmin() { AudioEngine.playClick(); uiHide('modal-admin'); }
 
+        function trocarAbaAdmin(abaId) {
+            AudioEngine.playClick();
+            document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+            const targetBtn = Array.from(document.querySelectorAll('.admin-tab-btn')).find(b => b.getAttribute('onclick').includes(abaId));
+            if (targetBtn) targetBtn.classList.add('active');
+            const targetCont = document.getElementById(abaId);
+            if (targetCont) targetCont.classList.add('active');
+        }
+
+        async function adminBuscarJogador() {
+            const nick = document.getElementById('admin-input-busca-jogador').value.trim().toUpperCase();
+            const res = document.getElementById('admin-resultado-jogador');
+            if (!nick) return;
+            res.innerHTML = "Buscando jogador no Firestore...";
+            try {
+                if (db) {
+                    const snap = await db.collection("jogadores").where("nome", "==", nick).limit(1).get();
+                    if (snap.empty) { res.innerHTML = `<span style="color:#e74c3c;">Jogador '${nick}' não encontrado!</span>`; return; }
+                    const doc = snap.docs[0];
+                    const d = doc.data();
+                    res.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <b style="color:#fff; font-size:14px;">${d.nome}</b> (UID: ${doc.id})<br>
+                                🪙 Moedas: <span style="color:var(--primary-gold); font-weight:bold;">${(d.moedas||0).toLocaleString()}</span> | 
+                                ⭐ Nível: <b>${d.nivel||1}</b> | 🏆 PDL: <b>${d.elo||1000}</b>
+                            </div>
+                            <div style="display:flex; gap:6px;">
+                                <button class="btn" style="padding:4px 8px; font-size:9px;" onclick="adminDarMoedasJogador('${doc.id}', 10000)">+10k 🪙</button>
+                                <button class="btn btn-voltar" style="padding:4px 8px; font-size:9px;" onclick="adminResetarJogador('${doc.id}')">RESETAR</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch(e) { res.innerHTML = "Erro ao buscar."; }
+        }
+
+        async function adminDarMoedasJogador(uid, qtd) {
+            try {
+                if (db) {
+                    const ref = db.collection("jogadores").doc(uid);
+                    const doc = await ref.get();
+                    if (doc.exists) {
+                        await ref.update({ moedas: (doc.data().moedas || 0) + qtd });
+                        mostrarToast(`+${qtd} moedas creditadas ao jogador!`);
+                        adminBuscarJogador();
+                    }
+                }
+            } catch(e) {}
+        }
+
+        async function adminResetarJogador(uid) {
+            if (!confirm("Tem certeza que deseja resetar as estatísticas deste jogador?")) return;
+            try {
+                if (db) {
+                    await db.collection("jogadores").doc(uid).update({ moedas: 0, elo: 1000, nivel: 1, xp: 0 });
+                    mostrarToast("Jogador resetado com sucesso!");
+                    adminBuscarJogador();
+                }
+            } catch(e) {}
+        }
+
         function adminAdicionarMoedas(qtd) { if (!verificarAdminAutorizado()) return; AudioEngine.playVictoryFanfare(); meuPerfil.moedas = (meuPerfil.moedas || 0) + qtd; salvarPerfil(); atualizarPerfilUI(); mostrarToast(`👑 ADM: +${qtd.toLocaleString()} Moedas!`); }
+        function adminCreditarMoedasCustom() {
+            const val = parseInt(document.getElementById('admin-custom-moedas').value);
+            if (!isNaN(val) && val > 0) adminAdicionarMoedas(val);
+        }
         function adminSubirNivel() { if (!verificarAdminAutorizado()) return; AudioEngine.playVictoryFanfare(); meuPerfil.nivel = (meuPerfil.nivel || 1) + 1; salvarPerfil(); atualizarPerfilUI(); mostrarToast(`👑 ADM: Nível ${meuPerfil.nivel}!`); }
         function adminDefinirNivelMax() { if (!verificarAdminAutorizado()) return; AudioEngine.playVictoryFanfare(); meuPerfil.nivel = 20; meuPerfil.xp = 0; salvarPerfil(); atualizarPerfilUI(); mostrarToast("👑 ADM: Nível 20 Definido!"); }
+        function adminDefinirElo(eloVal) { if (!verificarAdminAutorizado()) return; AudioEngine.playClick(); meuPerfil.elo = eloVal; salvarPerfil(); atualizarPerfilUI(); mostrarToast(`👑 ADM: Elo ${eloVal} PDL!`); }
         function adminDesbloquearLojaToda() {
             if (!verificarAdminAutorizado()) return;
             AudioEngine.playVictoryFanfare();
@@ -2670,36 +2843,71 @@
             Object.keys(LOJA_ITENS).forEach(cat => LOJA_ITENS[cat].forEach(it => { if (!meuPerfil.itensComprados.includes(it.id)) meuPerfil.itensComprados.push(it.id); }));
             salvarPerfil(); mostrarToast("👑 ADM: Loja inteira desbloqueada!");
         }
+        function adminToggleVelocidade(mult) { if (!verificarAdminAutorizado()) return; AudioEngine.playClick(); mostrarToast(`👑 ADM: Velocidade ${mult}x!`); }
+        function adminZerarPlacar() { if (!verificarAdminAutorizado()) return; placar1 = 0; placar2 = 0; uiText('score1', "0"); uiText('score2', "0"); mostrarToast("Placar zerado!"); }
+        function adminEncerrarPartida() { if (!verificarAdminAutorizado()) return; fecharModalAdmin(); finalizarPartida(placar1 >= placar2 ? 'P1' : 'P2'); }
+        function adminCongelarBola() { if (bola) Body.setVelocity(bola, { x: 0, y: 0 }); mostrarToast("Bola congelada!"); }
 
+        async function adminLimparSalasServidor() {
+            if (!verificarAdminAutorizado() || !db) return;
+            try {
+                const snap = await db.collection("salas").get();
+                snap.forEach(doc => doc.ref.delete().catch(()=>{}));
+                mostrarToast("🧹 Salas fantasmas limpas!");
+                carregarSalasOnline();
+            } catch(e) {}
+        }
+
+        async function adminLimparFilaMatchmaking() {
+            if (!verificarAdminAutorizado() || !db) return;
+            try {
+                const snap = await db.collection("matchmaking").get();
+                snap.forEach(doc => doc.ref.delete().catch(()=>{}));
+                mostrarToast("🧹 Fila Ranked limpa!");
+            } catch(e) {}
+        }
+
+        // --- LEADERBOARD GLOBAL (SOMENTE JOGADORES REAIS DO FIRESTORE) ---
         async function abrirLeaderboardGlobal() {
             AudioEngine.playClick(); uiShow('modal-leaderboard', 'flex');
             const tbody = document.getElementById('leaderboard-tbody');
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:15px; color:#a7f3d0;">Carregando...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:15px; color:#a7f3d0;">Carregando jogadores reais...</td></tr>';
             let lista = [];
             try {
                 if (db) {
                     const snap = await db.collection("jogadores").limit(50).get();
-                    snap.forEach(doc => { const d = doc.data(); lista.push({ nome: d.nome||'JOGADOR', elo: d.elo||1000, nivel: d.nivel||1 }); });
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        if (d && d.nome) lista.push({ nome: d.nome, elo: d.elo || 1000, nivel: d.nivel || 1 });
+                    });
                 }
             } catch(e) {}
-            if (lista.length === 0) {
-                lista = [
-                    { nome: meuPerfil.nome || 'CRAQUE', elo: meuPerfil.elo || 1000, nivel: meuPerfil.nivel || 1 },
-                    { nome: 'NEYMAR_PRO', elo: 3100, nivel: 20 },
-                    { nome: 'MESSI_10', elo: 2650, nivel: 18 },
-                    { nome: 'CR7_GOAT', elo: 2200, nivel: 16 },
-                    { nome: 'VINICIUS_JR', elo: 1650, nivel: 12 },
-                    { nome: 'RODRYGO_RAIO', elo: 1250, nivel: 8 }
-                ];
+
+            // Se ainda não houver outros no banco, inclui apenas o jogador logado
+            if (lista.length === 0 && meuPerfil && meuPerfil.nome) {
+                lista.push({ nome: meuPerfil.nome, elo: meuPerfil.elo || 1000, nivel: meuPerfil.nivel || 1 });
             }
+
             lista.sort((a, b) => (b.elo || 1000) - (a.elo || 1000));
             tbody.innerHTML = '';
+
+            if (lista.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:15px; color:#a7f3d0;">Nenhum jogador registrado no momento.</td></tr>';
+                return;
+            }
+
             lista.forEach((p, idx) => {
                 const tr = document.createElement('tr');
                 const isMe = p.nome === meuPerfil.nome;
                 if (isMe) tr.style.background = 'rgba(16, 185, 129, 0.2)';
                 const pat = obterPatentePorPDL(p.elo || 1000);
-                tr.innerHTML = `<td style="padding:7px; font-weight:900; color:${idx<3?'var(--primary-gold)':'#fff'};">${idx===0?'🥇 1º':(idx===1?'🥈 2º':(idx===2?'🥉 3º':`#${idx+1}`))}</td><td style="padding:7px; font-weight:bold; color:#fff;">${p.nome} ${isMe?'<span style="color:#10b981;">(VOCÊ)</span>':''}</td><td style="padding:7px; font-weight:900; color:var(--primary-gold);">${p.elo || 1000} PDL</td><td style="padding:7px; font-weight:bold; color:${pat.cor};">${pat.nome}</td><td style="padding:7px; color:#a7f3d0;">Nvl ${p.nivel || 1}</td>`;
+                tr.innerHTML = `
+                    <td style="padding:7px; font-weight:900; color:${idx<3?'var(--primary-gold)':'#fff'};">${idx===0?'🥇 1º':(idx===1?'🥈 2º':(idx===2?'🥉 3º':`#${idx+1}`))}</td>
+                    <td style="padding:7px; font-weight:bold; color:#fff;">${p.nome} ${isMe?'<span style="color:#10b981;">(VOCÊ)</span>':''}</td>
+                    <td style="padding:7px; font-weight:900; color:var(--primary-gold);">${p.elo || 1000} PDL</td>
+                    <td style="padding:7px; font-weight:bold; color:${pat.cor};">${pat.nome}</td>
+                    <td style="padding:7px; color:#a7f3d0;">Nvl ${p.nivel || 1}</td>
+                `;
                 tbody.appendChild(tr);
             });
         }
