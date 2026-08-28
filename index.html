@@ -643,36 +643,59 @@
             </div>
         </div>
 
-        <!-- LOBBY MULTIPLAYER -->
+        <!-- LOBBY MULTIPLAYER EXPANDIDO ATÉ 10 JOGADORES -->
         <div id="screen-online-host" class="screen">
-            <div class="screen-card-cartoon" style="max-width: 720px;">
-                <h1 style="font-size:26px; color:#2ecc71;">🎮 LOBBY MULTIPLAYER</h1>
-                <div id="txt-codigo-sala" style="font-size:17px; font-weight:900; color:#00d2d3; padding:8px; background:#000; border-radius:8px; margin:8px 0; border:2px solid #00d2d3;">GERANDO SALA...</div>
-                <button class="btn-cartoon cyan" style="padding:6px 14px; font-size:11px; margin-bottom:8px;" onclick="copiarCodigoSala()">📋 COPIAR CÓDIGO DA SALA</button>
-                <div id="host-network-status" style="font-size:13px; color:#a7f3d0; font-weight:800; margin-bottom:10px;">🟢 Sala pronta para conexões!</div>
+            <div class="screen-card-cartoon" style="max-width: 760px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <h1 style="font-size:24px; color:#2ecc71; margin:0;">🎮 LOBBY MULTIPLAYER</h1>
+                    <span id="lobby-modo-badge" style="background:#0d3820; border:2px solid #2ecc71; color:#2ecc71; padding:4px 12px; border-radius:20px; font-weight:900; font-size:12px;">5v5 SOCIETY (10 JOGADORES)</span>
+                </div>
                 
-                <div style="display:flex; gap:12px; width:100%; margin:10px 0;">
+                <div id="txt-codigo-sala" style="font-size:17px; font-weight:900; color:#00d2d3; padding:8px; background:#000; border-radius:8px; margin:6px 0; border:2px solid #00d2d3;">GERANDO SALA...</div>
+                <button class="btn-cartoon cyan" style="padding:6px 14px; font-size:11px; margin-bottom:8px;" onclick="copiarCodigoSala()">📋 COPIAR CÓDIGO DA SALA</button>
+                <div id="host-network-status" style="font-size:13px; color:#a7f3d0; font-weight:800; margin-bottom:8px;">🟢 Sala pronta para conexões!</div>
+                
+                <!-- BOTÕES DE TROCAR DE TIME NO LOBBY -->
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <button class="btn-cartoon" style="flex:1; padding:10px; background:#1e3799; border-color:#3498db;" onclick="solicitarTrocaTime(1)">🔵 ENTRAR NO TIME 1</button>
+                    <button class="btn-cartoon" style="flex:1; padding:10px; background:#b71540; border-color:#e74c3c;" onclick="solicitarTrocaTime(2)">🔴 ENTRAR NO TIME 2</button>
+                </div>
+
+                <div style="display:flex; gap:12px; width:100%; margin:8px 0;">
                     <div style="flex:1; background:rgba(41,128,185,0.2); border:3px solid #3498db; padding:12px; border-radius:12px;">
-                        <h3 style="color:#3498db; margin-bottom:8px;">🔵 TIME 1 (HOST)</h3>
-                        <div id="lobby-t1-container" style="display:flex; flex-direction:column; gap:6px;"></div>
+                        <h3 style="color:#3498db; margin-bottom:8px; display:flex; justify-content:space-between;">
+                            <span>🔵 TIME 1</span>
+                            <span id="t1-count" style="font-size:12px; color:#a7f3d0;">1/5</span>
+                        </h3>
+                        <div id="lobby-t1-container" style="display:flex; flex-direction:column; gap:6px; max-height:220px; overflow-y:auto;"></div>
                     </div>
                     <div style="flex:1; background:rgba(192,57,43,0.2); border:3px solid #e74c3c; padding:12px; border-radius:12px;">
-                        <h3 style="color:#e74c3c; margin-bottom:8px;">🔴 TIME 2 (CLIENT)</h3>
-                        <div id="lobby-t2-container" style="display:flex; flex-direction:column; gap:6px;"></div>
+                        <h3 style="color:#e74c3c; margin-bottom:8px; display:flex; justify-content:space-between;">
+                            <span>🔴 TIME 2</span>
+                            <span id="t2-count" style="font-size:12px; color:#a7f3d0;">0/5</span>
+                        </h3>
+                        <div id="lobby-t2-container" style="display:flex; flex-direction:column; gap:6px; max-height:220px; overflow-y:auto;"></div>
                     </div>
                 </div>
 
-                <button class="btn-cartoon" id="btn-host-avancar" style="width:100%; padding:14px; font-size:14px;" onclick="avancarAposLobby()">▶️ ESCOLHER TIMES E INICIAR ➔</button>
-                <button class="btn-cartoon red" style="width:100%; margin-top:10px;" onclick="cancelarOnline()">SAIR DA SALA</button>
+                <!-- ÁREA DE AÇÃO -->
+                <div id="host-action-area" style="width:100%;">
+                    <button class="btn-cartoon" id="btn-host-avancar" style="width:100%; padding:14px; font-size:15px;" onclick="avancarAposLobby()">▶️ ESCOLHER TIMES E INICIAR ➔</button>
+                </div>
+                <div id="client-waiting-area" style="display:none; width:100%; padding:10px; background:#061f12; border:2px solid #2ecc71; border-radius:10px; color:#2ecc71; font-weight:900; font-size:14px; margin-bottom:6px;">
+                    🟡 Aguardando o Host iniciar a escolha de times...
+                </div>
+
+                <button class="btn-cartoon red" style="width:100%; margin-top:6px;" onclick="cancelarOnline()">SAIR DA SALA</button>
             </div>
         </div>
 
-        <!-- CLIENT ESPERANDO -->
+        <!-- CLIENT ESPERANDO / TRANSIÇÃO -->
         <div id="screen-client-waiting" class="screen">
-            <div class="screen-card-cartoon" style="max-width: 500px;">
-                <h2 id="txt-meu-slot-client" style="color:#00d2d3;">CONECTANDO À SALA...</h2>
+            <div class="screen-card-cartoon" style="max-width: 520px;">
+                <h2 id="txt-meu-slot-client" style="color:#00d2d3;">ESCOLHA DE TIMES ONLINE</h2>
                 <div style="font-size: 15px; font-weight:800; padding:16px; background:#000; border:3px solid #f1c40f; border-radius:12px; margin:14px 0; color:#f1c40f;" id="txt-status-client-lobby">Iniciando conexão com o Host...</div>
-                <button class="btn-cartoon red" onclick="cancelarOnline()">DESCONECTAR</button>
+                <button class="btn-cartoon red" onclick="cancelarOnline()">CANCELAR / SAIR</button>
             </div>
         </div>
 
@@ -1784,6 +1807,14 @@
             });
         }
 
+        function obterMaxJogadoresModo(modo) {
+            if (!modo) return 2;
+            if (modo.includes('5V5')) return 10;
+            if (modo.includes('3V3')) return 6;
+            if (modo.includes('2V2')) return 4;
+            return 2;
+        }
+
         function abrirModalCriarSala() { AudioEngine.playClick(); uiShow('modal-criar-sala', 'flex'); }
         function fecharModalCriarSala() { AudioEngine.playClick(); uiHide('modal-criar-sala'); }
 
@@ -1797,7 +1828,11 @@
 
             isOnline = true; isHost = true; mySlot = 1; modoDeJogo = modo; isRanked = false; isPenaltiesMode = false;
             selCampoW = parseInt(estadioDim[0]); selCampoH = parseInt(estadioDim[1]);
-            pendingRoomConfig = { nome: nome, modo: modo, w: selCampoW, h: selCampoH };
+            const maxJog = obterMaxJogadoresModo(modo);
+            pendingRoomConfig = { nome: nome, modo: modo, w: selCampoW, h: selCampoH, max: maxJog };
+
+            playerNames = { 1: meuPerfil.nome || "HOST" };
+            playerNumbers = { 1: meuPerfil.numero || 10 };
 
             showScreen('screen-online-host');
             iniciarPeerHost();
@@ -1812,17 +1847,17 @@
         }
 
         function iniciarPeerHost() {
-            playerNames[1] = meuPerfil.nome || "HOST";
-            playerNumbers[1] = meuPerfil.numero || 10;
-            playerNames[2] = null;
+            playerNames = { 1: meuPerfil.nome || "HOST" };
+            playerNumbers = { 1: meuPerfil.numero || 10 };
             
             myRoomID = 'IAES_' + Math.random().toString(36).substring(2, 7).toUpperCase();
             uiText('txt-codigo-sala', `SALA: ${myRoomID}`);
             uiText('host-network-status', `🟡 Abrindo conexão global WebRTC...`);
 
+            const maxJog = (pendingRoomConfig && pendingRoomConfig.max) || obterMaxJogadoresModo(modoDeJogo);
             const salaData = {
                 id: myRoomID, nome: (pendingRoomConfig && pendingRoomConfig.nome) || "SALA OFICIAL", host: meuPerfil.nome || "CRAQUE",
-                modo: modoDeJogo, max: 2, selCampoW: selCampoW, selCampoH: selCampoH,
+                modo: modoDeJogo, max: maxJog, selCampoW: selCampoW, selCampoH: selCampoH,
                 jogadores: 1, criadoEmSec: Math.floor(Date.now() / 1000)
             };
             adicionarSalaNoCache(salaData);
@@ -1849,7 +1884,8 @@
                         conn.on('open', () => {
                             conn.send({
                                 type: 'host_ack', targetRoom: myRoomID,
-                                hostName: meuPerfil.nome, modo: modoDeJogo, w: selCampoW, h: selCampoH
+                                hostName: meuPerfil.nome, modo: modoDeJogo, w: selCampoW, h: selCampoH,
+                                names: playerNames, nums: playerNumbers, max: maxJog
                             });
                         });
                         conn.on('data', (data) => {
@@ -1910,10 +1946,10 @@
                     peerInstance.on('open', () => {
                         activePeerConn = peerInstance.connect(myRoomID, { reliable: true });
                         activePeerConn.on('open', () => {
-                            uiText('txt-status-client-lobby', `🟢 Conectado ao Host via WebRTC! Entrando na sala...`);
+                            uiText('txt-status-client-lobby', `🟢 Conectado ao Host via WebRTC! Entrando no Lobby...`);
                             activePeerConn.send({
                                 type: 'client_join', targetRoom: myRoomID,
-                                nome: meuPerfil.nome || 'JOGADOR 2', numero: meuPerfil.numero || 7
+                                nome: meuPerfil.nome || 'JOGADOR', numero: meuPerfil.numero || 7
                             });
                         });
                         activePeerConn.on('data', (data) => {
@@ -1935,7 +1971,7 @@
             const enviarTentativaJoin = () => {
                 const joinPacket = {
                     type: 'client_join', targetRoom: myRoomID,
-                    nome: meuPerfil.nome || 'JOGADOR 2', numero: meuPerfil.numero || 7
+                    nome: meuPerfil.nome || 'JOGADOR', numero: meuPerfil.numero || 7
                 };
                 if (activePeerConn && activePeerConn.open) {
                     try { activePeerConn.send(joinPacket); } catch(e) {}
@@ -1949,21 +1985,91 @@
             clientJoinTimer = setInterval(enviarTentativaJoin, 500);
         }
 
+        function solicitarTrocaTime(timeNum) {
+            AudioEngine.playClick();
+            const max = obterMaxJogadoresModo(modoDeJogo);
+            const teamSlots = timeNum === 1 ? [1, 3, 5, 7, 9].filter(s => s <= max) : [2, 4, 6, 8, 10].filter(s => s <= max);
+
+            if (isHost) {
+                if (teamSlots.includes(mySlot)) return; // Já está nesse time
+                const freeSlot = teamSlots.find(s => !playerNames[s]);
+                if (freeSlot) {
+                    delete playerNames[mySlot]; delete playerNumbers[mySlot];
+                    mySlot = freeSlot;
+                    playerNames[mySlot] = meuPerfil.nome || "HOST";
+                    playerNumbers[mySlot] = meuPerfil.numero || 10;
+                    renderLobbySlotsHost();
+                    broadcast({
+                        type: 'lobby_sync', targetRoom: myRoomID,
+                        names: playerNames, nums: playerNumbers, modo: modoDeJogo, max: max
+                    });
+                    mostrarToast(`🔵 Você mudou para o Time ${timeNum}!`);
+                } else {
+                    mostrarToast(`⚠️ O Time ${timeNum} já está cheio!`);
+                }
+            } else {
+                broadcast({
+                    type: 'request_team_change', targetRoom: myRoomID,
+                    targetTeam: timeNum, fromSlot: mySlot,
+                    nome: meuPerfil.nome || 'JOGADOR', num: meuPerfil.numero || 7
+                });
+            }
+        }
+
         function processarPacoteRede(data) {
             if (!data) return;
             if (data.targetRoom && myRoomID && data.targetRoom.toUpperCase() !== myRoomID.toUpperCase()) return;
 
             if (isHost) {
                 if (data.type === 'client_join') {
-                    playerNames[2] = data.nome || "CLIENT";
-                    playerNumbers[2] = data.numero || 7;
+                    const max = obterMaxJogadoresModo(modoDeJogo);
+                    // Procura primeiro slot livre no Time 2 (visitante), depois no Time 1
+                    let freeSlot = [2, 4, 6, 8, 10, 1, 3, 5, 7, 9].find(s => s <= max && !playerNames[s]);
+                    if (!freeSlot) freeSlot = 2;
+                    playerNames[freeSlot] = data.nome || `CLIENT_${freeSlot}`;
+                    playerNumbers[freeSlot] = data.numero || 7;
                     renderLobbySlotsHost();
                     broadcast({
-                        type: 'host_ack', targetRoom: myRoomID,
-                        hostName: meuPerfil.nome, modo: modoDeJogo, w: selCampoW, h: selCampoH
+                        type: 'lobby_sync', targetRoom: myRoomID,
+                        names: playerNames, nums: playerNumbers, modo: modoDeJogo,
+                        assignedSlot: freeSlot, targetClientName: data.nome, max: max,
+                        hostName: meuPerfil.nome
                     });
                 }
-                if (data.type === 'client_input') remoteInputs[2] = data.keys;
+                if (data.type === 'request_team_change') {
+                    const max = obterMaxJogadoresModo(modoDeJogo);
+                    const teamSlots = data.targetTeam === 1 ? [1, 3, 5, 7, 9].filter(s => s <= max) : [2, 4, 6, 8, 10].filter(s => s <= max);
+                    const freeSlot = teamSlots.find(s => !playerNames[s]);
+                    if (freeSlot) {
+                        if (data.fromSlot && playerNames[data.fromSlot]) {
+                            delete playerNames[data.fromSlot]; delete playerNumbers[data.fromSlot];
+                        }
+                        playerNames[freeSlot] = data.nome;
+                        playerNumbers[freeSlot] = data.num;
+                        renderLobbySlotsHost();
+                        broadcast({
+                            type: 'lobby_sync', targetRoom: myRoomID,
+                            names: playerNames, nums: playerNumbers, modo: modoDeJogo,
+                            assignedSlot: freeSlot, targetClientName: data.nome, max: max
+                        });
+                    }
+                }
+                if (data.type === 'p2_team_confirmed') {
+                    cfgP2 = data.cfgP2;
+                    playerNumbers[2] = data.p2Num || 7;
+                    broadcast({
+                        type: 'start_match', targetRoom: myRoomID,
+                        cfgP1: cfgP1, cfgP2: cfgP2,
+                        w: selCampoW, h: selCampoH, modo: modoDeJogo,
+                        names: playerNames, nums: playerNumbers
+                    });
+                    uiHide('main-content-wrapper');
+                    iniciarEngineJogo();
+                }
+                if (data.type === 'client_input') {
+                    const slot = data.slot || 2;
+                    remoteInputs[slot] = data.keys;
+                }
                 if (data.type === 'client_skip_replay') finalizarReplay();
                 if (data.type === 'chat_msg') {
                     adicionarMensagemChat(data.sender, data.text, '#00d2d3');
@@ -1975,10 +2081,32 @@
                 }
             } else {
                 // Client
-                if (data.type === 'host_ack') {
+                if (data.type === 'host_ack' || data.type === 'lobby_sync') {
                     if (clientJoinTimer) { clearInterval(clientJoinTimer); clientJoinTimer = null; }
-                    modoDeJogo = data.modo; selCampoW = data.w; selCampoH = data.h;
-                    uiText('txt-status-client-lobby', `🟢 Conectado ao Host (${data.hostName})! Aguardando início...`);
+                    modoDeJogo = data.modo || modoDeJogo;
+                    if (data.w) selCampoW = data.w;
+                    if (data.h) selCampoH = data.h;
+                    if (data.names) playerNames = data.names;
+                    if (data.nums) playerNumbers = data.nums;
+                    if (data.targetClientName === meuPerfil.nome && data.assignedSlot) {
+                        mySlot = data.assignedSlot;
+                    }
+                    showScreen('screen-online-host');
+                    renderLobbySlotsHost();
+                }
+                if (data.type === 'p2_pick_team') {
+                    cfgP1 = data.cfgP1;
+                    // Se sou o capitão do Time 2 (Slot 2 ou primeiro jogador do Time 2)
+                    if (mySlot === 2 || (mySlot % 2 === 0)) {
+                        currPlayer = 2;
+                        prepararTelaTime();
+                        uiText('title-jogador-team', "CAPITÃO TIME 2: ESCOLHA SEU TIME");
+                        showScreen('screen-team');
+                    } else {
+                        showScreen('screen-client-waiting');
+                        uiText('txt-meu-slot-client', 'TIME 1: ' + cfgP1.time.toUpperCase());
+                        uiText('txt-status-client-lobby', '🟡 O Capitão do Time 2 está escolhendo o uniforme...');
+                    }
                 }
                 if (data.type === 'start_match') {
                     if (clientJoinTimer) { clearInterval(clientJoinTimer); clientJoinTimer = null; }
@@ -1997,8 +2125,62 @@
         function renderLobbySlotsHost() {
             const cT1 = document.getElementById('lobby-t1-container'), cT2 = document.getElementById('lobby-t2-container');
             if(!cT1 || !cT2) return;
-            cT1.innerHTML = `<div style="background:#061f12; border:2px solid #3498db; padding:8px 12px; border-radius:8px; font-weight:900;">🟢 P1: ${playerNames[1] || meuPerfil.nome} (Nº ${playerNumbers[1]||10})</div>`;
-            cT2.innerHTML = `<div style="background:#1f0608; border:2px solid #e74c3c; padding:8px 12px; border-radius:8px; font-weight:900;">${playerNames[2] ? '🟢 P2: ' + playerNames[2] + ' (Nº ' + (playerNumbers[2]||7) + ')' : '🟡 Aguardando Jogador 2...'}</div>`;
+            cT1.innerHTML = ''; cT2.innerHTML = '';
+            
+            const max = obterMaxJogadoresModo(modoDeJogo);
+            const teamSlotsT1 = [1, 3, 5, 7, 9].filter(s => s <= max);
+            const teamSlotsT2 = [2, 4, 6, 8, 10].filter(s => s <= max);
+
+            const badge = document.getElementById('lobby-modo-badge');
+            if (badge) {
+                const nomesModo = { 'CLASSICO': '1v1 DUELO (2 JOGADORES)', 'CLASSICO_2V2': '2v2 DUPLAS (4 JOGADORES)', 'CLASSICO_3V3': '3v3 TRIO (6 JOGADORES)', 'CLASSICO_5V5': '5v5 SOCIETY (10 JOGADORES)' };
+                badge.innerText = nomesModo[modoDeJogo] || `${modoDeJogo} (${max} JOGADORES)`;
+            }
+
+            let countT1 = 0, countT2 = 0;
+
+            teamSlotsT1.forEach(slot => {
+                const nome = playerNames[slot];
+                const num = playerNumbers[slot] || (slot === 1 ? 10 : 7);
+                const isMe = (isHost && slot === mySlot) || (!isHost && slot === mySlot);
+                if (nome) countT1++;
+                cT1.innerHTML += `
+                    <div style="background:${nome ? '#061f12' : 'rgba(0,0,0,0.3)'}; border:2px solid ${isMe ? '#f1c40f' : (nome ? '#3498db' : '#2c3e50')}; padding:8px 12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:900; color:${nome ? '#fff' : '#64748b'}; font-size:13px;">
+                            ${nome ? '🔵 ' + (slot===1?'[CAPITÃO] ':'') + nome + ` (Nº ${num})` : `⚪ Slot ${slot} (Vazio)`}
+                        </span>
+                        ${isMe ? '<span style="background:#f1c40f; color:#000; font-size:10px; font-weight:900; padding:2px 6px; border-radius:6px;">VOCÊ</span>' : ''}
+                    </div>
+                `;
+            });
+
+            teamSlotsT2.forEach(slot => {
+                const nome = playerNames[slot];
+                const num = playerNumbers[slot] || 7;
+                const isMe = (isHost && slot === mySlot) || (!isHost && slot === mySlot);
+                if (nome) countT2++;
+                cT2.innerHTML += `
+                    <div style="background:${nome ? '#1f0608' : 'rgba(0,0,0,0.3)'}; border:2px solid ${isMe ? '#f1c40f' : (nome ? '#e74c3c' : '#2c3e50')}; padding:8px 12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:900; color:${nome ? '#fff' : '#64748b'}; font-size:13px;">
+                            ${nome ? '🔴 ' + (slot===2?'[CAPITÃO] ':'') + nome + ` (Nº ${num})` : `⚪ Slot ${slot} (Vazio)`}
+                        </span>
+                        ${isMe ? '<span style="background:#f1c40f; color:#000; font-size:10px; font-weight:900; padding:2px 6px; border-radius:6px;">VOCÊ</span>' : ''}
+                    </div>
+                `;
+            });
+
+            uiText('t1-count', `${countT1}/${teamSlotsT1.length}`);
+            uiText('t2-count', `${countT2}/${teamSlotsT2.length}`);
+
+            const hostArea = document.getElementById('host-action-area');
+            const clientArea = document.getElementById('client-waiting-area');
+            if (isHost) {
+                if (hostArea) hostArea.style.display = 'block';
+                if (clientArea) clientArea.style.display = 'none';
+            } else {
+                if (hostArea) hostArea.style.display = 'none';
+                if (clientArea) clientArea.style.display = 'block';
+            }
         }
 
         function broadcast(msg) {
@@ -2013,7 +2195,10 @@
 
         function avancarAposLobby() {
             AudioEngine.playClick();
-            currPlayer = 1; prepararTelaTime(); showScreen('screen-team');
+            currPlayer = 1;
+            prepararTelaTime();
+            uiText('title-jogador-team', "CAPITÃO TIME 1 (HOST): ESCOLHA SEU TIME");
+            showScreen('screen-team');
         }
 
         function sincronizarJogoCliente(data) {
@@ -2141,14 +2326,32 @@
                 cfgP1 = { time: timeTemporario, uni: uniValue, cores: coresFinal };
                 timeTemporario = "";
                 if (isOnline) {
-                    cfgP2 = { time: "Corinthians", uni: 1, cores: TIMES["Corinthians"].cor1 };
-                    broadcast({
-                        type: 'start_match', cfgP1: cfgP1, cfgP2: cfgP2,
-                        w: selCampoW, h: selCampoH, modo: modoDeJogo,
-                        names: playerNames, nums: playerNumbers
-                    });
-                    uiHide('main-content-wrapper');
-                    iniciarEngineJogo();
+                    // Verifica se existe jogador no Time 2
+                    const hasTeam2Player = [2, 4, 6, 8, 10].some(s => !!playerNames[s]);
+                    if (hasTeam2Player) {
+                        broadcast({
+                            type: 'p2_pick_team', targetRoom: myRoomID,
+                            cfgP1: cfgP1, hostName: meuPerfil.nome
+                        });
+                        showScreen('screen-client-waiting');
+                        uiText('txt-meu-slot-client', `TIME 1: ${cfgP1.time.toUpperCase()}`);
+                        uiText('txt-status-client-lobby', `🟡 Aguardando o Capitão do Time 2 (${playerNames[2] || 'P2'}) escolher o time...`);
+                    } else {
+                        // Host jogando sozinho / teste
+                        const adversariosPossiveis = ["Corinthians", "Flamengo", "Real Madrid", "Barcelona", "São Paulo", "Santos"];
+                        const timeAdv = adversariosPossiveis.find(t => t !== cfgP1.time) || "Corinthians";
+                        cfgP2 = { time: timeAdv, uni: 1, cores: TIMES[timeAdv].cor1 };
+                        playerNames[2] = playerNames[2] || "BOT_RIVAL";
+                        playerNumbers[2] = playerNumbers[2] || 7;
+                        broadcast({
+                            type: 'start_match', targetRoom: myRoomID,
+                            cfgP1: cfgP1, cfgP2: cfgP2,
+                            w: selCampoW, h: selCampoH, modo: modoDeJogo,
+                            names: playerNames, nums: playerNumbers
+                        });
+                        uiHide('main-content-wrapper');
+                        iniciarEngineJogo();
+                    }
                 } else if (isRanked) {
                     // Adversário Ranked Automático (Bot Competitivo)
                     const adversariosPossiveis = ["Corinthians", "Flamengo", "Real Madrid", "Barcelona", "São Paulo", "Santos"];
@@ -2164,8 +2367,18 @@
             } else {
                 cfgP2 = { time: timeTemporario, uni: uniValue, cores: coresFinal };
                 timeTemporario = "";
-                uiHide('main-content-wrapper');
-                iniciarEngineJogo();
+                if (isOnline) {
+                    broadcast({
+                        type: 'p2_team_confirmed', targetRoom: myRoomID,
+                        cfgP2: cfgP2, p2Num: numEscolhido
+                    });
+                    showScreen('screen-client-waiting');
+                    uiText('txt-meu-slot-client', `TIME 2: ${cfgP2.time.toUpperCase()}`);
+                    uiText('txt-status-client-lobby', `🟢 Time confirmado! Entrando na partida...`);
+                } else {
+                    uiHide('main-content-wrapper');
+                    iniciarEngineJogo();
+                }
             }
         }
 
@@ -3057,8 +3270,13 @@
         function processarControles() {
             let inputs = {};
             if (isOnline && isHost) {
-                inputs[1] = getLocalInputsP1();
-                inputs[2] = remoteInputs[2] || getLocalInputsP2();
+                const hostSlot = mySlot || 1;
+                inputs[hostSlot] = getLocalInputsP1();
+                for (let s = 1; s <= 10; s++) {
+                    if (s !== hostSlot) {
+                        inputs[s] = remoteInputs[s] || {};
+                    }
+                }
             } else if (isOnline && !isHost) {
                 return;
             } else {
