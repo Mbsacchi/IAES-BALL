@@ -123,7 +123,7 @@
         .mode-card-desc { font-size: 10px; color: #a0aec0; margin-top: 4px; line-height: 1.3; }
         .mode-card-badge { align-self: flex-start; margin-top: 8px; font-size: 9px; font-weight: 900; padding: 2px 7px; border-radius: 4px; }
 
-        .menu-sub-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; width: 100%; margin-top: 8px; }
+        .menu-sub-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; margin-top: 8px; }
         .sub-btn-card {
             background: rgba(18, 30, 46, 0.85); border: 1px solid rgba(255,255,255,0.12);
             border-radius: 8px; padding: 10px 6px; text-align: center; cursor: pointer; transition: 0.2s;
@@ -383,7 +383,7 @@
 
         <!-- MENU PRINCIPAL -->
         <div id="screen-home" class="screen">
-            <h1 style="font-size: 36px; color: var(--primary-gold); margin-bottom: 2px; cursor:pointer;" title="Clique 5 vezes para abrir o Admin" onclick="contarCliquesAdmin()">IAES BALL</h1>
+            <h1 style="font-size: 36px; color: var(--primary-gold); margin-bottom: 2px;">IAES BALL</h1>
             <div style="font-size: 11px; color: #94a3b8; margin-bottom: 16px; letter-spacing: 2px; font-weight: 700;">HAXBALL CHAMPIONS & RANKED</div>
             
             <div class="menu-modes-grid">
@@ -415,13 +415,14 @@
                 </div>
             </div>
 
-            <div class="menu-sub-grid">
+            <div class="menu-sub-grid" id="menu-sub-botoes">
                 <div class="sub-btn-card" onclick="abrirModalAmigos()" style="border-color: rgba(0,242,254,0.4);"><span>👥</span><div>AMIGOS/GRUPO</div></div>
                 <div class="sub-btn-card" onclick="abrirPasseBatalha()" style="border-color: rgba(241,196,15,0.4);"><span>🎫</span><div>PASSE (20)</div></div>
                 <div class="sub-btn-card" onclick="abrirLoja()"><span>🛒</span><div>MERCADO</div></div>
                 <div class="sub-btn-card" onclick="abrirEstatisticas()"><span>📊</span><div>STATS</div></div>
                 <div class="sub-btn-card" onclick="abrirModalConfiguracoes()"><span>⚙️</span><div>ÁUDIO</div></div>
-                <div class="sub-btn-card" onclick="abrirModalAdmin()" style="border-color: #e67e22; background: rgba(230, 126, 34, 0.15);"><span>👑</span><div style="color:#f39c12;">PAINEL ADM</div></div>
+                <!-- BOTÃO DO ADMIN EXCLUSIVO (APARECE APENAS QUANDO LOGADO COMO ADMIN) -->
+                <div class="sub-btn-card" id="btn-menu-admin" onclick="abrirModalAdmin()" style="border-color: #e67e22; background: rgba(230, 126, 34, 0.15); display: none;"><span>👑</span><div style="color:#f39c12;">PAINEL ADM</div></div>
             </div>
 
             <button class="btn btn-voltar" style="margin-top: 16px;" onclick="deslogar()">Sair da Conta</button>
@@ -622,12 +623,12 @@
         </div>
     </div>
 
-    <!-- MODAL DO PAINEL DE ADMINISTRAÇÃO -->
+    <!-- MODAL DO PAINEL DE ADMINISTRAÇÃO EXCLUSIVO -->
     <div id="modal-admin" class="modal-overlay">
         <div class="modal-box" style="border-color: #e67e22;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <h2 style="margin:0; color:#f39c12;">👑 PAINEL MASTER ADMIN</h2>
-                <span style="font-size:10px; background:#e74c3c; padding:2px 6px; border-radius:4px; font-weight:bold;">MODO SUPERUSUÁRIO</span>
+                <span style="font-size:10px; background:#e74c3c; padding:2px 6px; border-radius:4px; font-weight:bold;">AUTORIZADO</span>
             </div>
 
             <!-- ECONOMIA & RECURSOS -->
@@ -1051,28 +1052,25 @@
             AudioEngine.salvarPreferencias();
         }
 
-        // --- PAINEL DE ADMINISTRAÇÃO MASTER ---
-        let cliquesTituloAdmin = 0;
+        // --- PAINEL DE ADMINISTRAÇÃO MASTER (EXCLUSIVO PARA QUEM LOGAR COMO ADMIN) ---
         let adminVelocidadeMultiplicador = 1.0;
 
-        function contarCliquesAdmin() {
-            cliquesTituloAdmin++;
-            if (cliquesTituloAdmin >= 5) {
-                cliquesTituloAdmin = 0;
-                abrirModalAdmin();
-            }
+        function verificarAdminAutorizado() {
+            return !!(meuPerfil && (meuPerfil.isAdmin === true || (meuPerfil.nome && (meuPerfil.nome.startsWith('ADM_') || meuPerfil.nome === 'ADMIN'))));
         }
 
         function abrirModalAdmin() {
+            if (!verificarAdminAutorizado()) {
+                mostrarToast("⛔ Acesso Restrito: Apenas Administradores.");
+                return;
+            }
             AudioEngine.playClick();
-            meuPerfil.isAdmin = true;
-            uiShow('perfil-admin-badge', 'inline-block');
-            uiShow('btn-admin-ingame', 'block');
             uiShow('modal-admin', 'flex');
         }
         function fecharModalAdmin() { AudioEngine.playClick(); uiHide('modal-admin'); }
 
         function adminAdicionarMoedas(qtd) {
+            if (!verificarAdminAutorizado()) return;
             AudioEngine.playVictoryFanfare();
             meuPerfil.moedas = (meuPerfil.moedas || 0) + qtd;
             salvarPerfil(); atualizarPerfilUI();
@@ -1080,6 +1078,7 @@
         }
 
         function adminSubirNivel() {
+            if (!verificarAdminAutorizado()) return;
             AudioEngine.playVictoryFanfare();
             meuPerfil.nivel = (meuPerfil.nivel || 1) + 1;
             salvarPerfil(); atualizarPerfilUI();
@@ -1087,6 +1086,7 @@
         }
 
         function adminDefinirNivelMax() {
+            if (!verificarAdminAutorizado()) return;
             AudioEngine.playVictoryFanfare();
             meuPerfil.nivel = 20;
             meuPerfil.xp = 0;
@@ -1095,6 +1095,7 @@
         }
 
         function adminDefinirElo(eloVal) {
+            if (!verificarAdminAutorizado()) return;
             AudioEngine.playClick();
             meuPerfil.elo = eloVal;
             salvarPerfil(); atualizarPerfilUI();
@@ -1102,6 +1103,7 @@
         }
 
         function adminDesbloquearLojaToda() {
+            if (!verificarAdminAutorizado()) return;
             AudioEngine.playVictoryFanfare();
             if (!meuPerfil.itensComprados) meuPerfil.itensComprados = [];
             Object.keys(LOJA_ITENS).forEach(cat => {
@@ -1116,12 +1118,14 @@
         }
 
         function adminToggleVelocidade(mult) {
+            if (!verificarAdminAutorizado()) return;
             AudioEngine.playClick();
             adminVelocidadeMultiplicador = mult;
             mostrarToast(`👑 ADM: Multiplicador de velocidade alterado para ${mult}x!`);
         }
 
         function adminZerarPlacar() {
+            if (!verificarAdminAutorizado()) return;
             AudioEngine.playClick();
             placar1 = 0; placar2 = 0;
             uiText('score1', "0"); uiText('score2', "0");
@@ -1129,12 +1133,14 @@
         }
 
         function adminEncerrarPartida() {
+            if (!verificarAdminAutorizado()) return;
             AudioEngine.playVictoryFanfare();
             fecharModalAdmin();
             finalizarPartida(placar1 >= placar2 ? 'P1' : 'P2');
         }
 
         async function adminLimparSalasServidor() {
+            if (!verificarAdminAutorizado()) return;
             AudioEngine.playClick();
             if (db) {
                 try {
@@ -1142,18 +1148,19 @@
                     snap.forEach(doc => doc.ref.delete().catch(()=>{}));
                     mostrarToast("🧹 ADM: Todas as salas foram removidas do servidor!");
                     carregarSalasOnline();
-                } catch(e) { console.warn(e); }
+                } catch(e) {}
             }
         }
 
         async function adminLimparFilaMatchmaking() {
+            if (!verificarAdminAutorizado()) return;
             AudioEngine.playClick();
             if (db) {
                 try {
                     const snap = await db.collection("matchmaking").get();
                     snap.forEach(doc => doc.ref.delete().catch(()=>{}));
                     mostrarToast("🧹 ADM: Fila de Matchmaking limpa!");
-                } catch(e) { console.warn(e); }
+                } catch(e) {}
             }
         }
 
@@ -1172,7 +1179,7 @@
             if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
             auth = firebase.auth();
-        } catch (e) { console.error("Firebase erro: ", e); }
+        } catch (e) {}
 
         // --- CATÁLOGO DE ITENS DA LOJA (32 ITENS) ---
         const LOJA_ITENS = {
@@ -1231,7 +1238,6 @@
         let delayTimer = 0;
         let placar1 = 0, placar2 = 0;
         
-        // ESTRUTURA DE 2 TEMPOS DE 1m30s (90 segundos cada)
         const DURACAO_TEMPO = 90;
         let periodoJogo = 1;
         let tempoRestante = DURACAO_TEMPO;
@@ -1265,7 +1271,7 @@
 
         // --- WEBRTC & ROOM LIST ---
         const peerIceConfig = {
-            debug: 1,
+            debug: 0,
             config: {
                 iceServers: [
                     { urls: 'stun:stun.l.google.com:19302' },
@@ -1295,7 +1301,10 @@
         const keys = {};
         function handleKeyDown(e) {
             AudioEngine.init();
-            if (e.key === 'F2') { abrirModalAdmin(); return; }
+            if (e.key === 'F2') { 
+                if (verificarAdminAutorizado()) abrirModalAdmin(); 
+                return; 
+            }
             if (e.target && e.target.tagName === 'INPUT') return;
             if (e.code) keys[e.code.toLowerCase()] = true;
             if (e.key) keys[e.key.toLowerCase()] = true;
@@ -1332,18 +1341,14 @@
                             const doc = await db.collection("jogadores").doc(user.uid).get();
                             if (doc.exists) {
                                 meuPerfil = { ...meuPerfil, ...doc.data(), uid: user.uid };
-                                if (meuPerfil.nome && (meuPerfil.nome.startsWith('ADM') || meuPerfil.isAdmin)) {
-                                    meuPerfil.isAdmin = true;
-                                    uiShow('perfil-admin-badge', 'inline-block');
-                                    uiShow('btn-admin-ingame', 'block');
-                                }
+                                meuPerfil.isAdmin = verificarAdminAutorizado();
                                 atualizarPerfilUI();
                                 escutarNotificacoesUsuario();
                                 showScreen('screen-home');
                             }
                         } catch (e) {
-                            console.warn("Aviso doc perfil:", e);
                             meuPerfil.uid = user.uid;
+                            meuPerfil.isAdmin = verificarAdminAutorizado();
                             atualizarPerfilUI();
                             showScreen('screen-home');
                         }
@@ -1361,11 +1366,7 @@
             if(senha.length < 6) { uiText('auth-status-msg', 'Senha mín. 6 caracteres'); return; }
 
             meuPerfil.nome = nick;
-            if (nick.startsWith('ADM') || nick === 'ADMIN') {
-                meuPerfil.isAdmin = true;
-                uiShow('perfil-admin-badge', 'inline-block');
-                uiShow('btn-admin-ingame', 'block');
-            }
+            meuPerfil.isAdmin = (nick.startsWith('ADM_') || nick === 'ADMIN');
 
             try {
                 uiText('btn-login-txt', 'CARREGANDO...');
@@ -1373,7 +1374,11 @@
                 meuPerfil.uid = cred.user.uid;
                 try {
                     const doc = await db.collection("jogadores").doc(cred.user.uid).get();
-                    if (doc.exists) meuPerfil = { ...meuPerfil, ...doc.data(), uid: cred.user.uid };
+                    if (doc.exists) {
+                        const data = doc.data();
+                        meuPerfil = { ...meuPerfil, ...data, uid: cred.user.uid };
+                        meuPerfil.isAdmin = data.isAdmin === true || (nick.startsWith('ADM_') || nick === 'ADMIN');
+                    }
                 } catch(e) {}
                 atualizarPerfilUI(); escutarNotificacoesUsuario(); showScreen('screen-home');
             } catch (err) {
@@ -1398,11 +1403,7 @@
             if(senha.length < 6) { uiText('auth-status-msg', 'Senha mín. 6 caracteres'); return; }
 
             meuPerfil.nome = nick;
-            if (nick.startsWith('ADM') || nick === 'ADMIN') {
-                meuPerfil.isAdmin = true;
-                uiShow('perfil-admin-badge', 'inline-block');
-                uiShow('btn-admin-ingame', 'block');
-            }
+            meuPerfil.isAdmin = (nick.startsWith('ADM_') || nick === 'ADMIN');
 
             try {
                 uiText('btn-criar-txt', 'CRIANDO...');
@@ -1421,13 +1422,18 @@
             try {
                 const toSave = { ...meuPerfil }; delete toSave.senha;
                 await db.collection("jogadores").doc(auth.currentUser.uid).set(toSave, { merge: true });
-            } catch(e) { console.warn("Aviso salvar perfil:", e); }
+            } catch(e) {}
         }
 
         async function deslogar() {
             AudioEngine.playClick();
             if(auth) await auth.signOut().catch(()=>{});
-            uiHide('perfil-ui'); showScreen('screen-login');
+            meuPerfil.isAdmin = false;
+            uiHide('perfil-ui'); 
+            uiHide('btn-menu-admin');
+            uiHide('perfil-admin-badge');
+            uiHide('btn-admin-ingame');
+            showScreen('screen-login');
         }
 
         function adicionarXP(qtd) {
@@ -1447,7 +1453,20 @@
             uiText('perfil-nivel-badge', `NVL ${meuPerfil.nivel}`);
             uiText('perfil-rank', `RANKED (${meuPerfil.elo || 1000} PDL)`);
             uiText('perfil-moedas-val', meuPerfil.moedas);
-            if (meuPerfil.isAdmin) uiShow('perfil-admin-badge', 'inline-block');
+
+            const isAdm = verificarAdminAutorizado();
+            if (isAdm) {
+                uiShow('perfil-admin-badge', 'inline-block');
+                uiShow('btn-menu-admin', 'flex');
+                uiShow('btn-admin-ingame', 'block');
+                document.getElementById('menu-sub-botoes').style.gridTemplateColumns = 'repeat(6, 1fr)';
+            } else {
+                uiHide('perfil-admin-badge');
+                uiHide('btn-menu-admin');
+                uiHide('btn-admin-ingame');
+                document.getElementById('menu-sub-botoes').style.gridTemplateColumns = 'repeat(5, 1fr)';
+            }
+
             const perc = Math.min(100, Math.floor((meuPerfil.xp / (meuPerfil.nivel * 500)) * 100));
             const bar = document.getElementById('perfil-xp-bar'); if(bar) bar.style.width = perc + '%';
         }
@@ -1468,9 +1487,7 @@
                               }
                           }
                       });
-                  }, err => {
-                      console.warn("Aviso escuta notificações:", err.message);
-                  });
+                  }, () => {});
             } catch(e) {}
         }
 
@@ -1508,7 +1525,7 @@
                 input.value = '';
                 carregarListaAmigosUI();
                 mostrarToast(`👥 ${nick} adicionado à sua lista de amigos!`);
-            } catch(e) { console.error("Erro add amigo:", e); }
+            } catch(e) {}
         }
 
         function carregarListaAmigosUI() {
@@ -1552,7 +1569,7 @@
                         criadoEm: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 }
-            } catch(e) { console.warn("Aviso convite Firestore:", e); }
+            } catch(e) {}
             mostrarToast(`✉️ Convite enviado para ${amigoNome}!`);
         }
 
@@ -1609,7 +1626,7 @@
             iniciarBuscaRanked();
         }
 
-        // --- SISTEMA DE MATCHMAKING RANKED 100% FUNCIONAL E ROBUSTO ---
+        // --- SISTEMA DE MATCHMAKING RANKED ---
         function abrirMatchmakingRanked() {
             AudioEngine.playClick();
             showScreen('screen-matchmaking');
@@ -1652,7 +1669,6 @@
                 uiText('mm-timer-txt', `0${m}:${s<10?'0'+s:s}`);
             }, 1000);
 
-            // 1. TENTA ENCONTRAR UM TICKET EXISTENTE NA FILA (SEM REQUERER ÍNDICES COMPOSTOS)
             let foundTicket = null;
             try {
                 if (db) {
@@ -1674,13 +1690,10 @@
                         foundTicket = docs[0];
                     }
                 }
-            } catch (err) {
-                console.warn("Aviso busca fila Firestore:", err.message);
-            }
+            } catch (err) {}
 
             if (!isMatchmakingActive) return;
 
-            // Se achou um adversário na fila:
             if (foundTicket && foundTicket.peerId) {
                 uiText('mm-status-txt', `⚔️ Adversário encontrado: ${foundTicket.nome}!`);
                 uiText('mm-detail-txt', 'Estabelecendo conexão WebRTC...');
@@ -1724,9 +1737,8 @@
 
             peer.on('open', (id) => {
                 myRoomID = id;
-                console.log("Peer Host Matchmaking aberto com ID:", id);
                 uiText('mm-status-txt', `🔍 Fila ativa! Aguardando oponente...`);
-                uiText('mm-detail-txt', `Ticket ID: ${id.substring(0, 10)}...`);
+                uiText('mm-detail-txt', `Aguardando pareamento na nuvem...`);
 
                 if (db && myMatchTicketId) {
                     db.collection("matchmaking").doc(myMatchTicketId).set({
@@ -1738,7 +1750,7 @@
                         peerId: id,
                         criadoEmSec: Math.floor(Date.now() / 1000),
                         criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-                    }).catch(e => console.warn("Aviso gravar ticket:", e.message));
+                    }).catch(()=>{});
 
                     try {
                         db.collection("matchmaking").doc(myMatchTicketId).onSnapshot(doc => {
@@ -1752,7 +1764,6 @@
             });
 
             peer.on('connection', (conn) => {
-                console.log("Adversário conectou diretamente ao Host Ranked!");
                 conn.playerSlot = 2;
                 clientConnections.push(conn);
 
@@ -1785,7 +1796,7 @@
                 });
             });
 
-            peer.on('error', (err) => console.warn("Aviso Peer Host MM:", err.type));
+            peer.on('error', () => {});
         }
 
         function conectarPeerMatchmaking(hostPeerId, hostNome) {
@@ -1794,7 +1805,6 @@
             peer = new Peer(peerIceConfig);
 
             peer.on('open', () => {
-                console.log("Client MM conectando a:", hostPeerId);
                 myConn = peer.connect(hostPeerId, { reliable: true });
 
                 myConn.on('open', () => {
@@ -1832,16 +1842,15 @@
                     voltarMenu();
                 });
 
-                myConn.on('error', (err) => {
-                    console.warn("Aviso erro conexão MM:", err);
+                myConn.on('error', () => {
                     uiText('mm-status-txt', 'Tentando reconectar...');
                 });
             });
 
-            peer.on('error', (err) => console.warn("Aviso Peer Client MM:", err.type));
+            peer.on('error', () => {});
         }
 
-        // --- SISTEMA DE SALAS REAIS DO HAXBALL COM CONEXÃO POR CÓDIGO ---
+        // --- SISTEMA DE SALAS REAIS DO HAXBALL ---
         function abrirNavegadorSalas() { AudioEngine.playClick(); isRanked = false; showScreen('screen-online-rooms'); carregarSalasOnline(); }
 
         async function carregarSalasOnline() {
@@ -1855,7 +1864,7 @@
                     snap.forEach(doc => salasOnlineCache.push({ id: doc.id, ...doc.data() }));
                     salasOnlineCache.sort((a, b) => (b.criadoEmSec || 0) - (a.criadoEmSec || 0));
                 }
-            } catch (e) { console.warn("Aviso salas Firestore:", e.message); }
+            } catch (e) {}
 
             uiText('hax-counter', `${salasOnlineCache.length} sala(s) encontrada(s)`);
             filtrarTabelaSalas();
@@ -1958,7 +1967,6 @@
 
             peer.on('open', (id) => {
                 myRoomID = id;
-                console.log("Peer Host Room aberto com ID:", id);
                 uiText('txt-codigo-sala', `SALA: ${id}`);
                 uiText('host-network-status', "🟢 Online! Amigos podem entrar pelo Room list ou pelo código.");
 
@@ -1971,12 +1979,11 @@
                         jogadores: 1, temSenha: pendingRoomConfig.pass.length > 0, senha: pendingRoomConfig.pass, peerId: id,
                         criadoEmSec: Math.floor(Date.now() / 1000),
                         criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-                    }).catch(e => console.warn("Aviso registrar sala Firestore:", e.message));
+                    }).catch(()=>{});
                 }
             });
 
             peer.on('connection', (conn) => {
-                console.log("Novo jogador conectado ao Host Room:", conn);
                 const max = modoDeJogo.includes('5V5') ? 10 : (modoDeJogo.includes('3V3') ? 6 : (modoDeJogo.includes('2V2') ? 4 : 2));
                 let slotAssigned = 2;
                 const used = [mySlot, ...clientConnections.map(c => c.playerSlot)];
@@ -2004,7 +2011,6 @@
             });
 
             peer.on('error', (err) => {
-                console.warn("Aviso Peer Host:", err.type);
                 uiText('host-network-status', `Status WebRTC: ${err.type}`);
             });
         }
@@ -2030,11 +2036,9 @@
             peer = new Peer(peerIceConfig);
 
             peer.on('open', () => {
-                console.log("Client Room aberto, conectando a:", targetPeerId);
                 myConn = peer.connect(targetPeerId, { reliable: true });
 
                 myConn.on('open', () => {
-                    console.log("Conexão com o Host estabelecida!");
                     uiText('txt-status-client-lobby', "Conectado! Aguardando Capitão iniciar...");
                     myConn.send({ type: 'identify', nome: meuPerfil.nome || 'JOGADOR', numero: meuPerfil.numero || 10 });
                 });
@@ -2053,7 +2057,6 @@
             });
 
             peer.on('error', (err) => {
-                console.warn("Aviso Peer Client Room:", err.type);
                 uiText('txt-status-client-lobby', `Não foi possível conectar (${err.type}). Verifique o código da sala.`);
             });
         }
@@ -2276,7 +2279,7 @@
                 const oldMatter = document.getElementById('matter-container'); if(oldMatter) oldMatter.remove();
                 const newCanvas = document.createElement('canvas'); newCanvas.id = 'field-canvas'; wrapper.insertBefore(newCanvas, wrapper.firstChild);
                 const newMatter = document.createElement('div'); newMatter.id = 'matter-container'; wrapper.insertBefore(newMatter, newCanvas.nextSibling);
-            } catch(e) { console.error("Limpar motor erro:", e); }
+            } catch(e) {}
         }
 
         // --- ENTRADAS DE TECLADO ---
@@ -2364,7 +2367,7 @@
             ctx.shadowBlur = 0;
         }
 
-        // --- TORCIDA CLÁSSICA COM CORES INVERTIDAS NO 2º TEMPO ---
+        // --- TORCIDA CLÁSSICA ---
         function desenharTorcida(ctx) {
             const time = Date.now() / 150, size = 18;
             const halfW = selCampoW / 2;
@@ -2409,7 +2412,7 @@
                 uiText('tv-badge-status', isRanked ? "⚔️ RANKED • 1º TEMPO" : "1º TEMPO • IAES CUP");
                 
                 uiShow('btn-voltar-partida'); uiShow('btn-config-ingame'); uiShow('top-bar', 'flex'); 
-                if (meuPerfil.isAdmin) uiShow('btn-admin-ingame', 'block');
+                if (verificarAdminAutorizado()) uiShow('btn-admin-ingame', 'block'); else uiHide('btn-admin-ingame');
                 document.getElementById('top-bar').style.maxWidth = selCampoW + 'px';
                 
                 uiText('nome-p1', cfgP1.time.substring(0, 3).toUpperCase());
@@ -2424,7 +2427,7 @@
                 configurarFisica();
                 reposicionarJogadores();
                 setTimeout(() => forceFocus(), 50);
-            } catch(e) { console.error("Erro iniciar jogo:", e); voltarMenu(); }
+            } catch(e) { voltarMenu(); }
         }
 
         function configurarFisica() {
