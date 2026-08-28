@@ -1,21 +1,13 @@
-Aqui está o código completo do **IAES BALL** com os modos **5v5 Local** e **5v5 Ranked (Online)** integrados!
+Isso aconteceu porque o texto explicativo da mensagem anterior foi copiado e colado junto dentro do seu arquivo `.html` (fora das tags).
 
-### ✨ O que foi adicionado e aprimorado:
-1. **Modo 5v5 Local**: Partida completa de 10 jogadores (5 no Time 1 vs 5 no Time 2) com **Inteligência Artificial (Bots)** para auxiliar os companheiros de equipe em campo caso joguem no mesmo teclado, além de suporte a controles manuais.
-2. **Modo 5v5 Ranked Online**: Sala WebRTC com suporte para até **10 jogadores conectados simultaneamente** (5 no time Azul vs 5 no time Vermelho), com escolha de camisa/número, troca de times no lobby e cálculo completo de PDL/Elo Ranked para todos os 10 slots.
-3. **Novo Tamanho de Estádio "Colosso (Mega 5v5)"**: Dimensões de `1600x850` para garantir espaço e fluidez perfeita na troca de passes e jogadas 5v5.
-4. **Formação Tática 5v5**: Posicionamento realista de Futsal/Society (Goleiro/Zagueiro, Ala Esquerdo, Ala Direito, Meia e Pivô/Centroavante) para ambos os times.
-5. **Disputa de Pênaltis 5v5**: Rodízio dinâmico entre todos os 5 cobradores e goleiros na prorrogação/pênaltis.
-6. **Sincronização de Rede e Replay**: Suporte completo a 10 corpos físicos no Matter.js, sincronização de inputs remotos, replay cinematográfico e efeitos visuais.
-
----
+Copie **apenas o código abaixo** (clicando no botão de copiar no canto superior direito do bloco de código), apague tudo do seu arquivo com `Ctrl + A` e cole (`Ctrl + V`):
 
 ```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>IAES BALL - Versão Definitiva Pro (Modo 5v5 Local & Ranked)</title>
+    <title>IAES BALL - Versão Definitiva Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
     
     <!-- BIBLIOTECAS -->
@@ -388,7 +380,6 @@ Aqui está o código completo do **IAES BALL** com os modos **5v5 Local** e **5v
     </div>
 
     <script>
-        // O motor físico é carregado no topo para segurança
         const Engine = Matter.Engine, Render = Matter.Render, Runner = Matter.Runner, Bodies = Matter.Bodies, Body = Matter.Body, Composite = Matter.Composite, Events = Matter.Events;
 
         // --- FIREBASE INICIALIZAÇÃO SEGURA ---
@@ -1729,7 +1720,7 @@ Aqui está o código completo do **IAES BALL** com os modos **5v5 Local** e **5v
                                 estadoJogo = 'REWIND'; rewindIndex = historicoPosicoes.length - 1;
                                 votosPular.clear();
                                 let ativos = isOnline ? 1 + clientConnections.length : 1;
-                                uiText('btn-skip-replay', `PULAR ⏭ (0/${ativos})`);
+                                uiText('btn-skip-replay', `PULAR ⏭ (${votosPular.size}/${ativos})`);
                                 uiHide('texto-gol'); uiShow('texto-estado'); uiText('texto-estado', "⏪ VOLTANDO FITA...");
                                 
                                 const bt = document.getElementById('bar-top'); if(bt) bt.style.height = '12%';
@@ -1899,8 +1890,6 @@ Aqui está o código completo do **IAES BALL** com os modos **5v5 Local** e **5v
             if (!jogador) return;
             const forceNormal = 0.0034;
             const isT1 = teamId === 1;
-            const targetGoalX = isT1 ? selCampoW - 40 : 40;
-            const ownGoalX = isT1 ? 40 : selCampoW - 40;
             const midY = selCampoH / 2;
 
             let targetX = selCampoW / 2;
@@ -1925,7 +1914,6 @@ Aqui está o código completo do **IAES BALL** com os modos **5v5 Local** e **5v
 
             const distBola = Math.hypot(bola.position.x - jogador.position.x, bola.position.y - jogador.position.y);
             
-            // Se a bola estiver perto ou na zona do jogador, vai na bola!
             if (distBola < (role === 'pivo' ? 260 : 180)) {
                 targetX = bola.position.x;
                 targetY = bola.position.y;
@@ -2046,7 +2034,6 @@ Aqui está o código completo do **IAES BALL** com os modos **5v5 Local** e **5v
                     if (inData.shoot) tentarChutar(item.p);
                     if (inData.dash) darArrancada(item.p, item.id);
                 } else if (!isOnline && (modoDeJogo.includes('5V5') || modoDeJogo.includes('3V3') || modoDeJogo.includes('2V2'))) {
-                    // Bot IA nos slots locais não controlados por humano!
                     atualizarBotIA(item.p, item.team, item.role, item.id);
                 }
             });
@@ -2157,19 +2144,19 @@ Aqui está o código completo do **IAES BALL** com os modos **5v5 Local** e **5v
                 [player1, player2, player3, player4, player5, player6, player7, player8, player9, player10].forEach(p => { if(p) Body.setVelocity(p, {x: 0, y: 0}); });
                 Body.setPosition(bola, { x: selCampoW/2, y: selCampoH/2 });
                 
-                // Formação Tática 5v5 Time 1 (Azul)
-                Body.setPosition(player1, { x: selCampoW * 0.18, y: selCampoH * 0.50 }); // Goleiro/Zagueiro
-                Body.setPosition(player3, { x: selCampoW * 0.32, y: selCampoH * 0.22 }); // Ala Esquerdo
-                Body.setPosition(player5, { x: selCampoW * 0.32, y: selCampoH * 0.78 }); // Ala Direito
-                Body.setPosition(player7, { x: selCampoW * 0.38, y: selCampoH * 0.50 }); // Meia
-                Body.setPosition(player9, { x: selCampoW * 0.45, y: selCampoH * 0.50 }); // Pivô
+                // Formação 5v5 Time 1 (Azul)
+                Body.setPosition(player1, { x: selCampoW * 0.18, y: selCampoH * 0.50 });
+                Body.setPosition(player3, { x: selCampoW * 0.32, y: selCampoH * 0.22 });
+                Body.setPosition(player5, { x: selCampoW * 0.32, y: selCampoH * 0.78 });
+                Body.setPosition(player7, { x: selCampoW * 0.38, y: selCampoH * 0.50 });
+                Body.setPosition(player9, { x: selCampoW * 0.45, y: selCampoH * 0.50 });
 
-                // Formação Tática 5v5 Time 2 (Vermelho)
-                Body.setPosition(player2, { x: selCampoW * 0.82, y: selCampoH * 0.50 }); // Goleiro/Zagueiro
-                Body.setPosition(player4, { x: selCampoW * 0.68, y: selCampoH * 0.22 }); // Ala Esquerdo
-                Body.setPosition(player6, { x: selCampoW * 0.68, y: selCampoH * 0.78 }); // Ala Direito
-                Body.setPosition(player8, { x: selCampoW * 0.62, y: selCampoH * 0.50 }); // Meia
-                Body.setPosition(player10, { x: selCampoW * 0.55, y: selCampoH * 0.50 }); // Pivô
+                // Formação 5v5 Time 2 (Vermelho)
+                Body.setPosition(player2, { x: selCampoW * 0.82, y: selCampoH * 0.50 });
+                Body.setPosition(player4, { x: selCampoW * 0.68, y: selCampoH * 0.22 });
+                Body.setPosition(player6, { x: selCampoW * 0.68, y: selCampoH * 0.78 });
+                Body.setPosition(player8, { x: selCampoW * 0.62, y: selCampoH * 0.50 });
+                Body.setPosition(player10, { x: selCampoW * 0.55, y: selCampoH * 0.50 });
             } else if (modoDeJogo.includes('3V3')) {
                 Body.setVelocity(player3, { x: 0, y: 0 }); Body.setVelocity(player4, { x: 0, y: 0 });
                 Body.setVelocity(player5, { x: 0, y: 0 }); Body.setVelocity(player6, { x: 0, y: 0 });
