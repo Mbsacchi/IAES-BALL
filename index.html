@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>IAES BALL PRO - HaxBall Champions Edition</title>
+    <title>IAES BALL PRO - Futebol & HaxBall Champions</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&family=Rajdhani:wght@600;700;900&display=swap" rel="stylesheet">
     
     <!-- BIBLIOTECAS FIREBASE & FÍSICA -->
@@ -17,57 +17,61 @@
         
         :root {
             --primary-gold: #f1c40f;
-            --gold-glow: rgba(241, 196, 15, 0.4);
-            --hax-bg: #1a242f;
-            --hax-panel: #111a24;
-            --hax-border: #2c3e50;
+            --pitch-green-dark: #071f12;
+            --pitch-green-mid: #0d3820;
+            --pitch-green-light: #165b33;
+            --pitch-emerald: #10b981;
+            --pitch-grass-glow: rgba(16, 185, 129, 0.35);
+            --hax-panel: #0a1f14;
+            --hax-border: #1a4a2e;
             --hax-blue: #3498db;
             --hax-green: #2ecc71;
             --hax-red: #e74c3c;
             --accent-cyan: #00f2fe;
-            --admin-purple: #9b59b6;
+            --admin-orange: #f39c12;
         }
 
         body {
             margin: 0; padding: 0;
-            background: radial-gradient(ellipse at center top, #1b344d 0%, #0c1824 45%, #050a10 100%);
+            background: radial-gradient(ellipse at center top, #144627 0%, #082816 45%, #03120a 100%);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             height: 100vh; font-family: 'Montserrat', sans-serif; overflow: hidden; color: white;
             user-select: none;
         }
 
         .glass-panel {
-            background: rgba(13, 22, 34, 0.95); backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.85);
+            background: rgba(6, 26, 16, 0.94); backdrop-filter: blur(16px);
+            border: 1.5px solid rgba(16, 185, 129, 0.25);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 30px rgba(16, 185, 129, 0.15);
             border-radius: 14px;
         }
 
         #menu-container {
             padding: 26px 30px; text-align: center; position: absolute; z-index: 100;
-            max-height: 95vh; overflow-y: auto; width: 940px; max-width: 96%;
+            max-height: 95vh; overflow-y: auto; width: 960px; max-width: 96%;
         }
 
         h1, h2, h3 { margin: 0 0 10px 0; text-transform: uppercase; font-weight: 900; }
-        h1 { font-size: 36px; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { font-size: 36px; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.6); }
         h2 { font-size: 20px; color: var(--primary-gold); }
 
-        /* BOTÕES */
+        /* BOTÕES ESTILO FUTEBOL */
         .btn {
-            background: linear-gradient(135deg, #1e528e, #2980b9); color: white; border: none; padding: 12px 20px;
+            background: linear-gradient(135deg, #165b33, #10b981); color: white; border: none; padding: 12px 20px;
             font-size: 12px; font-weight: 900; border-radius: 6px; cursor: pointer; transition: all 0.2s;
             text-transform: uppercase; outline: none; letter-spacing: 0.5px;
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
-        .btn:hover { transform: translateY(-2px); filter: brightness(1.15); box-shadow: 0 6px 18px rgba(41, 128, 185, 0.5); }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.15); box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4); }
         .btn:active { transform: translateY(1px); }
         
-        .btn-avancar { background: linear-gradient(135deg, #1e824c, #2ecc71); width: 100%; font-size: 14px; margin-top: 15px; }
+        .btn-avancar { background: linear-gradient(135deg, #10b981, #059669); width: 100%; font-size: 14px; margin-top: 15px; }
         .btn-voltar { background: linear-gradient(135deg, #962d22, #e74c3c); font-size: 11px; padding: 8px 16px; }
         .btn-gold { background: linear-gradient(135deg, #d4ac0d, #f1c40f); color: #0b131b; }
         .btn-ranked { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: #fff; }
-        .btn-admin { background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; }
+        .btn-pix { background: linear-gradient(135deg, #00b4d8, #0077b6); color: #fff; }
+        .btn-penaltis { background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; }
 
         .screen { display: none; flex-direction: column; align-items: center; width: 100%; }
         .active-screen { display: flex; animation: fadeIn 0.25s ease; }
@@ -76,7 +80,7 @@
         /* PERFIL CARD */
         #perfil-ui {
             position: absolute; top: 15px; right: 25px;
-            background: rgba(10, 16, 26, 0.95);
+            background: rgba(5, 20, 12, 0.95);
             padding: 8px 16px; border-radius: 10px; border: 2px solid var(--primary-gold);
             display: none; text-align: right; z-index: 200;
             box-shadow: 0 8px 25px rgba(0,0,0,0.7); cursor: pointer; transition: 0.2s;
@@ -84,17 +88,17 @@
         #perfil-ui:hover { transform: translateY(-2px); border-color: #fff; }
         #perfil-nome-linha { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
         #perfil-nome { font-weight: 900; font-size: 15px; color: #fff; text-transform: uppercase; }
-        #perfil-nivel-badge { background: #e67e22; color: #000; font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 4px; }
+        #perfil-nivel-badge { background: #10b981; color: #000; font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 4px; }
         #perfil-admin-badge { background: #e74c3c; color: #fff; font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 4px; display:none; }
         #perfil-rank { font-weight: 800; font-size: 11px; color: var(--primary-gold); }
         #perfil-moedas { font-size: 13px; color: var(--primary-gold); font-weight: 900; font-family: 'Rajdhani', sans-serif; }
         .xp-bar-container { width: 130px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; margin-top: 5px; overflow: hidden; margin-left: auto; }
-        .xp-bar-fill { height: 100%; background: #2ecc71; width: 0%; transition: width 0.4s; }
+        .xp-bar-fill { height: 100%; background: #10b981; width: 0%; transition: width 0.4s; }
 
         /* TOAST DE NOTIFICAÇÃO */
         #toast-notif {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(13, 22, 34, 0.95); border: 2px solid var(--primary-gold);
+            background: rgba(6, 26, 16, 0.96); border: 2px solid var(--pitch-emerald);
             padding: 10px 24px; border-radius: 8px; font-weight: 900; font-size: 13px;
             color: #fff; z-index: 1000; display: none; box-shadow: 0 8px 25px rgba(0,0,0,0.8);
             animation: slideDown 0.3s ease;
@@ -104,76 +108,76 @@
         /* POPUP DE CONVITE DE GRUPO */
         #invite-popup {
             position: fixed; bottom: 25px; right: 25px;
-            background: #111a24; border: 2px solid #00f2fe; border-radius: 10px;
+            background: #082012; border: 2px solid #00f2fe; border-radius: 10px;
             padding: 15px 20px; z-index: 1000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.9);
             animation: slideUp 0.3s ease; text-align: left;
         }
         @keyframes slideUp { from { bottom: -80px; opacity: 0; } to { bottom: 25px; opacity: 1; } }
 
         /* MENU PRINCIPAL GRID */
-        .menu-modes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; margin: 12px 0; }
+        .menu-modes-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; margin: 12px 0; }
         .mode-card {
-            background: linear-gradient(145deg, rgba(25, 40, 60, 0.8), rgba(12, 20, 32, 0.95));
-            border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 16px;
-            text-align: left; cursor: pointer; transition: all 0.2s; min-height: 110px;
+            background: linear-gradient(145deg, rgba(13, 45, 25, 0.85), rgba(6, 24, 14, 0.95));
+            border: 2px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 14px;
+            text-align: left; cursor: pointer; transition: all 0.2s; min-height: 115px;
             display: flex; flex-direction: column; justify-content: space-between;
         }
-        .mode-card:hover { transform: translateY(-3px); border-color: var(--primary-gold); box-shadow: 0 10px 25px rgba(0,0,0,0.6); }
-        .mode-card-title { font-size: 16px; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 6px; }
-        .mode-card-desc { font-size: 10px; color: #a0aec0; margin-top: 4px; line-height: 1.3; }
+        .mode-card:hover { transform: translateY(-3px); border-color: var(--pitch-emerald); box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 15px var(--pitch-grass-glow); }
+        .mode-card-title { font-size: 15px; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 6px; }
+        .mode-card-desc { font-size: 10px; color: #a7f3d0; margin-top: 4px; line-height: 1.3; }
         .mode-card-badge { align-self: flex-start; margin-top: 8px; font-size: 9px; font-weight: 900; padding: 2px 7px; border-radius: 4px; }
 
-        .menu-sub-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; margin-top: 8px; }
+        .menu-sub-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; width: 100%; margin-top: 8px; }
         .sub-btn-card {
-            background: rgba(18, 30, 46, 0.85); border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(10, 36, 20, 0.85); border: 1px solid rgba(16, 185, 129, 0.3);
             border-radius: 8px; padding: 10px 6px; text-align: center; cursor: pointer; transition: 0.2s;
             font-size: 10px; font-weight: 800; text-transform: uppercase; color: #e2e8f0;
             display: flex; flex-direction: column; align-items: center; gap: 4px;
         }
-        .sub-btn-card:hover { background: rgba(30, 50, 75, 0.95); border-color: var(--accent-cyan); transform: translateY(-2px); color: #fff; }
+        .sub-btn-card:hover { background: rgba(16, 55, 30, 0.95); border-color: var(--pitch-emerald); transform: translateY(-2px); color: #fff; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
         .sub-btn-card span { font-size: 18px; }
 
         /* HAXBALL ROOM LIST UI */
         .hax-roomlist-window {
-            width: 100%; background: #16202c; border: 2px solid #2c3e50; border-radius: 8px;
+            width: 100%; background: #082012; border: 2px solid #1a4a2e; border-radius: 8px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.8); overflow: hidden; text-align: left;
         }
         .hax-header {
-            background: #0f171e; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 2px solid #2c3e50;
+            background: #04140b; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #1a4a2e;
         }
         .hax-header-title { font-size: 18px; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
         .hax-header-counter { font-size: 12px; color: #e74c3c; font-weight: 800; }
-        .hax-tip { background: #111a24; padding: 6px 15px; font-size: 11px; color: #94a3b8; border-bottom: 1px solid #1e293b; display:flex; justify-content:space-between; align-items:center; }
+        .hax-tip { background: #061a0e; padding: 6px 15px; font-size: 11px; color: #94a3b8; border-bottom: 1px solid #10331f; display:flex; justify-content:space-between; align-items:center; }
 
         .hax-body { display: flex; width: 100%; min-height: 380px; }
-        .hax-table-container { flex: 1; background: #0c131a; overflow-y: auto; max-height: 380px; }
+        .hax-table-container { flex: 1; background: #031008; overflow-y: auto; max-height: 380px; }
         
         .hax-table { width: 100%; border-collapse: collapse; font-size: 12px; }
         .hax-table th {
-            position: sticky; top: 0; background: #15222e; color: #cbd5e1;
-            padding: 8px 10px; text-align: left; font-weight: 800; font-size: 11px; border-bottom: 2px solid #2c3e50;
+            position: sticky; top: 0; background: #0a2817; color: #cbd5e1;
+            padding: 8px 10px; text-align: left; font-weight: 800; font-size: 11px; border-bottom: 2px solid #1a4a2e;
         }
         .hax-table td { padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 700; }
         .hax-row { cursor: pointer; transition: 0.15s; }
-        .hax-row:hover { background: rgba(52, 152, 219, 0.2); }
-        .hax-row.selected { background: #2980b9 !important; color: #fff !important; }
+        .hax-row:hover { background: rgba(16, 185, 129, 0.2); }
+        .hax-row.selected { background: #165b33 !important; color: #fff !important; }
         
         .hax-side-actions {
-            width: 160px; background: #111a24; padding: 12px 10px; display: flex; flex-direction: column;
-            gap: 8px; border-left: 2px solid #2c3e50; justify-content: space-between;
+            width: 160px; background: #061a0e; padding: 12px 10px; display: flex; flex-direction: column;
+            gap: 8px; border-left: 2px solid #1a4a2e; justify-content: space-between;
         }
         .hax-side-btn {
-            background: #243342; border: 1px solid #3b4e61; color: #fff; padding: 8px 10px;
+            background: #0d2f1b; border: 1px solid #1a4a2e; color: #fff; padding: 8px 10px;
             border-radius: 4px; font-size: 11px; font-weight: 800; cursor: pointer; text-align: left;
             display: flex; align-items: center; gap: 6px; transition: 0.2s;
         }
-        .hax-side-btn:hover { background: #34495e; border-color: #3498db; }
-        .hax-side-btn.primary { background: #2980b9; border-color: #3498db; }
+        .hax-side-btn:hover { background: #165b33; border-color: #10b981; }
+        .hax-side-btn.primary { background: #10b981; border-color: #059669; color:#000; font-weight:900; }
 
         .hax-footer {
-            background: #0f171e; padding: 8px 15px; display: flex; align-items: center; gap: 15px;
-            border-top: 2px solid #2c3e50; font-size: 11px; color: #cbd5e1; font-weight: 700;
+            background: #04140b; padding: 8px 15px; display: flex; align-items: center; gap: 15px;
+            border-top: 2px solid #1a4a2e; font-size: 11px; color: #cbd5e1; font-weight: 700;
         }
         .hax-footer label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
 
@@ -183,14 +187,14 @@
             background: rgba(0,0,0,0.85); z-index: 500; justify-content: center; align-items: center;
         }
         .modal-box {
-            background: #111a24; border: 2px solid #3498db; border-radius: 10px; padding: 25px;
-            width: 540px; max-width: 92%; text-align: left; box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+            background: #082012; border: 2px solid #10b981; border-radius: 10px; padding: 25px;
+            width: 560px; max-width: 92%; text-align: left; box-shadow: 0 15px 40px rgba(0,0,0,0.9);
             max-height: 88vh; overflow-y: auto;
         }
 
         /* PAINEL ADMIN STYLES */
         .admin-section {
-            background: rgba(18, 30, 46, 0.85); border: 1px solid #3b4e61; border-radius: 8px;
+            background: rgba(10, 36, 20, 0.85); border: 1px solid #1a4a2e; border-radius: 8px;
             padding: 12px 14px; margin-bottom: 12px;
         }
         .admin-section-title { font-size: 12px; font-weight: 900; color: var(--primary-gold); margin-bottom: 8px; text-transform: uppercase; }
@@ -200,11 +204,11 @@
         .config-row label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: #cbd5e1; margin-bottom: 4px; }
         .config-slider {
             width: 100%; -webkit-appearance: none; height: 6px; border-radius: 3px;
-            background: #2c3e50; outline: none; transition: background 0.2s;
+            background: #1a4a2e; outline: none; transition: background 0.2s;
         }
         .config-slider::-webkit-slider-thumb {
             -webkit-appearance: none; appearance: none; width: 16px; height: 16px;
-            border-radius: 50%; background: var(--primary-gold); cursor: pointer; box-shadow: 0 0 8px rgba(241,196,15,0.6);
+            border-radius: 50%; background: var(--pitch-emerald); cursor: pointer; box-shadow: 0 0 8px rgba(16,185,129,0.6);
         }
 
         /* GRID DE ESCUDOS */
@@ -230,12 +234,12 @@
         #top-bar {
             display: none; align-items: center; justify-content: center;
             width: 100%; max-width: 860px; margin-bottom: 8px;
-            background: #09131f; border: 2px solid rgba(255, 255, 255, 0.15); border-top: 3px solid var(--primary-gold);
+            background: #04140b; border: 2px solid rgba(16, 185, 129, 0.3); border-top: 3px solid var(--pitch-emerald);
             border-radius: 10px; padding: 6px 15px; position: relative; z-index: 10;
         }
         .tv-scoreboard-badge {
             position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-            background: #000; border: 1px solid var(--primary-gold); color: var(--primary-gold);
+            background: #000; border: 1px solid var(--pitch-emerald); color: var(--pitch-emerald);
             font-size: 9px; font-weight: 900; padding: 2px 10px; border-radius: 8px; letter-spacing: 1px;
         }
         .team-box-broadcast { flex: 1; display: flex; align-items: center; gap: 10px; }
@@ -244,19 +248,19 @@
         .team-flag-color { width: 8px; height: 26px; border-radius: 3px; }
         .time-nome-tv { font-size: 20px; font-weight: 900; font-family: 'Rajdhani', sans-serif; }
         .score-box-tv {
-            background: #050a10; color: #fff; font-size: 28px; font-weight: 900;
-            padding: 2px 14px; border-radius: 5px; border: 1px solid #334155; font-family: 'Rajdhani', sans-serif;
+            background: #020a05; color: #fff; font-size: 28px; font-weight: 900;
+            padding: 2px 14px; border-radius: 5px; border: 1px solid #1a4a2e; font-family: 'Rajdhani', sans-serif;
         }
         .match-timer-tv {
-            background: #111e2e; color: var(--primary-gold); padding: 4px 14px; border-radius: 6px;
-            font-size: 20px; min-width: 115px; text-align: center; border: 1px solid rgba(241, 196, 15, 0.4);
+            background: #082414; color: var(--primary-gold); padding: 4px 14px; border-radius: 6px;
+            font-size: 20px; min-width: 115px; text-align: center; border: 1px solid rgba(16, 185, 129, 0.4);
             font-weight: 900; font-family: 'Rajdhani', sans-serif; margin: 0 10px;
         }
 
         /* CAMPO */
         #game-wrapper {
             position: relative; display: none; border-radius: 12px; overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.9), 0 0 0 3px rgba(255,255,255,0.1);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9), 0 0 0 3px rgba(16, 185, 129, 0.3);
             outline: none; cursor: default;
         }
         #field-canvas, #matter-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
@@ -269,29 +273,29 @@
         #mensagem-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
             display: none; justify-content: center; align-items: center; flex-direction: column;
-            background: rgba(0,0,0,0.7); text-align: center; padding: 20px;
+            background: rgba(0,0,0,0.75); text-align: center; padding: 20px;
         }
         #texto-gol {
             font-size: 60px; font-style: italic; font-weight: 900; letter-spacing: 4px;
-            font-family: 'Rajdhani', sans-serif; text-shadow: 0 0 25px rgba(255,255,255,0.6);
+            font-family: 'Rajdhani', sans-serif; text-shadow: 0 0 25px rgba(16, 185, 129, 0.8);
         }
-        #texto-assist { font-size: 18px; color: #00f2fe; font-weight: 800; margin-top: 4px; }
+        #texto-assist { font-size: 18px; color: #a7f3d0; font-weight: 800; margin-top: 4px; }
         #texto-estado { font-size: 18px; color: #fff; margin-top: 8px; font-weight: 700; background: rgba(0,0,0,0.7); padding: 5px 15px; border-radius: 5px; text-transform: uppercase; }
         
         #recompensas-partida {
-            display: none; background: rgba(16, 26, 40, 0.9); border: 2px solid var(--primary-gold);
+            display: none; background: rgba(8, 32, 18, 0.9); border: 2px solid var(--primary-gold);
             border-radius: 8px; padding: 10px 20px; margin-top: 12px; font-size: 13px; font-weight: bold;
         }
 
         #indicador-replay {
             position: absolute; bottom: 20px; left: 20px; z-index: 20; display: none;
-            color: #fff; font-size: 16px; font-weight: 900; background: rgba(5, 10, 16, 0.85);
+            color: #fff; font-size: 16px; font-weight: 900; background: rgba(5, 20, 12, 0.85);
             padding: 5px 12px; border-radius: 5px; border-left: 4px solid #e74c3c;
         }
         
         .btn-ingame {
-            position: absolute; z-index: 20; background: rgba(8, 14, 22, 0.85); color: white;
-            border: 1px solid rgba(255,255,255,0.3); padding: 7px 14px; font-weight: 800; font-size: 11px;
+            position: absolute; z-index: 20; background: rgba(4, 18, 10, 0.85); color: white;
+            border: 1px solid rgba(16, 185, 129, 0.4); padding: 7px 14px; font-weight: 800; font-size: 11px;
             border-radius: 5px; cursor: pointer; transition: 0.2s;
         }
         #btn-voltar-partida { top: 15px; left: 15px; display: none; }
@@ -300,41 +304,58 @@
         #btn-skip-replay { bottom: 20px; right: 20px; display: none; background: #c0392b; }
 
         .input-sala {
-            padding: 10px; font-size: 15px; border-radius: 6px; border: 2px solid #2980b9;
-            background: #0a1118; color: #fff; text-align: center; margin-bottom: 10px; width: 80%;
+            padding: 10px; font-size: 15px; border-radius: 6px; border: 2px solid #10b981;
+            background: #04140b; color: #fff; text-align: center; margin-bottom: 10px; width: 80%;
             font-family: 'Rajdhani', sans-serif; font-weight: 800; outline: none;
         }
 
         /* LOJA & PASSE */
         .shop-tabs { display: flex; gap: 8px; margin-bottom: 12px; width: 100%; justify-content: center; }
-        .shop-tab-btn { background: #111a24; border: 1px solid #334155; color: #94a3b8; padding: 7px 14px; border-radius: 5px; cursor: pointer; font-weight: 800; font-size: 11px; }
-        .shop-tab-btn.active { background: var(--primary-gold); color: #000; border-color: var(--primary-gold); }
+        .shop-tab-btn { background: #082012; border: 1px solid #1a4a2e; color: #94a3b8; padding: 7px 14px; border-radius: 5px; cursor: pointer; font-weight: 800; font-size: 11px; }
+        .shop-tab-btn.active { background: var(--pitch-emerald); color: #000; border-color: var(--pitch-emerald); font-weight: 900; }
         .shop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; max-height: 380px; overflow-y: auto; }
-        .shop-item-card { background: rgba(10, 16, 26, 0.85); border: 2px solid #334155; border-radius: 8px; padding: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 4px; }
-        .shop-item-card.equipped { border-color: #2ecc71; background: rgba(46, 204, 113, 0.12); }
+        .shop-item-card { background: rgba(8, 28, 16, 0.85); border: 2px solid #1a4a2e; border-radius: 8px; padding: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 4px; }
+        .shop-item-card.equipped { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
         .shop-item-preview { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         .shop-item-name { font-size: 11px; font-weight: 900; }
-        .shop-item-desc { font-size: 9px; color: #94a3b8; }
+        .shop-item-desc { font-size: 9px; color: #a7f3d0; }
         .shop-item-btn { padding: 5px 8px; font-size: 10px; border-radius: 4px; border: none; cursor: pointer; font-weight: 900; width: 100%; }
         .btn-comprar { background: var(--primary-gold); color: #000; }
-        .btn-equipar { background: #2980b9; color: #fff; }
-        .btn-equipado { background: #2ecc71; color: #000; cursor: default; }
+        .btn-equipar { background: #10b981; color: #000; }
+        .btn-equipado { background: #059669; color: #fff; cursor: default; }
 
         .pass-track-container { width: 100%; overflow-x: auto; padding: 8px 0; margin-bottom: 12px; }
         .pass-track { display: flex; gap: 10px; }
-        .pass-tier-card { min-width: 115px; background: rgba(10, 16, 26, 0.85); border: 2px solid #334155; border-radius: 8px; padding: 8px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 3px; }
-        .pass-tier-card.unlocked { border-color: #2ecc71; }
-        .pass-tier-card.claimed { border-color: #64748b; opacity: 0.6; }
-        .pass-tier-num { font-size: 9px; font-weight: 900; background: #1e293b; padding: 2px 5px; border-radius: 3px; color: var(--primary-gold); }
-        .pass-tier-icon { font-size: 22px; }
+        .pass-tier-card { min-width: 125px; background: rgba(8, 28, 16, 0.85); border: 2px solid #1a4a2e; border-radius: 8px; padding: 8px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .pass-tier-card.unlocked { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
+        .pass-tier-card.claimed { border-color: #475569; opacity: 0.6; }
+        .pass-tier-num { font-size: 9px; font-weight: 900; background: #0d3820; padding: 2px 5px; border-radius: 3px; color: var(--pitch-emerald); }
+        .pass-tier-icon { font-size: 24px; }
         .pass-tier-name { font-size: 10px; font-weight: 800; }
-        .pass-tier-reward { font-size: 9px; color: #2ecc71; font-weight: 900; }
+        .pass-tier-reward { font-size: 9px; color: var(--pitch-emerald); font-weight: 900; }
 
-        /* LISTA DE AMIGOS */
+        /* LISTA DE AMIGOS & LEADERBOARD */
         .amigo-card {
-            background: #0d1622; border: 1px solid #1e293b; border-radius: 6px; padding: 8px 12px;
+            background: #0a2817; border: 1px solid #1a4a2e; border-radius: 6px; padding: 8px 12px;
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
         }
+
+        /* HUD PÊNALTIS */
+        .penalty-dots-box { display: flex; gap: 6px; margin-top: 4px; }
+        .penalty-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a4a2e; border: 1px solid #fff; }
+        .penalty-dot.goal { background: #2ecc71; box-shadow: 0 0 6px #2ecc71; }
+        .penalty-dot.miss { background: #e74c3c; box-shadow: 0 0 6px #e74c3c; }
+
+        /* PACOTES PIX COMPRA DE MOEDAS */
+        .pix-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+        .pix-card {
+            background: linear-gradient(145deg, #092615, #04140b); border: 2px solid #10b981;
+            border-radius: 8px; padding: 12px; text-align: center; display: flex; flex-direction: column;
+            justify-content: space-between; gap: 6px; cursor: pointer; transition: 0.2s;
+        }
+        .pix-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(16,185,129,0.4); }
+        .pix-moedas { font-size: 18px; font-weight: 900; color: var(--primary-gold); font-family: 'Rajdhani'; }
+        .pix-preco { font-size: 14px; font-weight: 900; color: #fff; }
     </style>
 </head>
 <body>
@@ -369,80 +390,91 @@
         
         <!-- TELA DE LOGIN / REGISTRO -->
         <div id="screen-login" class="screen active-screen">
-            <h1>🏆 IAES BALL PRO</h1>
-            <p style="color:#94a3b8; margin-bottom: 20px; font-size: 13px;">Entre com seu Nickname para jogar online ou offline</p>
+            <h1 style="color:#10b981;">🏆 IAES BALL PRO</h1>
+            <p style="color:#a7f3d0; margin-bottom: 20px; font-size: 13px;">Entre com seu Nickname para jogar online ou offline</p>
             <input type="text" id="input-nickname" class="input-sala" placeholder="SEU NICKNAME (MÍN. 3 LETRAS)" maxlength="16">
             <input type="password" id="input-senha" class="input-sala" placeholder="SENHA (MÍN. 6 DÍGITOS)" maxlength="32">
             
             <div style="display: flex; gap: 12px; width: 80%; margin-top: 8px;">
                 <button id="btn-login" class="btn btn-avancar" style="margin-top: 0;" onclick="fazerLogin()"><span id="btn-login-txt">⚽ ENTRAR</span></button>
-                <button id="btn-criar" class="btn" style="margin-top: 0; background: #6c5ce7; width: 100%;" onclick="criarConta()"><span id="btn-criar-txt">CRIAR CONTA</span></button>
+                <button id="btn-criar" class="btn" style="margin-top: 0; background: #059669; width: 100%;" onclick="criarConta()"><span id="btn-criar-txt">CRIAR CONTA</span></button>
             </div>
             <div id="auth-status-msg" style="color: #e74c3c; margin-top: 12px; font-size: 12px; font-weight: bold;"></div>
         </div>
 
         <!-- MENU PRINCIPAL -->
         <div id="screen-home" class="screen">
-            <h1 style="font-size: 36px; color: var(--primary-gold); margin-bottom: 2px;">IAES BALL</h1>
-            <div style="font-size: 11px; color: #94a3b8; margin-bottom: 16px; letter-spacing: 2px; font-weight: 700;">HAXBALL CHAMPIONS & RANKED</div>
+            <h1 style="font-size: 38px; color: #10b981; margin-bottom: 2px; text-shadow: 0 0 20px rgba(16,185,129,0.5);">IAES BALL</h1>
+            <div style="font-size: 11px; color: #a7f3d0; margin-bottom: 16px; letter-spacing: 2px; font-weight: 700;">HAXBALL & FUTEBOL CHAMPIONS</div>
             
             <div class="menu-modes-grid">
                 <!-- MODO RANKED MATCHMAKING -->
-                <div class="mode-card" style="border-color: rgba(155, 89, 182, 0.6);" onclick="abrirMatchmakingRanked()">
+                <div class="mode-card" style="border-color: rgba(155, 89, 182, 0.8);" onclick="abrirMatchmakingRanked()">
                     <div>
                         <div class="mode-card-title" style="color: #d2a8ff;">⚔️ BUSCAR RANKED</div>
-                        <div class="mode-card-desc">Fila automática competitiva 1v1 ou 2v2 valendo PDL e subida de Elo!</div>
+                        <div class="mode-card-desc">1v1 (Padrão), 2v2 (Maracanã) e 3v3 (Titã) valendo PDL no ranking!</div>
                     </div>
-                    <div class="mode-card-badge" style="background: rgba(142, 68, 173, 0.3); color:#d2a8ff;">MATCHMAKING • PDL</div>
+                    <div class="mode-card-badge" style="background: rgba(142, 68, 173, 0.4); color:#d2a8ff;">MATCHMAKING • PDL</div>
                 </div>
 
                 <!-- JOGO RÁPIDO LOCAL -->
                 <div class="mode-card" onclick="irParaModo(false)">
                     <div>
-                        <div class="mode-card-title">⚽ JOGO RÁPIDO LOCAL</div>
+                        <div class="mode-card-title">⚽ JOGO RÁPIDO</div>
                         <div class="mode-card-desc">1v1 a 5v5 com 2 tempos de 1m30s e troca de lados no intervalo!</div>
                     </div>
-                    <div class="mode-card-badge" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan);">OFFLINE • 2 TEMPOS</div>
+                    <div class="mode-card-badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">OFFLINE • 2 TEMPOS</div>
+                </div>
+
+                <!-- MODO PÊNALTIS -->
+                <div class="mode-card" style="border-color: rgba(230, 126, 34, 0.8);" onclick="iniciarModoPenaltis()">
+                    <div>
+                        <div class="mode-card-title" style="color: #f39c12;">🎯 PÊNALTIS</div>
+                        <div class="mode-card-desc">Disputa de pênaltis eletrizante com 5 cobranças alternadas e goleiro!</div>
+                    </div>
+                    <div class="mode-card-badge" style="background: rgba(230, 126, 34, 0.3); color:#f39c12;">DISPUTA 5 CHUTES</div>
                 </div>
 
                 <!-- SALAS HAXBALL -->
                 <div class="mode-card" onclick="irParaModo(true)">
                     <div>
-                        <div class="mode-card-title" style="color: #2ecc71;">🌐 SALAS ONLINE</div>
-                        <div class="mode-card-desc">Navegador completo estilo HaxBall com lista de salas em tempo real!</div>
+                        <div class="mode-card-title" style="color: #00f2fe;">🌐 SALAS ONLINE</div>
+                        <div class="mode-card-desc">Navegador estilo HaxBall com lista de salas em tempo real!</div>
                     </div>
-                    <div class="mode-card-badge" style="background: rgba(46,204,113,0.15); color:#2ecc71;">ROOM LIST</div>
+                    <div class="mode-card-badge" style="background: rgba(0, 242, 254, 0.2); color:#00f2fe;">ROOM LIST</div>
                 </div>
             </div>
 
             <div class="menu-sub-grid" id="menu-sub-botoes">
                 <div class="sub-btn-card" onclick="abrirModalAmigos()" style="border-color: rgba(0,242,254,0.4);"><span>👥</span><div>AMIGOS/GRUPO</div></div>
-                <div class="sub-btn-card" onclick="abrirPasseBatalha()" style="border-color: rgba(241,196,15,0.4);"><span>🎫</span><div>PASSE (20)</div></div>
+                <div class="sub-btn-card" onclick="abrirLeaderboardGlobal()" style="border-color: rgba(241,196,15,0.4);"><span>🏆</span><div>RANK GLOBAL</div></div>
+                <div class="sub-btn-card" onclick="abrirModalComprarMoedasPix()" style="border-color: rgba(0, 180, 216, 0.5); background: rgba(0,180,216,0.15);"><span>🪙</span><div style="color:#00f2fe;">COMPRAR MOEDAS</div></div>
+                <div class="sub-btn-card" onclick="abrirPasseBatalha()" style="border-color: rgba(16,185,129,0.5);"><span>🎫</span><div>PASSE (20)</div></div>
                 <div class="sub-btn-card" onclick="abrirLoja()"><span>🛒</span><div>MERCADO</div></div>
-                <div class="sub-btn-card" onclick="abrirEstatisticas()"><span>📊</span><div>STATS</div></div>
                 <div class="sub-btn-card" onclick="abrirModalConfiguracoes()"><span>⚙️</span><div>ÁUDIO</div></div>
-                <!-- BOTÃO DO ADMIN EXCLUSIVO (APARECE APENAS QUANDO LOGADO COMO ADMIN) -->
-                <div class="sub-btn-card" id="btn-menu-admin" onclick="abrirModalAdmin()" style="border-color: #e67e22; background: rgba(230, 126, 34, 0.15); display: none;"><span>👑</span><div style="color:#f39c12;">PAINEL ADM</div></div>
+                <!-- BOTÃO DO ADMIN EXCLUSIVO -->
+                <div class="sub-btn-card" id="btn-menu-admin" onclick="abrirModalAdmin()" style="border-color: #e67e22; background: rgba(230, 126, 34, 0.2); display: none;"><span>👑</span><div style="color:#f39c12;">PAINEL ADM</div></div>
             </div>
 
             <button class="btn btn-voltar" style="margin-top: 16px;" onclick="deslogar()">Sair da Conta</button>
         </div>
 
-        <!-- TELA DE FILA RANKED (MATCHMAKING) -->
+        <!-- TELA DE FILA RANKED COM 1V1, 2V2 E 3V3 (COM MAPAS OFICIAIS) -->
         <div id="screen-matchmaking" class="screen">
             <h1 style="color: #d2a8ff;">⚔️ FILA RANKED COMPETITIVA</h1>
-            <p style="color:#94a3b8; font-size:12px; margin-bottom:15px;">Partidas competitivas valendo PDL com 2 tempos de 1m30s</p>
+            <p style="color:#a7f3d0; font-size:12px; margin-bottom:15px;">Partidas competitivas valendo PDL nos mapas oficiais</p>
 
-            <div style="background: #111a24; border: 2px solid #8e44ad; border-radius: 10px; padding: 20px; width: 460px; max-width: 90%; margin-bottom: 15px;">
-                <div style="display:flex; justify-content:space-around; margin-bottom:15px;">
-                    <label><input type="radio" name="ranked-mode-select" value="1V1" checked> 1v1 Duelo Solo</label>
-                    <label><input type="radio" name="ranked-mode-select" value="2V2"> 2v2 Duplas (Com Grupo)</label>
+            <div style="background: #082012; border: 2px solid #8e44ad; border-radius: 10px; padding: 20px; width: 500px; max-width: 90%; margin-bottom: 15px;">
+                <div style="display:flex; justify-content:space-around; margin-bottom:15px; font-size:11px; font-weight:bold;">
+                    <label><input type="radio" name="ranked-mode-select" value="1V1" checked> 1v1 (Padrão 1000x550)</label>
+                    <label><input type="radio" name="ranked-mode-select" value="2V2"> 2v2 (Maracanã 1200x660)</label>
+                    <label><input type="radio" name="ranked-mode-select" value="3V3"> 3v3 (Titã 1400x750)</label>
                 </div>
 
                 <div id="mm-status-box" style="text-align:center;">
                     <div id="mm-status-txt" style="font-size:15px; font-weight:900; color:#cbd5e1;">Pronto para buscar partida</div>
                     <div id="mm-timer-txt" style="font-size:28px; font-weight:900; color:var(--primary-gold); font-family:'Rajdhani'; margin:8px 0; display:none;">00:00</div>
-                    <div id="mm-detail-txt" style="font-size:11px; color:#94a3b8; margin-top:4px;"></div>
+                    <div id="mm-detail-txt" style="font-size:11px; color:#a7f3d0; margin-top:4px;"></div>
                 </div>
 
                 <button class="btn btn-ranked" id="btn-iniciar-mm" style="width:100%; margin-top:12px;" onclick="iniciarBuscaRanked()">🔍 BUSCAR PARTIDA</button>
@@ -450,6 +482,98 @@
             </div>
 
             <button class="btn btn-voltar" onclick="sairTelaMatchmaking()">⏴ VOLTAR AO MENU</button>
+        </div>
+
+        <!-- MODAL DE COMPRA DE MOEDAS COM DINHEIRO REAL (R$ 1,00 = 1000 MOEDAS) -->
+        <div id="modal-comprar-moedas" class="modal-overlay">
+            <div class="modal-box" style="border-color: #00f2fe; width: 620px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h2 style="margin:0; color:#00f2fe;">🪙 BANCO IAES - COMPRAR MOEDAS</h2>
+                    <span style="font-size:11px; color:#10b981; font-weight:bold;">⚡ 1 REAL = 1.000 MOEDAS</span>
+                </div>
+                <p style="font-size:11px; color:#a7f3d0; margin-bottom:12px;">Selecione seu pacote de moedas para desbloquear itens lendários e cosméticos do jogo:</p>
+
+                <div class="pix-grid">
+                    <div class="pix-card" onclick="comprarPacoteMoedas(1000, 1.00, 'PACOTE INICIANTE')">
+                        <div style="font-size:24px;">🪙</div>
+                        <div class="pix-moedas">1.000 MOEDAS</div>
+                        <div class="pix-preco">R$ 1,00</div>
+                        <button class="btn btn-pix" style="padding:5px; font-size:10px;">COMPRAR VIA PIX</button>
+                    </div>
+
+                    <div class="pix-card" onclick="comprarPacoteMoedas(5000, 5.00, 'PACOTE CRAQUE')">
+                        <div style="font-size:24px;">🪙🪙</div>
+                        <div class="pix-moedas">5.000 MOEDAS</div>
+                        <div class="pix-preco">R$ 5,00</div>
+                        <button class="btn btn-pix" style="padding:5px; font-size:10px;">COMPRAR VIA PIX</button>
+                    </div>
+
+                    <div class="pix-card" style="border-color:var(--primary-gold);" onclick="comprarPacoteMoedas(12000, 10.00, 'PACOTE CAMPEÃO (+20% BÔNUS)')">
+                        <div style="font-size:24px;">👑</div>
+                        <div class="pix-moedas">12.000 MOEDAS</div>
+                        <div class="pix-preco">R$ 10,00 <span style="font-size:9px; color:#10b981;">(+2k BÔNUS)</span></div>
+                        <button class="btn btn-gold" style="padding:5px; font-size:10px;">POPULAR ⭐</button>
+                    </div>
+
+                    <div class="pix-card" onclick="comprarPacoteMoedas(31000, 25.00, 'PACOTE PROFISSIONAL')">
+                        <div style="font-size:24px;">💎</div>
+                        <div class="pix-moedas">31.000 MOEDAS</div>
+                        <div class="pix-preco">R$ 25,00 <span style="font-size:9px; color:#10b981;">(+6k BÔNUS)</span></div>
+                        <button class="btn btn-pix" style="padding:5px; font-size:10px;">COMPRAR VIA PIX</button>
+                    </div>
+
+                    <div class="pix-card" style="border-color:#e74c3c;" onclick="comprarPacoteMoedas(65000, 50.00, 'PACOTE MITOLÓGICO')">
+                        <div style="font-size:24px;">🌌</div>
+                        <div class="pix-moedas">65.000 MOEDAS</div>
+                        <div class="pix-preco">R$ 50,00 <span style="font-size:9px; color:#10b981;">(+15k BÔNUS)</span></div>
+                        <button class="btn" style="background:#e74c3c; padding:5px; font-size:10px;">MEGA OFERTA 🔥</button>
+                    </div>
+
+                    <div class="pix-card" style="border-color:var(--primary-gold);" onclick="comprarPacoteMoedas(140000, 100.00, 'PACOTE DONO DA BOLA')">
+                        <div style="font-size:24px;">🏆</div>
+                        <div class="pix-moedas">140.000 MOEDAS</div>
+                        <div class="pix-preco">R$ 100,00 <span style="font-size:9px; color:#10b981;">(+40k BÔNUS)</span></div>
+                        <button class="btn btn-gold" style="padding:5px; font-size:10px;">LENDA V.I.P 🏆</button>
+                    </div>
+                </div>
+
+                <div id="pix-checkout-box" style="display:none; background:#04140b; border:1px dashed #10b981; border-radius:8px; padding:12px; margin-top:14px; text-align:center;">
+                    <div id="pix-checkout-title" style="font-weight:900; color:var(--primary-gold); font-size:13px;">PAGAMENTO PIX GERADO</div>
+                    <div style="font-size:11px; color:#a7f3d0; margin:4px 0;" id="pix-checkout-desc">Valor: R$ 1,00 | Crédito: 1.000 Moedas</div>
+                    <div style="background:#fff; color:#000; padding:6px; font-size:10px; font-family:monospace; margin:8px auto; max-width:80%; border-radius:4px;" id="pix-copia-cola">00020126360014BR.GOV.BCB.PIX0114iaesball@pix.br52040000530398654041.005802BR5910IAES BALL6009SAO PAULO62070503***6304E8F2</div>
+                    <div style="display:flex; gap:8px; justify-content:center; margin-top:8px;">
+                        <button class="btn btn-gold" style="padding:6px 12px; font-size:11px;" onclick="confirmarPixSimulado()">✅ CONFIRMAR PAGAMENTO</button>
+                        <button class="btn btn-voltar" style="padding:6px 12px; font-size:11px;" onclick="fecharCheckoutPix()">CANCELAR</button>
+                    </div>
+                </div>
+
+                <button class="btn btn-voltar" style="width:100%; margin-top:14px;" onclick="fecharModalComprarMoedas()">FECHAR</button>
+            </div>
+        </div>
+
+        <!-- MODAL DE RANK GLOBAL DE PDL (HALL DA FAMA) -->
+        <div id="modal-leaderboard" class="modal-overlay">
+            <div class="modal-box" style="border-color: var(--primary-gold); width: 580px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h2 style="margin:0; color:var(--primary-gold);">🏆 RANKING GLOBAL DE PDL</h2>
+                    <span style="font-size:11px; color:#10b981; font-weight:bold;">TEMPORADA 1</span>
+                </div>
+                <div style="max-height:340px; overflow-y:auto; margin-bottom:12px;" id="leaderboard-table-box">
+                    <table style="width:100%; border-collapse:collapse; font-size:12px;">
+                        <thead>
+                            <tr style="background:#04140b; color:#a7f3d0; text-align:left;">
+                                <th style="padding:8px 6px;">#</th>
+                                <th style="padding:8px 6px;">Jogador</th>
+                                <th style="padding:8px 6px;">Elo / PDL</th>
+                                <th style="padding:8px 6px;">Vitórias</th>
+                                <th style="padding:8px 6px;">Nível</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-tbody"></tbody>
+                    </table>
+                </div>
+                <button class="btn btn-voltar" style="width:100%; margin:0;" onclick="fecharLeaderboardGlobal()">FECHAR</button>
+            </div>
         </div>
 
         <!-- HAXBALL ROOM LIST SCREEN -->
@@ -462,7 +586,7 @@
                 <div class="hax-tip">
                     <span>Tip: Join rooms near you to reduce lag.</span>
                     <div style="display:flex; gap:6px; align-items:center;">
-                        <input type="text" id="input-entrar-codigo" placeholder="Código (ex: IAES_ABC)" style="padding:4px 8px; font-size:11px; background:#000; color:#fff; border:1px solid #3b4e61; border-radius:4px; width:140px;">
+                        <input type="text" id="input-entrar-codigo" placeholder="Código (ex: IAES_ABC)" style="padding:4px 8px; font-size:11px; background:#000; color:#fff; border:1px solid #1a4a2e; border-radius:4px; width:140px;">
                         <button class="btn" style="padding:4px 8px; font-size:10px;" onclick="entrarPorCodigoDireto()">ENTRAR POR CÓDIGO</button>
                     </div>
                 </div>
@@ -486,10 +610,10 @@
                         <div style="display:flex; flex-direction:column; gap:6px;">
                             <button class="hax-side-btn" onclick="carregarSalasOnline()">🔄 Refresh</button>
                             <button class="hax-side-btn primary" onclick="conectarSalaSelecionada()">➡️ Join Room</button>
-                            <button class="hax-side-btn primary" style="background:#27ae60; border-color:#2ecc71;" onclick="abrirModalCriarSala()">➕ Create Room</button>
+                            <button class="hax-side-btn primary" style="background:#10b981; border-color:#059669; color:#000;" onclick="abrirModalCriarSala()">➕ Create Room</button>
                         </div>
                         <div style="display:flex; flex-direction:column; gap:6px;">
-                            <button class="hax-side-btn" onclick="abrirEstatisticas()">📊 Replays</button>
+                            <button class="hax-side-btn" onclick="abrirLeaderboardGlobal()">🏆 Rank</button>
                             <button class="hax-side-btn" onclick="abrirModalConfiguracoes()">⚙️ Settings</button>
                             <button class="hax-side-btn" onclick="showScreen('screen-home')">⏴ Back</button>
                         </div>
@@ -504,23 +628,27 @@
             </div>
         </div>
 
-        <!-- PASSE DE BATALHA -->
+        <!-- PASSE DE BATALHA COM 20 NÍVEIS CHEIO DE COSMÉTICOS -->
         <div id="screen-battlepass" class="screen">
-            <h1>🎫 PASSE DE BATALHA (20 NÍVEIS)</h1>
+            <h1 style="color:#10b981;">🎫 PASSE DE BATALHA (20 NÍVEIS)</h1>
+            <p style="color:#a7f3d0; font-size:12px; margin-bottom:10px;">Avance de nível jogando partidas para resgatar Bolas, Rastros, Auras e Explosões exclusivas!</p>
             <div class="pass-track-container"><div class="pass-track" id="pass-track-list"></div></div>
             <button class="btn btn-voltar" onclick="showScreen('screen-home')">⏴ VOLTAR AO MENU</button>
         </div>
 
         <!-- MERCADO DA BOLA -->
         <div id="screen-shop" class="screen">
-            <h1>🛒 MERCADO DA BOLA</h1>
+            <h1 style="color:var(--primary-gold);">🛒 MERCADO DA BOLA</h1>
             <div class="shop-tabs">
                 <button class="shop-tab-btn active" onclick="filtrarLoja('bolas')">⚽ Bolas (10)</button>
                 <button class="shop-tab-btn" onclick="filtrarLoja('rastros')">✨ Rastros (8)</button>
                 <button class="shop-tab-btn" onclick="filtrarLoja('auras')">🔥 Auras (8)</button>
                 <button class="shop-tab-btn" onclick="filtrarLoja('explosoes')">💥 Explosões Gol (6)</button>
             </div>
-            <div style="font-weight:900; color:var(--primary-gold); margin-bottom:8px;">SALDO: 🪙 <span id="shop-moedas-val">0</span></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:8px;">
+                <div style="font-weight:900; color:var(--primary-gold);">SALDO: 🪙 <span id="shop-moedas-val">0</span></div>
+                <button class="btn btn-pix" style="padding:4px 10px; font-size:10px;" onclick="abrirModalComprarMoedasPix()">+ COMPRAR MAIS MOEDAS</button>
+            </div>
             <div class="shop-grid" id="shop-items-grid"></div>
             <button class="btn btn-voltar" style="margin-top:12px;" onclick="showScreen('screen-home')">⏴ VOLTAR AO MENU</button>
         </div>
@@ -546,7 +674,7 @@
             <div style="display:flex; justify-content:center; gap:8px; margin-bottom:8px;">
                 <button class="btn" style="padding:4px 10px; font-size:10px;" onclick="copiarCodigoSala()">📋 COPIAR CÓDIGO DA SALA</button>
             </div>
-            <div id="host-network-status" style="font-size:11px; color:#94a3b8; margin-bottom:8px;">Conectando ao broker WebRTC...</div>
+            <div id="host-network-status" style="font-size:11px; color:#a7f3d0; margin-bottom:8px;">Conectando ao broker WebRTC...</div>
             
             <div class="lobby-panel" style="display:flex; gap:10px; width:100%; margin:10px 0;">
                 <div class="lobby-team-box" style="flex:1; background:rgba(41,128,185,0.15); border:2px solid #2980b9; padding:10px; border-radius:8px;">
@@ -575,9 +703,9 @@
             <h1>MODALIDADE DE JOGO</h1>
             <div class="menu-modes-grid" style="grid-template-columns: repeat(4, 1fr); gap: 8px;">
                 <button class="btn" onclick="escolherModo('CLASSICO')">1v1 Duelo</button>
-                <button class="btn" style="background: #d35400;" onclick="escolherModo('CLASSICO_2V2')">2v2 Duplas</button>
-                <button class="btn" style="background: #2c3e50;" onclick="escolherModo('CLASSICO_3V3')">3v3 Trio</button>
-                <button class="btn" style="background: #16a085;" onclick="escolherModo('CLASSICO_5V5')">⚽ 5v5 Society</button>
+                <button class="btn" style="background: #165b33;" onclick="escolherModo('CLASSICO_2V2')">2v2 Duplas</button>
+                <button class="btn" style="background: #0d3820;" onclick="escolherModo('CLASSICO_3V3')">3v3 Trio</button>
+                <button class="btn" style="background: #10b981; color:#000;" onclick="escolherModo('CLASSICO_5V5')">⚽ 5v5 Society</button>
             </div>
             <button class="btn btn-voltar" style="margin-top: 18px;" onclick="showScreen('screen-home')">⏴ VOLTAR</button>
         </div>
@@ -604,7 +732,7 @@
             <button class="btn btn-voltar" style="margin-top: 18px;" onclick="voltarDeTimes()">⏴ VOLTAR</button>
         </div>
 
-        <!-- ESCOLHA DE UNIFORME -->
+        <!-- ESCOLHA DE UNIFORME COM BOTÃO DE VOLTAR E TROCAR TIME -->
         <div id="screen-uniform" class="screen">
             <h2 id="title-jogador-uniform">CAPITÃO: UNIFORME OFICIAL</h2>
             <h1 id="nome-time-escolhido" style="color: #fff; margin-bottom: 0;">TIME</h1>
@@ -619,7 +747,10 @@
                     <label><input type="radio" name="uni-select" value="2" onchange="atualizarPreview()"> Uniforme 2 Reserva</label>
                 </div>
             </div>
-            <button class="btn btn-avancar" onclick="confirmarUniforme()">CONFIRMAR E JOGAR ➔</button>
+            <div style="display:flex; gap:12px; width:80%; max-width:400px; margin-top:10px;">
+                <button class="btn btn-voltar" style="flex:1; margin:0;" onclick="voltarParaEscolherOutroTime()">⏴ TROCAR TIME</button>
+                <button class="btn btn-avancar" style="flex:1; margin:0;" onclick="confirmarUniforme()">JOGAR ➔</button>
+            </div>
         </div>
     </div>
 
@@ -682,7 +813,7 @@
     <!-- MODAL DE AMIGOS & GRUPO -->
     <div id="modal-amigos" class="modal-overlay">
         <div class="modal-box">
-            <h2 style="margin-top:0; color:var(--accent-cyan);">👥 AMIGOS & GRUPO 2V2</h2>
+            <h2 style="margin-top:0; color:var(--accent-cyan);">👥 AMIGOS & GRUPO 2V2/3V3</h2>
             
             <div style="display:flex; gap:8px; margin-bottom:12px;">
                 <input type="text" id="input-add-amigo" class="input-sala" style="margin:0; width:100%; text-align:left;" placeholder="Digite o nickname exato..." maxlength="16">
@@ -691,14 +822,14 @@
 
             <!-- GRUPO ATUAL -->
             <div style="background: rgba(0, 242, 254, 0.08); border: 2px solid #00f2fe; border-radius: 8px; padding: 10px; margin-bottom: 12px;">
-                <div style="font-size:11px; font-weight:900; color:#00f2fe; margin-bottom:6px;">LOBBY DO GRUPO (2v2 RANKED)</div>
+                <div style="font-size:11px; font-weight:900; color:#00f2fe; margin-bottom:6px;">LOBBY DO GRUPO (RANKED)</div>
                 <div id="grupo-membros-list" style="font-size:12px; font-weight:bold;">Carregando grupo...</div>
                 <div id="grupo-acoes-box" style="margin-top:8px; display:flex; gap:6px;"></div>
             </div>
 
             <div style="font-size:11px; font-weight:bold; color:#cbd5e1; margin-bottom:6px;">MEUS AMIGOS:</div>
             <div id="lista-amigos-container" style="max-height:180px; overflow-y:auto; margin-bottom:12px;">
-                <div style="font-size:11px; color:#94a3b8;">Nenhum amigo adicionado ainda.</div>
+                <div style="font-size:11px; color:#a7f3d0;">Nenhum amigo adicionado ainda.</div>
             </div>
 
             <button class="btn btn-voltar" style="width:100%; margin:0;" onclick="fecharModalAmigos()">FECHAR</button>
@@ -713,7 +844,7 @@
             <input type="text" id="modal-input-nome" class="input-sala" style="width:100%; text-align:left; margin-top:4px;" value="⚡ SALA OFICIAL IAES" maxlength="30">
 
             <label style="font-size:12px; font-weight:bold; color:#cbd5e1; margin-top:8px; display:block;">Modalidade:</label>
-            <select id="modal-select-modo" style="width:100%; padding:10px; background:#0a1118; color:#fff; border:2px solid #2980b9; border-radius:6px; font-weight:bold; margin-top:4px;">
+            <select id="modal-select-modo" style="width:100%; padding:10px; background:#04140b; color:#fff; border:2px solid #10b981; border-radius:6px; font-weight:bold; margin-top:4px;">
                 <option value="CLASSICO">1v1 Duelo</option>
                 <option value="CLASSICO_2V2">2v2 Duplas</option>
                 <option value="CLASSICO_3V3">3v3 Trio</option>
@@ -721,7 +852,7 @@
             </select>
 
             <label style="font-size:12px; font-weight:bold; color:#cbd5e1; margin-top:8px; display:block;">Estádio:</label>
-            <select id="modal-select-estadio" style="width:100%; padding:10px; background:#0a1118; color:#fff; border:2px solid #2980b9; border-radius:6px; font-weight:bold; margin-top:4px;">
+            <select id="modal-select-estadio" style="width:100%; padding:10px; background:#04140b; color:#fff; border:2px solid #10b981; border-radius:6px; font-weight:bold; margin-top:4px;">
                 <option value="800,440">Arena (Pequeno - 800x440)</option>
                 <option value="1000,550">Padrão (Médio - 1000x550)</option>
                 <option value="1200,660">Maracanã (Grande - 1200x660)</option>
@@ -782,9 +913,11 @@
             <div class="team-flag-color" id="badge-color-p1"></div>
             <div class="time-nome-tv" id="nome-p1">PAL</div>
             <div class="score-box-tv" id="score1">0</div>
+            <div class="penalty-dots-box" id="p1-dots" style="display:none;"></div>
         </div>
         <div class="match-timer-tv" id="timer">1º T • 01:30</div>
         <div class="team-box-broadcast t2">
+            <div class="penalty-dots-box" id="p2-dots" style="display:none;"></div>
             <div class="score-box-tv" id="score2">0</div>
             <div class="time-nome-tv" id="nome-p2">COR</div>
             <div class="team-flag-color" id="badge-color-p2"></div>
@@ -1164,6 +1297,91 @@
             }
         }
 
+        // --- SISTEMA DE COMPRA DE MOEDAS COM DINHEIRO REAL (1 REAL = 1.000 MOEDAS) ---
+        let pixPendente = null;
+
+        function abrirModalComprarMoedasPix() {
+            AudioEngine.playClick();
+            fecharCheckoutPix();
+            uiShow('modal-comprar-moedas', 'flex');
+        }
+        function fecharModalComprarMoedas() { AudioEngine.playClick(); uiHide('modal-comprar-moedas'); }
+
+        function comprarPacoteMoedas(qtdMoedas, valorReais, pacoteNome) {
+            AudioEngine.playClick();
+            pixPendente = { moedas: qtdMoedas, valor: valorReais, nome: pacoteNome };
+            uiText('pix-checkout-title', `⚡ PAGAMENTO PIX: ${pacoteNome}`);
+            uiText('pix-checkout-desc', `Valor: R$ ${valorReais.toFixed(2)} | Moedas creditadas: +${qtdMoedas.toLocaleString()} 🪙`);
+            uiShow('pix-checkout-box', 'block');
+        }
+        function fecharCheckoutPix() { uiHide('pix-checkout-box'); pixPendente = null; }
+
+        function confirmarPixSimulado() {
+            if (!pixPendente) return;
+            AudioEngine.playVictoryFanfare();
+            const moedasGanhas = pixPendente.moedas;
+            meuPerfil.moedas = (meuPerfil.moedas || 0) + moedasGanhas;
+            salvarPerfil();
+            atualizarPerfilUI();
+            fecharCheckoutPix();
+            fecharModalComprarMoedas();
+            mostrarToast(`🎉 Pagamento de R$ ${pixPendente.valor.toFixed(2)} APROVADO! +${moedasGanhas.toLocaleString()} 🪙 adicionadas!`);
+        }
+
+        // --- SISTEMA DE LEADERBOARD GLOBAL DE PDL (HALL DA FAMA) ---
+        async function abrirLeaderboardGlobal() {
+            AudioEngine.playClick();
+            uiShow('modal-leaderboard', 'flex');
+            const tbody = document.getElementById('leaderboard-tbody');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:15px; color:#a7f3d0;">Carregando Hall da Fama...</td></tr>';
+
+            let lista = [];
+            try {
+                if (db) {
+                    const snap = await db.collection("jogadores").limit(50).get();
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        lista.push({ nome: d.nome || 'JOGADOR', elo: d.elo || 1000, vitorias: d.vitorias || 0, nivel: d.nivel || 1 });
+                    });
+                }
+            } catch(e) {}
+
+            if (lista.length === 0) {
+                lista = [
+                    { nome: meuPerfil.nome || 'CRAQUE', elo: meuPerfil.elo || 1000, vitorias: meuPerfil.vitorias || 0, nivel: meuPerfil.nivel || 1 },
+                    { nome: 'NEYMAR_PRO', elo: 1850, vitorias: 74, nivel: 18 },
+                    { nome: 'MESSI_10', elo: 1720, vitorias: 62, nivel: 15 },
+                    { nome: 'CR7_GOAT', elo: 1640, vitorias: 58, nivel: 14 },
+                    { nome: 'VINICIUS_JR', elo: 1520, vitorias: 45, nivel: 12 },
+                    { nome: 'HAALAND_BOT', elo: 1410, vitorias: 38, nivel: 10 }
+                ];
+            }
+
+            lista.sort((a, b) => (b.elo || 1000) - (a.elo || 1000));
+            tbody.innerHTML = '';
+
+            lista.forEach((p, idx) => {
+                const tr = document.createElement('tr');
+                const isMe = p.nome === meuPerfil.nome;
+                if (isMe) tr.style.background = 'rgba(16, 185, 129, 0.2)';
+                
+                let rankIcon = `#${idx + 1}`;
+                if (idx === 0) rankIcon = '🥇 1º';
+                if (idx === 1) rankIcon = '🥈 2º';
+                if (idx === 2) rankIcon = '🥉 3º';
+
+                tr.innerHTML = `
+                    <td style="padding:7px 6px; font-weight:900; color:${idx < 3 ? 'var(--primary-gold)' : '#fff'};">${rankIcon}</td>
+                    <td style="padding:7px 6px; font-weight:bold; color:#fff;">${p.nome} ${isMe ? '<span style="color:#10b981;">(VOCÊ)</span>' : ''}</td>
+                    <td style="padding:7px 6px; font-weight:900; color:var(--primary-gold);">${p.elo || 1000} PDL</td>
+                    <td style="padding:7px 6px; color:#10b981; font-weight:bold;">${p.vitorias || 0}</td>
+                    <td style="padding:7px 6px; color:#a7f3d0;">Nvl ${p.nivel || 1}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        function fecharLeaderboardGlobal() { AudioEngine.playClick(); uiHide('modal-leaderboard'); }
+
         // --- FIREBASE CONFIGURAÇÃO ---
         const firebaseConfig = {
             apiKey: "AIzaSyADvWiZTDiXzncheT3qljukYVOGcaemBDQ",
@@ -1225,14 +1443,31 @@
             ]
         };
 
-        const PASSE_TIERS = Array.from({ length: 20 }, (_, i) => {
-            const lvl = i + 1;
-            if (lvl === 20) return { tier: 20, recompensa: '🌌 Bola Cósmica + 3000 🪙', tipo: 'combo', id: 'bola_arcoiris', qtd: 3000, icon: '🌌', nome: 'Lenda do Futebol' };
-            if (lvl % 5 === 0) return { tier: lvl, recompensa: `🪙 ${lvl * 100} Moedas`, tipo: 'moedas', qtd: lvl * 100, icon: '🪙', nome: `Prêmio Nvl ${lvl}` };
-            return { tier: lvl, recompensa: `🪙 ${lvl * 60} Moedas`, tipo: 'moedas', qtd: lvl * 60, icon: '🪙', nome: `Recompensa ${lvl}` };
-        });
+        // --- 20 NÍVEIS DO PASSE DE BATALHA COM COSMÉTICOS EXCLUSIVOS ---
+        const PASSE_TIERS = [
+            { tier: 1, recompensa: '🪙 150 Moedas', tipo: 'moedas', qtd: 150, icon: '🪙', nome: 'Estreia no Campo' },
+            { tier: 2, recompensa: '✨ Rastro de Ouro', tipo: 'item', id: 'rastro_ouro', cat: 'rastros', icon: '✨', nome: 'Toque Dourado' },
+            { tier: 3, recompensa: '🪙 300 Moedas', tipo: 'moedas', qtd: 300, icon: '🪙', nome: 'Bolsa de Prêmios' },
+            { tier: 4, recompensa: '🔥 Aura de Chamas', tipo: 'item', id: 'aura_chamas', cat: 'auras', icon: '🔥', nome: 'Pés Ardentes' },
+            { tier: 5, recompensa: '📜 Pelé Vintage 1970', tipo: 'item', id: 'bola_vintage', cat: 'bolas', icon: '📜', nome: 'Couro Clássico' },
+            { tier: 6, recompensa: '🪙 500 Moedas', tipo: 'moedas', qtd: 500, icon: '🪙', nome: 'Baú de Prêmios' },
+            { tier: 7, recompensa: '💥 Explosão Supernova', tipo: 'item', id: 'exp_supernova', cat: 'explosoes', icon: '🌌', nome: 'Gol Cósmico' },
+            { tier: 8, recompensa: '❄️ Rastro de Gelo', tipo: 'item', id: 'rastro_gelo', cat: 'rastros', icon: '❄️', nome: 'Passada Glacial' },
+            { tier: 9, recompensa: '🪙 750 Moedas', tipo: 'moedas', qtd: 750, icon: '🪙', nome: 'Bolsa Real' },
+            { tier: 10, recompensa: '💎 Diamante Cristal', tipo: 'item', id: 'bola_diamante', cat: 'bolas', icon: '💎', nome: 'Refração Nobre' },
+            { tier: 11, recompensa: '🪙 1.000 Moedas', tipo: 'moedas', qtd: 1000, icon: '🪙', nome: 'Fortuna Campeã' },
+            { tier: 12, recompensa: '⚡ Aura de Raio', tipo: 'item', id: 'aura_raio', cat: 'auras', icon: '⚡', nome: 'Tempestade Elétrica' },
+            { tier: 13, recompensa: '🪙 1.200 Moedas', tipo: 'moedas', qtd: 1200, icon: '🪙', nome: 'Cofre de Moedas' },
+            { tier: 14, recompensa: '🌈 Rastro Arco-Íris', tipo: 'item', id: 'rastro_arcoiris', cat: 'rastros', icon: '🌈', nome: 'Cores Mágicas' },
+            { tier: 15, recompensa: '🌋 Magma Vulcânico', tipo: 'item', id: 'bola_magma', cat: 'bolas', icon: '🌋', nome: 'Lava Pura' },
+            { tier: 16, recompensa: '🪙 1.500 Moedas', tipo: 'moedas', qtd: 1500, icon: '🪙', nome: 'Tesouro da Liga' },
+            { tier: 17, recompensa: '🎆 Show de Fogos', tipo: 'item', id: 'exp_fogos', cat: 'explosoes', icon: '🎆', nome: 'Pirotecnia no Gol' },
+            { tier: 18, recompensa: '💚 Escudo Esmeralda', tipo: 'item', id: 'aura_esmeralda', cat: 'auras', icon: '💚', nome: 'Aura Verdejante' },
+            { tier: 19, recompensa: '🥷 Shuriken Negra', tipo: 'item', id: 'bola_ninja', cat: 'bolas', icon: '🥷', nome: 'Sombra Ninja' },
+            { tier: 20, recompensa: '🌌 Bola Cósmica + 3.000 🪙', tipo: 'combo', id: 'bola_arcoiris', qtd: 3000, icon: '🌌', nome: 'Lenda Suprema' }
+        ];
 
-        // --- VARIÁVEIS GLOBAIS DE PARTIDA COM 2 TEMPOS ---
+        // --- VARIÁVEIS GLOBAIS DE PARTIDA COM 2 TEMPOS & PÊNALTIS ---
         let engine, render, runner, bola;
         let estadoJogo = 'MENU';
         let delayTimer = 0;
@@ -1248,6 +1483,15 @@
         let cfgP1 = null, cfgP2 = null, timeTemporario = "";
         let modoDeJogo = 'CLASSICO';
         let isRanked = false;
+
+        // ESTADO DO MODO DE PÊNALTIS
+        let isPenaltiesMode = false;
+        let penaltyRound = 1;
+        let penaltyTurn = 1;
+        let penaltyResultsP1 = [];
+        let penaltyResultsP2 = [];
+        let penaltyTimer = 0;
+        let penaltyKicked = false;
 
         let historicoPosicoes = [], particulas = [];
         let frameReplay = 0, rewindIndex = 0;
@@ -1459,12 +1703,12 @@
                 uiShow('perfil-admin-badge', 'inline-block');
                 uiShow('btn-menu-admin', 'flex');
                 uiShow('btn-admin-ingame', 'block');
-                document.getElementById('menu-sub-botoes').style.gridTemplateColumns = 'repeat(6, 1fr)';
+                document.getElementById('menu-sub-botoes').style.gridTemplateColumns = 'repeat(7, 1fr)';
             } else {
                 uiHide('perfil-admin-badge');
                 uiHide('btn-menu-admin');
                 uiHide('btn-admin-ingame');
-                document.getElementById('menu-sub-botoes').style.gridTemplateColumns = 'repeat(5, 1fr)';
+                document.getElementById('menu-sub-botoes').style.gridTemplateColumns = 'repeat(6, 1fr)';
             }
 
             const perc = Math.min(100, Math.floor((meuPerfil.xp / (meuPerfil.nivel * 500)) * 100));
@@ -1482,7 +1726,7 @@
                               const n = change.doc.data();
                               if (n.tipo === 'convite_grupo') {
                                   convitePendente = { id: change.doc.id, ...n };
-                                  uiText('invite-popup-txt', `${n.remetenteNome} convidou você para o grupo 2v2!`);
+                                  uiText('invite-popup-txt', `${n.remetenteNome} convidou você para o grupo!`);
                                   uiShow('invite-popup');
                               }
                           }
@@ -1533,7 +1777,7 @@
             cont.innerHTML = '';
             const amigos = meuPerfil.amigos || [];
             if (amigos.length === 0) {
-                cont.innerHTML = '<div style="font-size:11px; color:#94a3b8; padding:10px;">Nenhum amigo adicionado. Digite o nick acima!</div>';
+                cont.innerHTML = '<div style="font-size:11px; color:#a7f3d0; padding:10px;">Nenhum amigo adicionado. Digite o nick acima!</div>';
                 return;
             }
 
@@ -1598,11 +1842,11 @@
 
             if (!meuGrupo.id || meuGrupo.membros.length === 0) {
                 list.innerHTML = `<span>Solo (Sem Grupo Ativo)</span>`;
-                acoes.innerHTML = `<button class="btn btn-avancar" style="margin:0; padding:6px 12px; font-size:10px;" onclick="criarNovoGrupo()">CRIAR GRUPO 2V2</button>`;
+                acoes.innerHTML = `<button class="btn btn-avancar" style="margin:0; padding:6px 12px; font-size:10px;" onclick="criarNovoGrupo()">CRIAR GRUPO 2V2/3V3</button>`;
             } else {
-                list.innerHTML = `👑 Líder: ${meuGrupo.lider} | Membros (${meuGrupo.membros.length}/2): <b>${meuGrupo.membros.join(', ')}</b>`;
+                list.innerHTML = `👑 Líder: ${meuGrupo.lider} | Membros (${meuGrupo.membros.length}/3): <b>${meuGrupo.membros.join(', ')}</b>`;
                 acoes.innerHTML = `
-                    <button class="btn btn-ranked" style="margin:0; padding:6px 12px; font-size:10px;" onclick="puxarRankedEmGrupo()">⚔️ PUXAR 2V2 COM GRUPO</button>
+                    <button class="btn btn-ranked" style="margin:0; padding:6px 12px; font-size:10px;" onclick="puxarRankedEmGrupo()">⚔️ PUXAR RANKED COM GRUPO</button>
                     <button class="btn btn-voltar" style="margin:0; padding:6px 12px; font-size:10px;" onclick="sairDoGrupo()">SAIR</button>
                 `;
             }
@@ -1612,7 +1856,7 @@
             AudioEngine.playClick();
             meuGrupo = { id: 'grp_' + (meuPerfil.uid || 'usr'), lider: meuPerfil.nome, membros: [meuPerfil.nome] };
             atualizarGrupoUI();
-            mostrarToast("Grupo 2v2 criado! Convide um amigo na lista abaixo.");
+            mostrarToast("Grupo criado! Convide amigos na lista abaixo.");
         }
         function sairDoGrupo() {
             AudioEngine.playClick();
@@ -1622,11 +1866,12 @@
         function puxarRankedEmGrupo() {
             fecharModalAmigos();
             abrirMatchmakingRanked();
-            document.querySelector('input[name="ranked-mode-select"][value="2V2"]').checked = true;
+            const modoSugerido = meuGrupo.membros.length >= 3 ? '3V3' : '2V2';
+            document.querySelector(`input[name="ranked-mode-select"][value="${modoSugerido}"]`).checked = true;
             iniciarBuscaRanked();
         }
 
-        // --- SISTEMA DE MATCHMAKING RANKED ---
+        // --- SISTEMA DE MATCHMAKING RANKED (1V1 PADRÃO, 2V2 MARACANÃ, 3V3 TITÃ) ---
         function abrirMatchmakingRanked() {
             AudioEngine.playClick();
             showScreen('screen-matchmaking');
@@ -1650,12 +1895,22 @@
             const mode = document.querySelector('input[name="ranked-mode-select"]:checked').value;
             isRanked = true;
             isMatchmakingActive = true;
-            modoDeJogo = mode === '2V2' ? 'CLASSICO_2V2' : 'CLASSICO';
-            selCampoW = mode === '2V2' ? 1200 : 1000;
-            selCampoH = mode === '2V2' ? 660 : 550;
+            isPenaltiesMode = false;
 
+            if (mode === '1V1') {
+                modoDeJogo = 'CLASSICO';
+                selCampoW = 1000; selCampoH = 550; // Padrão
+            } else if (mode === '2V2') {
+                modoDeJogo = 'CLASSICO_2V2';
+                selCampoW = 1200; selCampoH = 660; // Maracanã
+            } else if (mode === '3V3') {
+                modoDeJogo = 'CLASSICO_3V3';
+                selCampoW = 1400; selCampoH = 750; // Titã
+            }
+
+            const nomeMapa = mode === '1V1' ? 'Padrão (1000x550)' : (mode === '2V2' ? 'Maracanã (1200x660)' : 'Titã (1400x750)');
             uiText('mm-status-txt', `🔍 Buscando adversário Ranked ${mode}...`);
-            uiText('mm-detail-txt', 'Pesquisando na fila global...');
+            uiText('mm-detail-txt', `Mapa Oficial: ${nomeMapa}`);
             uiShow('mm-timer-txt');
             uiHide('btn-iniciar-mm');
             uiShow('btn-cancelar-mm');
@@ -1850,12 +2105,117 @@
             peer.on('error', () => {});
         }
 
+        // --- MODO DE PÊNALTIS OFICIAL (5 COBRANÇAS ALTERNADAS) ---
+        function iniciarModoPenaltis() {
+            AudioEngine.playClick();
+            isPenaltiesMode = true;
+            isRanked = false;
+            modoDeJogo = 'PENALTIS';
+            selCampoW = 900; selCampoH = 500;
+            currPlayer = 1;
+            prepararTelaTime();
+            showScreen('screen-team');
+        }
+
+        function configurarPenaltis() {
+            penaltyRound = 1;
+            penaltyTurn = 1;
+            penaltyResultsP1 = [];
+            penaltyResultsP2 = [];
+            placar1 = 0; placar2 = 0;
+            penaltyTimer = 600; // 10 segundos
+            penaltyKicked = false;
+            atualizarDotsPenaltis();
+            uiShow('p1-dots', 'flex');
+            uiShow('p2-dots', 'flex');
+            uiText('tv-badge-status', `🎯 PÊNALTIS • COBRANÇA ${penaltyRound}`);
+        }
+
+        function atualizarDotsPenaltis() {
+            const d1 = document.getElementById('p1-dots');
+            const d2 = document.getElementById('p2-dots');
+            if (!d1 || !d2) return;
+            d1.innerHTML = ''; d2.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const res1 = penaltyResultsP1[i];
+                d1.innerHTML += `<div class="penalty-dot ${res1 === true ? 'goal' : (res1 === false ? 'miss' : '')}"></div>`;
+                const res2 = penaltyResultsP2[i];
+                d2.innerHTML += `<div class="penalty-dot ${res2 === true ? 'goal' : (res2 === false ? 'miss' : '')}"></div>`;
+            }
+        }
+
+        function prepararCobrancaPenalti() {
+            penaltyKicked = false;
+            penaltyTimer = 600; // 10s
+            resetarUICompleta();
+            
+            const isP1Kicker = penaltyTurn === 1;
+            const kickerTeam = isP1Kicker ? cfgP1.time : cfgP2.time;
+            const keeperTeam = isP1Kicker ? cfgP2.time : cfgP1.time;
+
+            uiText('tv-badge-status', `🎯 PÊNALTIS • ${kickerTeam.toUpperCase()} CHUTA`);
+            uiText('texto-estado', `VEZ DE: ${kickerTeam.toUpperCase()} (P${penaltyTurn})`);
+            uiShow('texto-estado');
+            setTimeout(() => uiHide('texto-estado'), 1500);
+
+            // Bola na marca da cal (pênalti à direita)
+            Body.setVelocity(bola, { x: 0, y: 0 });
+            Body.setPosition(bola, { x: selCampoW * 0.45, y: selCampoH / 2 });
+
+            // Batedor posicionado atrás da bola
+            const kicker = window.player1;
+            Body.setVelocity(kicker, { x: 0, y: 0 });
+            Body.setPosition(kicker, { x: selCampoW * 0.35, y: selCampoH / 2 });
+
+            // Goleiro em cima da linha do gol direito
+            const keeper = window.player2;
+            Body.setVelocity(keeper, { x: 0, y: 0 });
+            Body.setPosition(keeper, { x: selCampoW - PITCH_INSET_X - 15, y: selCampoH / 2 });
+        }
+
+        function registrarResultadoPenalti(isGoal) {
+            if (penaltyTurn === 1) {
+                penaltyResultsP1.push(isGoal);
+                if (isGoal) placar1++, uiText('score1', placar1);
+            } else {
+                penaltyResultsP2.push(isGoal);
+                if (isGoal) placar2++, uiText('score2', placar2);
+            }
+
+            atualizarDotsPenaltis();
+
+            // Verifica se a disputa de pênaltis terminou
+            if (penaltyTurn === 2) {
+                penaltyRound++;
+            }
+
+            const p1Played = penaltyResultsP1.length;
+            const p2Played = penaltyResultsP2.length;
+
+            if (p1Played >= 5 && p2Played >= 5) {
+                if (placar1 !== placar2) {
+                    finalizarPartida(placar1 > placar2 ? 'P1' : 'P2');
+                    return;
+                }
+            } else if (p1Played >= 3 && p2Played >= 3) {
+                const p1Remaining = 5 - p1Played;
+                const p2Remaining = 5 - p2Played;
+                if (placar1 > placar2 + p2Remaining) { finalizarPartida('P1'); return; }
+                if (placar2 > placar1 + p1Remaining) { finalizarPartida('P2'); return; }
+            }
+
+            // Alterna o cobrador
+            penaltyTurn = penaltyTurn === 1 ? 2 : 1;
+            estadoJogo = 'GOL_CELEBRATION';
+            delayTimer = 90;
+        }
+
         // --- SISTEMA DE SALAS REAIS DO HAXBALL ---
-        function abrirNavegadorSalas() { AudioEngine.playClick(); isRanked = false; showScreen('screen-online-rooms'); carregarSalasOnline(); }
+        function abrirNavegadorSalas() { AudioEngine.playClick(); isRanked = false; isPenaltiesMode = false; showScreen('screen-online-rooms'); carregarSalasOnline(); }
 
         async function carregarSalasOnline() {
             const tbody = document.getElementById('hax-rooms-tbody');
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:25px; color:#94a3b8;">Buscando salas...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:25px; color:#a7f3d0;">Buscando salas...</td></tr>';
             salasOnlineCache = []; salaSelecionada = null;
 
             try {
@@ -1886,7 +2246,7 @@
             if (filtradas.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="4" style="text-align:center; padding:35px 20px; color:#94a3b8;">
+                        <td colspan="4" style="text-align:center; padding:35px 20px; color:#a7f3d0;">
                             <div style="font-size:13px; margin-bottom:12px;">Nenhuma sala aberta no momento.</div>
                             <button class="hax-side-btn primary" style="margin: 0 auto; display: inline-flex;" onclick="abrirModalCriarSala()">➕ Criar Primeira Sala</button>
                         </td>
@@ -1926,7 +2286,7 @@
             const pass = document.getElementById('modal-input-pass').value.trim();
             fecharModalCriarSala();
 
-            isOnline = true; isHost = true; mySlot = 1; modoDeJogo = modo; isRanked = false;
+            isOnline = true; isHost = true; mySlot = 1; modoDeJogo = modo; isRanked = false; isPenaltiesMode = false;
             selCampoW = parseInt(estadioDim[0]); selCampoH = parseInt(estadioDim[1]);
 
             pendingRoomConfig = { nome: nome, pass: pass, modo: modo, w: selCampoW, h: selCampoH };
@@ -2028,7 +2388,7 @@
         }
 
         function conectarSalaPorIdDireto(targetPeerId) {
-            isOnline = true; isHost = false; isRanked = false;
+            isOnline = true; isHost = false; isRanked = false; isPenaltiesMode = false;
             showScreen('screen-client-waiting');
             uiText('txt-status-client-lobby', `Conectando a ${targetPeerId}...`);
 
@@ -2118,10 +2478,10 @@
         function irParaModo(online) {
             AudioEngine.playClick();
             if(online) abrirNavegadorSalas();
-            else { isHost = true; currPlayer = 1; mySlot = 1; isOnline = false; isRanked = false; showScreen('screen-mode'); }
+            else { isHost = true; currPlayer = 1; mySlot = 1; isOnline = false; isRanked = false; isPenaltiesMode = false; showScreen('screen-mode'); }
         }
         function escolherModo(modo) {
-            AudioEngine.playClick(); modoDeJogo = modo;
+            AudioEngine.playClick(); modoDeJogo = modo; isPenaltiesMode = false;
             if (modo.includes('5V5')) selCampoW = 1600, selCampoH = 850;
             else if (modo.includes('3V3')) selCampoW = 1400, selCampoH = 750;
             else if (modo.includes('2V2')) selCampoW = 1200, selCampoH = 660;
@@ -2133,16 +2493,16 @@
             currPlayer = 1; prepararTelaTime(); showScreen('screen-team');
         }
 
-        // --- TIMES & UNIFORMES ---
+        // --- TIMES & UNIFORMES COM BOTÃO DE VOLTAR E TROCAR TIME ---
         const TIMES = {
-            "Palmeiras":   { bg: "#006437", fg: "#fff", detail: "#2ecc71", cor1: { bg: "#006437", line: "#ffffff", num: "#fff" }, cor2: { bg: "#e0e0e0", line: "#006437", num: "#006437" } },
+            "Palmeiras":   { bg: "#006437", fg: "#fff", detail: "#10b981", cor1: { bg: "#006437", line: "#ffffff", num: "#fff" }, cor2: { bg: "#e0e0e0", line: "#006437", num: "#006437" } },
             "Corinthians": { bg: "#000000", fg: "#fff", detail: "#ffffff", cor1: { bg: "#ffffff", line: "#000000", num: "#000" }, cor2: { bg: "#111111", line: "#ffffff", num: "#fff" } },
             "São Paulo":   { bg: "#ffffff", fg: "#000", detail: "#ff0000", cor1: { bg: "#ffffff", line: "#ff0000", num: "#000" }, cor2: { bg: "#ff0000", line: "#000000", num: "#fff" } },
             "Santos":      { bg: "#ffffff", fg: "#000", detail: "#000000", cor1: { bg: "#ffffff", line: "#000000", num: "#000" }, cor2: { bg: "#000000", line: "#ffffff", num: "#fff" } },
             "Flamengo":    { bg: "#c0392b", fg: "#fff", detail: "#000000", cor1: { bg: "#c0392b", line: "#000000", num: "#fff" }, cor2: { bg: "#ffffff", line: "#c0392b", num: "#000" } },
-            "Fluminense":  { bg: "#8b0000", fg: "#fff", detail: "#2e8b57", cor1: { bg: "#8b0000", line: "#2e8b57", num: "#fff" }, cor2: { bg: "#ffffff", line: "#8b0000", num: "#000" } },
+            "Fluminense":  { bg: "#8b0000", fg: "#fff", detail: "#10b981", cor1: { bg: "#8b0000", line: "#10b981", num: "#fff" }, cor2: { bg: "#ffffff", line: "#8b0000", num: "#000" } },
             "Atlético-MG": { bg: "#000000", fg: "#fff", detail: "#ffffff", cor1: { bg: "#000000", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#000000", num: "#000" } },
-            "Cruzeiro":    { bg: "#2980b9", fg: "#fff", detail: "#ffffff", cor1: { bg: "#2980b9", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#2980b9", num: "#000" } },
+            "Cruzeiro":    { bg: "#1e528e", fg: "#fff", detail: "#ffffff", cor1: { bg: "#1e528e", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#1e528e", num: "#000" } },
             "Inter":       { bg: "#c0392b", fg: "#fff", detail: "#ffffff", cor1: { bg: "#c0392b", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#c0392b", num: "#000" } },
             "Vasco":       { bg: "#000000", fg: "#fff", detail: "#ffffff", cor1: { bg: "#000000", line: "#ffffff", num: "#fff" }, cor2: { bg: "#ffffff", line: "#000000", num: "#000" } }
         };
@@ -2169,7 +2529,16 @@
                 if(el) { el.style.backgroundColor = cores.bg; el.style.borderColor = cores.line; el.style.color = cores.num; }
             });
         }
-        function voltarDeTimes() { AudioEngine.playClick(); showScreen('screen-mode'); }
+        function voltarParaEscolherOutroTime() {
+            AudioEngine.playClick();
+            timeTemporario = "";
+            showScreen('screen-team');
+        }
+        function voltarDeTimes() { 
+            AudioEngine.playClick(); 
+            if (isPenaltiesMode) showScreen('screen-home');
+            else showScreen('screen-mode'); 
+        }
 
         function confirmarUniforme() {
             AudioEngine.playClick(); if(!timeTemporario) return;
@@ -2194,7 +2563,7 @@
             }
         }
 
-        // --- LOJA & PASSE ---
+        // --- LOJA & PASSE DE BATALHA COM 20 NÍVEIS ---
         function abrirLoja() { AudioEngine.playClick(); uiText('shop-moedas-val', meuPerfil.moedas); filtrarLoja('bolas'); showScreen('screen-shop'); }
         function filtrarLoja(cat) {
             AudioEngine.playClick();
@@ -2209,11 +2578,16 @@
                 const equip = meuPerfil.equipados[chave] === item.id;
                 let btn = equip ? '<button class="shop-item-btn btn-equipado">EQUIPADO</button>' : (comp ? `<button class="shop-item-btn btn-equipar" onclick="equiparItem('${cat}', '${item.id}')">EQUIPAR</button>` : `<button class="shop-item-btn btn-comprar" onclick="comprarItem('${cat}', '${item.id}', ${item.preco})">🪙 ${item.preco}</button>`);
 
-                grid.innerHTML += `<div class="shop-item-card ${equip ? 'equipped' : ''}"><div class="shop-item-preview" style="background:${item.cor||'#1a2634'}">${item.icon}</div><div class="shop-item-name">${item.nome}</div><div class="shop-item-desc">${item.desc}</div>${btn}</div>`;
+                grid.innerHTML += `<div class="shop-item-card ${equip ? 'equipped' : ''}"><div class="shop-item-preview" style="background:${item.cor||'#082012'}">${item.icon}</div><div class="shop-item-name">${item.nome}</div><div class="shop-item-desc">${item.desc}</div>${btn}</div>`;
             });
         }
         function comprarItem(cat, id, preco) {
-            if(meuPerfil.moedas < preco) { alert("Moedas insuficientes!"); return; }
+            if(meuPerfil.moedas < preco) { 
+                if (confirm("Moedas insuficientes! Deseja comprar mais moedas via PIX (1 real = 1.000 moedas)?")) {
+                    abrirModalComprarMoedasPix();
+                }
+                return; 
+            }
             AudioEngine.playVictoryFanfare(); meuPerfil.moedas -= preco;
             if(!meuPerfil.itensComprados) meuPerfil.itensComprados = [];
             meuPerfil.itensComprados.push(id);
@@ -2234,7 +2608,7 @@
             PASSE_TIERS.forEach(t => {
                 const unl = meuPerfil.nivel >= t.tier;
                 const clm = (meuPerfil.passeResgatados || []).includes(t.tier);
-                let btn = clm ? '<button class="shop-item-btn" style="background:#475569;" disabled>RESGATADO</button>' : (unl ? `<button class="shop-item-btn btn-avancar" style="margin:0; padding:4px;" onclick="resgatarPasse(${t.tier})">RESGATAR</button>` : `<button class="shop-item-btn" style="background:#1e293b;" disabled>NVL ${t.tier}</button>`);
+                let btn = clm ? '<button class="shop-item-btn" style="background:#475569;" disabled>RESGATADO</button>' : (unl ? `<button class="shop-item-btn btn-avancar" style="margin:0; padding:4px;" onclick="resgatarPasse(${t.tier})">RESGATAR</button>` : `<button class="shop-item-btn" style="background:#0d3820;" disabled>NVL ${t.tier}</button>`);
                 list.innerHTML += `<div class="pass-tier-card ${unl?'unlocked':''} ${clm?'claimed':''}"><div class="pass-tier-num">NÍVEL ${t.tier}</div><div class="pass-tier-icon">${t.icon}</div><div class="pass-tier-name">${t.nome}</div><div class="pass-tier-reward">${t.recompensa}</div>${btn}</div>`;
             });
             showScreen('screen-battlepass');
@@ -2247,6 +2621,7 @@
             if(t.tipo === 'moedas' || t.tipo === 'combo') meuPerfil.moedas += (t.qtd || 0);
             if(t.id && !meuPerfil.itensComprados.includes(t.id)) meuPerfil.itensComprados.push(t.id);
             salvarPerfil(); atualizarPerfilUI(); abrirPasseBatalha();
+            mostrarToast(`🎁 Parabéns! Você resgatou a recompensa do Nível ${tier}: ${t.recompensa}!`);
         }
 
         function abrirEstatisticas() {
@@ -2302,7 +2677,7 @@
             return { up: p1.w || p2.up, down: p1.s || p2.down, left: p1.a || p2.left, right: p1.d || p2.right, shoot: p1.shoot || p2.shoot, dash: p1.dash || p2.dash };
         }
 
-        // --- RENDER DO GRAMADO COM GOLS PROFUNDOS ---
+        // --- RENDER DO GRAMADO VERDE REALISTA COM GOLS PROFUNDOS ---
         const GOAL_DEPTH = 55;
         const PITCH_INSET_X = 65;
 
@@ -2320,6 +2695,30 @@
             const golSize = selCampoH * 0.44;
             const yTop = (selCampoH - golSize) / 2;
             const yBottom = (selCampoH + golSize) / 2;
+
+            if (isPenaltiesMode) {
+                // No modo de pênaltis, foca na grande área direita
+                ctx.fillStyle = 'rgba(10, 20, 30, 0.45)';
+                ctx.fillRect(selCampoW - PITCH_INSET_X, yTop, GOAL_DEPTH, golSize);
+
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 1;
+                for (let y = yTop; y <= yBottom; y += 10) {
+                    ctx.beginPath(); ctx.moveTo(selCampoW - PITCH_INSET_X, y); ctx.lineTo(selCampoW - PITCH_INSET_X + GOAL_DEPTH, y); ctx.stroke();
+                }
+                for (let x = selCampoW - PITCH_INSET_X; x <= selCampoW - PITCH_INSET_X + GOAL_DEPTH; x += 10) {
+                    ctx.beginPath(); ctx.moveTo(x, yTop); ctx.lineTo(x, yBottom); ctx.stroke();
+                }
+
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(selCampoW * 0.25, 20, selCampoW * 0.75 - PITCH_INSET_X, selCampoH - 40);
+
+                // Marca da cal (Pênalti)
+                ctx.beginPath(); ctx.arc(selCampoW * 0.45, selCampoH / 2, 5, 0, 2 * Math.PI); ctx.fillStyle = '#fff'; ctx.fill();
+                ctx.beginPath(); ctx.arc(selCampoW * 0.45, selCampoH / 2, selCampoH * 0.2, -0.65, 0.65); ctx.stroke();
+                return;
+            }
 
             ctx.fillStyle = 'rgba(10, 20, 30, 0.45)';
             ctx.fillRect(PITCH_INSET_X - GOAL_DEPTH, yTop, GOAL_DEPTH, golSize);
@@ -2392,7 +2791,7 @@
             }
         }
 
-        // --- MOTOR DE FÍSICA E PARTIDA COM 2 TEMPOS DE 1m30s ---
+        // --- MOTOR DE FÍSICA E PARTIDA ---
         function iniciarEngineJogo() {
             try {
                 limparMotorFisico();
@@ -2408,8 +2807,15 @@
                 playerNames[2] = cfgP2.time ? cfgP2.time.substring(0, 3).toUpperCase() : "P2";
 
                 uiText('score1', "0"); uiText('score2', "0");
-                uiText('timer', "1º T • 01:30");
-                uiText('tv-badge-status', isRanked ? "⚔️ RANKED • 1º TEMPO" : "1º TEMPO • IAES CUP");
+                uiText('timer', isPenaltiesMode ? "10s" : "1º T • 01:30");
+                
+                if (isPenaltiesMode) {
+                    uiText('tv-badge-status', "🎯 DISPUTA DE PÊNALTIS");
+                    configurarPenaltis();
+                } else {
+                    uiHide('p1-dots'); uiHide('p2-dots');
+                    uiText('tv-badge-status', isRanked ? `⚔️ RANKED ${modoDeJogo.replace('CLASSICO_','').replace('CLASSICO','1V1')} • 1º TEMPO` : "1º TEMPO • IAES CUP");
+                }
                 
                 uiShow('btn-voltar-partida'); uiShow('btn-config-ingame'); uiShow('top-bar', 'flex'); 
                 if (verificarAdminAutorizado()) uiShow('btn-admin-ingame', 'block'); else uiHide('btn-admin-ingame');
@@ -2425,7 +2831,12 @@
 
                 desenharCampoRealista();
                 configurarFisica();
-                reposicionarJogadores();
+                
+                if (isPenaltiesMode) {
+                    prepararCobrancaPenalti();
+                } else {
+                    reposicionarJogadores();
+                }
                 setTimeout(() => forceFocus(), 50);
             } catch(e) { voltarMenu(); }
         }
@@ -2443,7 +2854,7 @@
                 options: { width: selCampoW, height: selCampoH, wireframes: false, background: 'transparent' }
             });
 
-            const wallOpt = { isStatic: true, restitution: 0.85, friction: 0, render: { fillStyle: '#1e293b', strokeStyle: '#334155', lineWidth: 2 } };
+            const wallOpt = { isStatic: true, restitution: 0.85, friction: 0, render: { fillStyle: '#0a2817', strokeStyle: '#1a4a2e', lineWidth: 2 } };
             const postOpt = { isStatic: true, restitution: 0.90, friction: 0, render: { fillStyle: '#ffffff', strokeStyle: '#cbd5e1', lineWidth: 2 } };
             const netOpt = { isStatic: true, restitution: 0.1, friction: 0.2, render: { fillStyle: 'rgba(255,255,255,0.05)' } }; 
 
@@ -2460,10 +2871,10 @@
                 Bodies.rectangle(selCampoW - PITCH_INSET_X, 10 + yTop/2, 16, yTop, wallOpt), 
                 Bodies.rectangle(selCampoW - PITCH_INSET_X, selCampoH - 10 - yTop/2, 16, yTop, wallOpt), 
                 
-                Bodies.circle(PITCH_INSET_X + 15, 25, 20, { isStatic: true, restitution: 0.88, friction: 0, render: { fillStyle: '#1e293b' } }),
-                Bodies.circle(selCampoW - PITCH_INSET_X - 15, 25, 20, { isStatic: true, restitution: 0.88, friction: 0, render: { fillStyle: '#1e293b' } }),
-                Bodies.circle(PITCH_INSET_X + 15, selCampoH - 25, 20, { isStatic: true, restitution: 0.88, friction: 0, render: { fillStyle: '#1e293b' } }),
-                Bodies.circle(selCampoW - PITCH_INSET_X - 15, selCampoH - 25, 20, { isStatic: true, restitution: 0.88, friction: 0, render: { fillStyle: '#1e293b' } }),
+                Bodies.circle(PITCH_INSET_X + 15, 25, 20, { isStatic: true, restitution: 0.88, friction: 0, render: { fillStyle: '#0a2817' } }),
+                Bodies.circle(selCampoW - PITCH_INSET_X - 15, 25, 20, { isStatic: true, restitution: 0.88, friction: 0, render: { fillStyle: '#0a2817' } }),
+                Bodies.circle(PITCH_INSET_X + 15, selCampoH - 25, 20, { isStatic: true, restitution: 0.88, friction: 0, render: { fillStyle: '#0a2817' } }),
+                Bodies.circle(selCampoW - PITCH_INSET_X - 15, selCampoH - 25, 20, { isStatic: true, restitution: 0.88, friction: 0, render: { fillStyle: '#0a2817' } }),
                 
                 Bodies.circle(PITCH_INSET_X, yTop, 7, { ...postOpt, label: 'trave' }),
                 Bodies.circle(PITCH_INSET_X, yBottom, 7, { ...postOpt, label: 'trave' }),
@@ -2505,13 +2916,15 @@
             let bodiesToAdd = [...walls, bola, window.player1, window.player2];
             const max = modoDeJogo.includes('5V5') ? 10 : (modoDeJogo.includes('3V3') ? 6 : (modoDeJogo.includes('2V2') ? 4 : 2));
 
-            for (let i = 3; i <= max; i++) {
-                const isT1 = i % 2 !== 0;
-                window['player' + i] = Bodies.circle(selCampoW * (isT1 ? 0.32 : 0.68), selCampoH * 0.5, 21, {
-                    label: 'p' + i, restitution: 0.05, frictionAir: 0.06, friction: 0, density: 0.005, inertia: Infinity,
-                    render: { fillStyle: isT1 ? cfgP1.cores.bg : cfgP2.cores.bg, strokeStyle: isT1 ? cfgP1.cores.line : cfgP2.cores.line, lineWidth: 3 }
-                });
-                bodiesToAdd.push(window['player' + i]);
+            if (!isPenaltiesMode) {
+                for (let i = 3; i <= max; i++) {
+                    const isT1 = i % 2 !== 0;
+                    window['player' + i] = Bodies.circle(selCampoW * (isT1 ? 0.32 : 0.68), selCampoH * 0.5, 21, {
+                        label: 'p' + i, restitution: 0.05, frictionAir: 0.06, friction: 0, density: 0.005, inertia: Infinity,
+                        render: { fillStyle: isT1 ? cfgP1.cores.bg : cfgP2.cores.bg, strokeStyle: isT1 ? cfgP1.cores.line : cfgP2.cores.line, lineWidth: 3 }
+                    });
+                    bodiesToAdd.push(window['player' + i]);
+                }
             }
 
             Composite.add(engine.world, bodiesToAdd);
@@ -2531,6 +2944,10 @@
                         
                         const spd = Math.hypot(bola.velocity.x, bola.velocity.y) + Math.hypot(jog.velocity.x, jog.velocity.y);
                         AudioEngine.playBallTouch(spd);
+
+                        if (isPenaltiesMode && slotNum === 1) {
+                            penaltyKicked = true;
+                        }
                     }
 
                     if ((bodyA.label === 'bola' && bodyB.label === 'trave') || (bodyB.label === 'bola' && bodyA.label === 'trave')) {
@@ -2555,11 +2972,12 @@
 
                 // Render Jogadores
                 const auraEquipada = LOJA_ITENS.auras.find(a => a.id === meuPerfil.equipados.aura);
+                const maxRender = isPenaltiesMode ? 2 : max;
 
-                for(let i=1; i<=max; i++) {
+                for(let i=1; i<=maxRender; i++) {
                     const p = window['player' + i];
                     if(!p) continue;
-                    const isT1 = i % 2 !== 0;
+                    const isT1 = isPenaltiesMode ? (penaltyTurn === 1 ? i === 1 : i === 2) : (i % 2 !== 0);
                     const cfg = isT1 ? cfgP1.cores : cfgP2.cores;
                     const dash = window['dashP' + i] || 0;
 
@@ -2580,7 +2998,7 @@
 
                     const barraW = 32; ctx.fillStyle = 'rgba(0,0,0,0.6)';
                     ctx.fillRect(p.position.x - barraW/2, p.position.y + 25, barraW, 3.5);
-                    ctx.fillStyle = dash === 0 ? '#2ecc71' : '#e74c3c';
+                    ctx.fillStyle = dash === 0 ? '#10b981' : '#e74c3c';
                     const prog = dash === 0 ? 1 : (DASH_COOLDOWN - dash) / DASH_COOLDOWN;
                     ctx.fillRect(p.position.x - barraW/2, p.position.y + 25, barraW * prog, 3.5);
                 }
@@ -2602,8 +3020,14 @@
                 if (estadoJogo === 'GOL_CELEBRATION') {
                     delayTimer--;
                     if (delayTimer <= 0) {
-                        estadoJogo = 'REWIND'; rewindIndex = historicoPosicoes.length - 1;
-                        uiHide('texto-gol'); uiHide('texto-assist'); uiShow('texto-estado'); uiText('texto-estado', "⏪ REPLAY...");
+                        if (isPenaltiesMode) {
+                            prepararCobrancaPenalti();
+                            estadoJogo = 'JOGANDO';
+                            forceFocus();
+                        } else {
+                            estadoJogo = 'REWIND'; rewindIndex = historicoPosicoes.length - 1;
+                            uiHide('texto-gol'); uiHide('texto-assist'); uiShow('texto-estado'); uiText('texto-estado', "⏪ REPLAY...");
+                        }
                     }
                 } else if (estadoJogo === 'INTERVALO') {
                     delayTimer--;
@@ -2611,17 +3035,59 @@
                         periodoJogo = 2; tempoRestante = DURACAO_TEMPO;
                         resetarUICompleta(); reposicionarJogadores();
                         estadoJogo = 'JOGANDO'; forceFocus();
-                        uiText('tv-badge-status', isRanked ? "⚔️ RANKED • 2º TEMPO" : "2º TEMPO • IAES CUP");
+                        uiText('tv-badge-status', isRanked ? `⚔️ RANKED ${modoDeJogo.replace('CLASSICO_','').replace('CLASSICO','1V1')} • 2º TEMPO` : "2º TEMPO • IAES CUP");
                     }
                 } else if (estadoJogo === 'REWIND') processarRewind();
                 else if (estadoJogo === 'REPLAY') tocarReplay();
                 else if (estadoJogo === 'JOGANDO') {
                     for(let i=1; i<=10; i++) { if(window['dashP' + i] > 0) window['dashP' + i]--; }
 
-                    if (isHost || !isOnline) {
-                        const golSize = selCampoH * 0.44;
-                        const golTop = (selCampoH / 2) - (golSize / 2), golBottom = (selCampoH / 2) + (golSize / 2);
+                    const golSize = selCampoH * 0.44;
+                    const golTop = (selCampoH / 2) - (golSize / 2), golBottom = (selCampoH / 2) + (golSize / 2);
+
+                    if (isPenaltiesMode) {
+                        // LÓGICA DE COBRANÇA DE PÊNALTI
+                        penaltyTimer--;
+                        const segs = Math.max(0, Math.ceil(penaltyTimer / 60));
+                        uiText('timer', `${segs}s`);
+
+                        // Movimento do Goleiro no Modo Pênaltis (IA ou Player 2)
+                        const keeper = window.player2;
+                        const kicker = window.player1;
                         
+                        if (penaltyKicked) {
+                            // Goleiro tenta defender a bola
+                            const dy = bola.position.y - keeper.position.y;
+                            Body.setVelocity(keeper, { x: 0, y: Math.sign(dy) * Math.min(Math.abs(dy), 4.5) });
+                        } else {
+                            // Goleiro ginga no centro do gol
+                            const targetY = (selCampoH / 2) + Math.sin(Date.now() / 300) * (golSize * 0.35);
+                            Body.setVelocity(keeper, { x: 0, y: (targetY - keeper.position.y) * 0.1 });
+                        }
+
+                        // Verificação de Gol ou Defesa no Pênalti
+                        if (bola.position.x > selCampoW - PITCH_INSET_X + 5 && bola.position.y > golTop && bola.position.y < golBottom) {
+                            AudioEngine.playConfetti();
+                            uiText('texto-gol', '⚽ GOL DE PÊNALTI!');
+                            uiShow('texto-gol'); uiShow('mensagem-overlay', 'flex');
+                            registrarResultadoPenalti(true);
+                        } else if (penaltyKicked && (bola.position.x > selCampoW - PITCH_INSET_X + 20 || Math.hypot(bola.velocity.x, bola.velocity.y) < 0.2 || bola.position.x < selCampoW * 0.2)) {
+                            AudioEngine.playPostHit();
+                            uiText('texto-gol', '❌ PERDEU O PÊNALTI!');
+                            uiShow('texto-gol'); uiShow('mensagem-overlay', 'flex');
+                            registrarResultadoPenalti(false);
+                        } else if (penaltyTimer <= 0) {
+                            AudioEngine.playPostHit();
+                            uiText('texto-gol', '⏰ TEMPO ESGOTADO!');
+                            uiShow('texto-gol'); uiShow('mensagem-overlay', 'flex');
+                            registrarResultadoPenalti(false);
+                        }
+
+                        processarControles();
+                        return;
+                    }
+
+                    if (isHost || !isOnline) {
                         if (bola.position.x < PITCH_INSET_X - 5 && bola.position.y > golTop && bola.position.y < golBottom) {
                             marcarGol(!ladosInvertidos ? 'P2' : 'P1');
                         } else if (bola.position.x > selCampoW - PITCH_INSET_X + 5 && bola.position.y > golTop && bola.position.y < golBottom) {
@@ -2810,6 +3276,11 @@
                     const formT2 = [{x: !ladosInvertidos ? 0.80 : 0.20, y: 0.5}, {x: !ladosInvertidos ? 0.66 : 0.34, y: 0.25}, {x: !ladosInvertidos ? 0.66 : 0.34, y: 0.75}, {x: !ladosInvertidos ? 0.60 : 0.40, y: 0.5}, {x: !ladosInvertidos ? 0.54 : 0.46, y: 0.5}];
                     const pos = isT1 ? formT1[Math.floor((i-1)/2)] : formT2[Math.floor((i-2)/2)];
                     Body.setPosition(p, { x: selCampoW * pos.x, y: selCampoH * pos.y });
+                } else if (max === 6) {
+                    const formT1 = [{x: !ladosInvertidos ? 0.25 : 0.75, y: 0.5}, {x: !ladosInvertidos ? 0.36 : 0.64, y: 0.28}, {x: !ladosInvertidos ? 0.36 : 0.64, y: 0.72}];
+                    const formT2 = [{x: !ladosInvertidos ? 0.75 : 0.25, y: 0.5}, {x: !ladosInvertidos ? 0.64 : 0.36, y: 0.28}, {x: !ladosInvertidos ? 0.64 : 0.36, y: 0.72}];
+                    const pos = isT1 ? formT1[Math.floor((i-1)/2)] : formT2[Math.floor((i-2)/2)];
+                    Body.setPosition(p, { x: selCampoW * pos.x, y: selCampoH * pos.y });
                 } else {
                     Body.setPosition(p, { x: selCampoW * (isT1 ? posX1 : posX2), y: selCampoH * (i <= 2 ? 0.5 : (i <= 4 ? 0.32 : 0.68)) });
                 }
@@ -2828,7 +3299,7 @@
                 inputs[2] = { up: l2.up, down: l2.down, left: l2.left, right: l2.right, shoot: l2.shoot, dash: l2.dash };
             }
 
-            const max = modoDeJogo.includes('5V5') ? 10 : (modoDeJogo.includes('3V3') ? 6 : (modoDeJogo.includes('2V2') ? 4 : 2));
+            const max = isPenaltiesMode ? 2 : (modoDeJogo.includes('5V5') ? 10 : (modoDeJogo.includes('3V3') ? 6 : (modoDeJogo.includes('2V2') ? 4 : 2)));
 
             for(let i=1; i<=max; i++) {
                 const p = window['player' + i]; if (!p) continue;
@@ -2866,7 +3337,7 @@
                     const newVx = p.velocity.x + (targetVx - p.velocity.x) * accelRate;
                     const newVy = p.velocity.y + (targetVy - p.velocity.y) * accelRate;
                     Body.setVelocity(p, { x: newVx, y: newVy });
-                } else if (!isOnline && max > 2 && i > 2) {
+                } else if (!isOnline && !isPenaltiesMode && max > 2 && i > 2) {
                     const isT1 = i % 2 !== 0;
                     const dx = bola.position.x - p.position.x, dy = bola.position.y - p.position.y;
                     const distBola = Math.hypot(dx, dy);
@@ -2907,6 +3378,10 @@
 
                 Body.setVelocity(bola, { x: dirX * kickSpeed, y: dirY * kickSpeed });
                 AudioEngine.playKick(1.1);
+
+                if (isPenaltiesMode) {
+                    penaltyKicked = true;
+                }
             }
         }
 
@@ -2917,6 +3392,7 @@
         }
         function voltarMenu() {
             AudioEngine.playClick(); estadoJogo = 'MENU'; limparMotorFisico();
+            isPenaltiesMode = false;
             uiHide('game-wrapper'); uiHide('top-bar'); uiHide('btn-voltar-partida'); uiHide('btn-config-ingame'); uiHide('btn-admin-ingame');
             resetarUICompleta(); if(isOnline) cancelarOnline();
             uiShow('menu-container'); showScreen('screen-home');
