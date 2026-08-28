@@ -514,7 +514,7 @@
         <div id="screen-matchmaking" class="screen">
             <div class="screen-card-cartoon" style="max-width: 650px;">
                 <h1 style="color: #d2a8ff; font-family:'Fredoka'; font-size:32px;">⚔️ FILA RANKED COMPETITIVA</h1>
-                <p style="font-size:13px; margin-bottom:18px;">Partidas competitivas valendo PDL nos mapas oficiais</p>
+                <p style="font-size:13px; margin-bottom:18px;">Partidas competitivas valendo PDL contra outros jogadores reais</p>
 
                 <div style="background: #082012; border: 3px solid #8e44ad; border-radius: 16px; padding: 22px; margin-bottom: 18px; box-shadow: 0 6px 0 #04140a;">
                     <div style="display:flex; justify-content:space-around; margin-bottom:16px; font-size:14px; font-weight:bold;">
@@ -526,6 +526,10 @@
                     <div id="mm-status-box" style="text-align:center;">
                         <div id="mm-status-txt" style="font-size:18px; font-weight:900; color:#cbd5e1;">Pronto para buscar partida</div>
                         <div id="mm-timer-txt" style="font-size:38px; font-weight:900; color:#f1c40f; font-family:'Fredoka'; margin:10px 0; display:none;">00:00</div>
+                        <div id="mm-rival-found-box" style="display:none; background:#04140b; border:2px solid #2ecc71; border-radius:12px; padding:14px; margin:10px 0;">
+                            <div style="color:#2ecc71; font-weight:900; font-size:18px; margin-bottom:6px;">⚔️ ADVERSÁRIO ENCONTRADO!</div>
+                            <div id="mm-rival-info" style="font-size:15px; font-weight:bold; color:#fff;"></div>
+                        </div>
                     </div>
 
                     <button class="btn-cartoon purple" id="btn-iniciar-mm" style="width:100%; margin-top:14px;" onclick="iniciarBuscaRanked()">🔍 BUSCAR PARTIDA</button>
@@ -1921,8 +1925,8 @@
         }
 
         let clientJoinTimer = null;
-        function conectarSalaPorIdDireto(targetRoomId) {
-            isOnline = true; isHost = false; isRanked = false; isPenaltiesMode = false; mySlot = 2;
+        function conectarSalaPorIdDireto(targetRoomId, rankedMode = false) {
+            isOnline = true; isHost = false; isRanked = !!rankedMode || isRanked; isPenaltiesMode = false; mySlot = 2;
             const cleanTargetId = targetRoomId.trim().toUpperCase();
             myRoomID = cleanTargetId;
             showScreen('screen-client-waiting');
@@ -2224,6 +2228,8 @@
                 uiHide('btn-skip-replay');
                 uiText('tv-badge-status', `${periodoJogo}º TEMPO • IAES CUP`);
                 resetarUICompleta();
+            } else if (data.st === 'FIM' && estadoJogo !== 'FIM') {
+                finalizarPartida(data.vencedor);
             }
         }
 
@@ -2439,6 +2445,197 @@
             const tot = (meuPerfil.vitorias||0) + (meuPerfil.derrotas||0);
             uiText('st-winrate', (tot>0 ? Math.round((meuPerfil.vitorias/tot)*100) : 0) + '%');
             showScreen('screen-stats');
+        }
+
+        // --- SISTEMA DE MATCHMAKING RANKED (PLAYERS REAIS) ---
+        let mmSearchTimer = null;
+        let mmSeconds = 0;
+        let mmSearching = false;
+        let mmChannel = null;
+        try {
+            if (typeof BroadcastChannel !== 'undefined') {
+                mmChannel = new BroadcastChannel('iaes_ranked_matchmaking_pool');
+            }
+        } catch(e) {}
+
+        function abrirMatchmakingRanked() {
+            try { AudioEngine.init(); AudioEngine.playClick(); } catch(e) {}
+            cancelarBuscaRanked();
+            showScreen('screen-matchmaking');
+        }
+
+        function sairTelaMatchmaking() {
+            try { AudioEngine.playClick(); } catch(e) {}
+            cancelarBuscaRanked();
+            showScreen('screen-home');
+        }
+
+        function iniciarBuscaRanked() {
+            try { AudioEngine.init(); AudioEngine.playClick(); } catch(e) {}
+            mmSearching = true;
+            mmSeconds = 0;
+            isRanked = true;
+            isOnline = true;
+
+            const modoSelect = document.querySelector('input[name="ranked-mode-select"]:checked');
+            const modoEscolhido = modoSelect ? modoSelect.value : '1V1';
+            
+            if (modoEscolhido === '1V1') {
+                modoDeJogo = 'CLASSICO'; selCampoW = 1000; selCampoH = 550;
+            } else if (modoEscolhido === '2V2') {
+                modoDeJogo = 'CLASSICO_2V2'; selCampoW = 1200; selCampoH = 660;
+            } else {
+                modoDeJogo = 'CLASSICO_3V3'; selCampoW = 1400; selCampoH = 750;
+            }
+
+            uiText('mm-status-txt', '🔍 Buscando jogador real na fila com PDL compatível...');
+            uiShow('mm-timer-txt', 'block');
+            uiText('mm-timer-txt', '00:00');
+            uiHide('mm-rival-found-box');
+            uiHide('btn-iniciar-mm');
+            uiShow('btn-cancelar-mm', 'block');
+
+            const myTicket = {
+                uid: meuPerfil.uid || ('usr_' + Math.random().toString(36).substring(2, 8)),
+                nome: meuPerfil.nome || 'CRAQUE',
+                elo: meuPerfil.elo || 1000,
+                modo: modoEscolhido,
+                peerId: 'RANKED_' + Math.random().toString(36).substring(2, 8).toUpperCase(),
+                time: Date.now()
+            };
+
+            myRoomID = myTicket.peerId;
+            playerNames = { 1: meuPerfil.nome || "CRAQUE" };
+            playerNumbers = { 1: meuPerfil.numero || 10 };
+
+            if (peerInstance) { try { peerInstance.destroy(); } catch(e) {} peerInstance = null; }
+            if (typeof Peer !== 'undefined') {
+                try {
+                    peerInstance = new Peer(myRoomID, {
+                        debug: 1,
+                        config: {
+                            iceServers: [
+                                { urls: 'stun:stun.l.google.com:19302' },
+                                { urls: 'stun:stun1.l.google.com:19302' },
+                                { urls: 'stun:global.stun.twilio.com:3478' }
+                            ]
+                        }
+                    });
+                    peerInstance.on('connection', (conn) => {
+                        activePeerConn = conn;
+                        conn.on('open', () => {
+                            conectarPartidaRankedEncontrada(conn, true);
+                        });
+                        conn.on('data', (data) => processarPacoteRede(data));
+                    });
+                } catch(e) {}
+            }
+
+            const anunciarTicket = () => {
+                if (!mmSearching) return;
+                const pool = obterMatchmakingPoolDB().filter(t => (Date.now() - t.time) < 15000 && t.uid !== myTicket.uid);
+                const rival = pool.find(t => t.modo === myTicket.modo);
+                if (rival) {
+                    if (myTicket.time > rival.time || (myTicket.time === rival.time && myTicket.uid > rival.uid)) {
+                        conectarAoRivalRanked(rival);
+                        return;
+                    }
+                }
+                
+                pool.push(myTicket);
+                salvarMatchmakingPoolDB(pool);
+                if (mmChannel) {
+                    try { mmChannel.postMessage({ type: 'mm_ticket', ticket: myTicket }); } catch(e) {}
+                }
+            };
+
+            if (mmChannel) {
+                mmChannel.onmessage = (e) => {
+                    if (!mmSearching) return;
+                    if (e.data && e.data.type === 'mm_ticket' && e.data.ticket) {
+                        const rival = e.data.ticket;
+                        if (rival.uid !== myTicket.uid && rival.modo === myTicket.modo) {
+                            if (myTicket.time > rival.time) {
+                                conectarAoRivalRanked(rival);
+                            }
+                        }
+                    }
+                };
+            }
+
+            anunciarTicket();
+            if (mmSearchTimer) clearInterval(mmSearchTimer);
+            mmSearchTimer = setInterval(() => {
+                mmSeconds++;
+                const min = Math.floor(mmSeconds / 60);
+                const sec = mmSeconds % 60;
+                uiText('mm-timer-txt', `${min < 10 ? '0' + min : min}:${sec < 10 ? '0' + sec : sec}`);
+                anunciarTicket();
+            }, 1000);
+        }
+
+        function conectarAoRivalRanked(rival) {
+            cancelarBuscaRankedInterna();
+            uiText('mm-status-txt', '⚡ Conectando ao adversário encontrado...');
+            uiShow('mm-rival-found-box', 'block');
+            const pat = obterPatentePorPDL(rival.elo || 1000);
+            uiText('mm-rival-info', `${rival.nome} (${rival.elo || 1000} PDL • ${pat.nome})`);
+            AudioEngine.playVictoryFanfare();
+
+            isHost = false;
+            mySlot = 2;
+            isRanked = true;
+            isOnline = true;
+            conectarSalaPorIdDireto(rival.peerId, true);
+        }
+
+        function conectarPartidaRankedEncontrada(conn, isHostPlayer) {
+            cancelarBuscaRankedInterna();
+            AudioEngine.playVictoryFanfare();
+            uiShow('mm-rival-found-box', 'block');
+            uiText('mm-status-txt', '⚔️ Partida Ranked Encontrada!');
+            isHost = isHostPlayer;
+            mySlot = isHostPlayer ? 1 : 2;
+            isRanked = true;
+            isOnline = true;
+
+            setTimeout(() => {
+                showScreen('screen-online-host');
+                renderLobbySlotsHost();
+            }, 1200);
+        }
+
+        function cancelarBuscaRanked() {
+            try { AudioEngine.playClick(); } catch(e) {}
+            cancelarBuscaRankedInterna();
+            uiText('mm-status-txt', 'Pronto para buscar partida');
+            uiHide('mm-timer-txt');
+            uiHide('mm-rival-found-box');
+            uiShow('btn-iniciar-mm', 'block');
+            uiHide('btn-cancelar-mm');
+            isRanked = false;
+        }
+
+        function cancelarBuscaRankedInterna() {
+            mmSearching = false;
+            if (mmSearchTimer) { clearInterval(mmSearchTimer); mmSearchTimer = null; }
+            removerMeuTicketPoolDB();
+        }
+
+        function obterMatchmakingPoolDB() {
+            try {
+                const raw = localStorage.getItem('iaes_mm_pool_db');
+                return raw ? JSON.parse(raw) : [];
+            } catch(e) { return []; }
+        }
+        function salvarMatchmakingPoolDB(pool) {
+            try { localStorage.setItem('iaes_mm_pool_db', JSON.stringify(pool)); } catch(e) {}
+        }
+        function removerMeuTicketPoolDB() {
+            try {
+                const pool = obterMatchmakingPoolDB().filter(t => t.uid !== meuPerfil.uid);
+                salvarMatchmakingPoolDB(pool);
+            } catch(e) {}
         }
 
         // --- SISTEMA DE AMIGOS ---
@@ -3236,8 +3433,9 @@
             let pdlGanho = 0;
 
             if (vencedorStr) {
+                const souVencedor = (isHost && vencedorStr === 'P1') || (!isHost && vencedorStr === 'P2');
                 currentStatusMsg = `${(vencedorStr === 'P1' ? cfgP1.time : cfgP2.time).toUpperCase()} VENCEU!`;
-                if (vencedorStr === 'P1') {
+                if (souVencedor) {
                     meuPerfil.vitorias = (meuPerfil.vitorias || 0) + 1;
                     xpGanho += 150; moedasGanhas += 120;
                     if (isRanked) { pdlGanho = 28; meuPerfil.elo = (meuPerfil.elo || 1000) + pdlGanho; }
@@ -3253,6 +3451,14 @@
             const pdlMsg = isRanked ? ` | ${pdlGanho >= 0 ? '+' + pdlGanho : pdlGanho} PDL` : '';
             uiText('texto-assist', `+${xpGanho} XP | +${moedasGanhas} 🪙${pdlMsg}`);
             uiShow('texto-assist'); uiShow('botoes-fim-jogo', 'flex'); uiShow('mensagem-overlay', 'flex');
+
+            if (isOnline && isHost) {
+                broadcast({
+                    type: 'sync', st: 'FIM', s1: placar1, s2: placar2,
+                    vencedor: vencedorStr, timeStr: 'FIM DE JOGO',
+                    periodo: periodoJogo, ladosInvertidos: ladosInvertidos
+                });
+            }
         }
 
         function reposicionarJogadores() {
