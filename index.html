@@ -158,7 +158,7 @@
         }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
 
-        /* ABAS DO PAINEL ADMIN MASTER */
+        /* ABAS ADMIN */
         .admin-tabs { display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid #1a4a2e; padding-bottom: 8px; flex-wrap: wrap; }
         .admin-tab-btn { background: #061c10; border: 1px solid #1a4a2e; color: #cbd5e1; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; }
         .admin-tab-btn.active { background: #f39c12; color: #000; border-color: #f39c12; font-weight: 900; }
@@ -184,7 +184,7 @@
         .hax-row { cursor: pointer; transition: 0.15s; }
         .hax-row:hover { background: rgba(16, 185, 129, 0.2); }
         .hax-row.selected { background: #165b33 !important; color: #fff !important; }
-        .hax-side-actions { width: 160px; background: #061a0e; padding: 12px 10px; display: flex; flex-direction: column; gap: 8px; border-left: 2px solid #1a4a2e; justify-content: space-between; }
+        .hax-side-actions { width: 180px; background: #061a0e; padding: 12px 10px; display: flex; flex-direction: column; gap: 8px; border-left: 2px solid #1a4a2e; justify-content: space-between; }
         .hax-side-btn { background: #0d2f1b; border: 1px solid #1a4a2e; color: #fff; padding: 8px 10px; border-radius: 5px; font-size: 11px; font-weight: 800; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 6px; }
 
         /* GRID TIMES */
@@ -231,7 +231,7 @@
         }
         .match-timer-tv {
             background: #082414; color: var(--primary-gold); padding: 4px 12px; border-radius: 6px;
-            font-size: 19px; min-width: 125px; text-align: center; border: 1px solid rgba(16, 185, 129, 0.4);
+            font-size: 19px; min-width: 135px; text-align: center; border: 1px solid rgba(16, 185, 129, 0.4);
             font-weight: 900; font-family: 'Rajdhani', sans-serif; margin: 0 10px;
         }
 
@@ -353,7 +353,7 @@
             </div>
         </div>
 
-        <!-- LOBBY PRINCIPAL COM TABELA DE RANKS & PDL -->
+        <!-- LOBBY PRINCIPAL -->
         <div id="screen-home" class="screen">
             <div class="screen-card">
                 <div class="ranks-pdl-banner">
@@ -389,23 +389,23 @@
                     <div class="mode-hero-card" onclick="irParaModo(false)">
                         <div>
                             <div class="mode-hero-title">⚽ JOGO RÁPIDO</div>
-                            <div class="mode-hero-desc">1v1 a 5v5 (2 tempos de 1m30s + Prorrogação de 30s + Pênaltis)!</div>
+                            <div class="mode-hero-desc">1v1 a 5v5 (Torcida no estádio + 2 tempos de 1m30s + Pênaltis)!</div>
                         </div>
-                        <div class="mode-hero-badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">OFFLINE • 2 TEMPOS</div>
+                        <div class="mode-hero-badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">OFFLINE • COM TORCIDA</div>
                     </div>
 
                     <div class="mode-hero-card" style="border-color: rgba(230, 126, 34, 0.8);" onclick="iniciarModoPenaltis()">
                         <div>
                             <div class="mode-hero-title" style="color: #f39c12;">🎯 PÊNALTIS (TITÃ)</div>
-                            <div class="mode-hero-desc">Disputa de 5 cobranças no estádio Titã (1400x750)!</div>
+                            <div class="mode-hero-desc">Regra Oficial: Max 2 toques e 3 segundos após o 1º toque!</div>
                         </div>
-                        <div class="mode-hero-badge" style="background: rgba(230, 126, 34, 0.3); color:#f39c12;">MAPA TITÃ • 5 CHUTES</div>
+                        <div class="mode-hero-badge" style="background: rgba(230, 126, 34, 0.3); color:#f39c12;">REGRA 2 TOQUES • TITÃ</div>
                     </div>
 
                     <div class="mode-hero-card" onclick="irParaModo(true)">
                         <div>
                             <div class="mode-hero-title" style="color: #00f2fe;">🌐 SALAS ONLINE</div>
-                            <div class="mode-hero-desc">Navegador estilo HaxBall com chat in-game e comando /avatar!</div>
+                            <div class="mode-hero-desc">Navegador WebRTC multi-abas com conexão por código direto!</div>
                         </div>
                         <div class="mode-hero-badge" style="background: rgba(0, 242, 254, 0.2); color:#00f2fe;">ROOM LIST OFICIAL</div>
                     </div>
@@ -528,23 +528,23 @@
             </div>
         </div>
 
-        <!-- HAXBALL ROOM LIST -->
+        <!-- HAXBALL ROOM LIST RECONSTRUÍDO COM CONEXÃO DIRETA -->
         <div id="screen-online-rooms" class="screen">
-            <div class="screen-card" style="max-width: 900px; padding: 15px;">
+            <div class="screen-card" style="max-width: 950px; padding: 18px;">
                 <div class="hax-roomlist-window">
                     <div class="hax-header">
-                        <div style="font-size:18px; font-weight:900; color:#fff;">Room list</div>
-                        <div style="font-size:12px; color:#e74c3c; font-weight:800;" id="hax-counter">0 salas abertas</div>
+                        <div style="font-size:18px; font-weight:900; color:#fff;">Room list (Salas Abertas)</div>
+                        <div style="font-size:12px; color:#10b981; font-weight:800;" id="hax-counter">Buscando salas...</div>
                     </div>
                     <div class="hax-body">
                         <div class="hax-table-container">
                             <table class="hax-table">
                                 <thead>
                                     <tr>
-                                        <th style="width: 48%;">Name</th>
+                                        <th style="width: 45%;">Name</th>
                                         <th style="width: 15%;">Players</th>
-                                        <th style="width: 12%;">Pass</th>
-                                        <th style="width: 25%;">Host / Dist</th>
+                                        <th style="width: 15%;">Modo</th>
+                                        <th style="width: 25%;">Host / ID</th>
                                     </tr>
                                 </thead>
                                 <tbody id="hax-rooms-tbody"></tbody>
@@ -554,6 +554,13 @@
                             <button class="hax-side-btn" onclick="carregarSalasOnline()">🔄 Refresh</button>
                             <button class="hax-side-btn" style="background:#10b981; color:#000;" onclick="conectarSalaSelecionada()">➡️ Join Room</button>
                             <button class="hax-side-btn" style="background:#10b981; color:#000;" onclick="abrirModalCriarSala()">➕ Create Room</button>
+                            
+                            <div style="background:#04140b; border:1px solid #1a4a2e; border-radius:6px; padding:8px 6px; margin:4px 0;">
+                                <div style="font-size:10px; color:#a7f3d0; font-weight:bold; margin-bottom:4px;">🔗 ENTRAR POR ID:</div>
+                                <input type="text" id="input-join-id-direto" class="input-iaes" style="padding:5px; font-size:11px; margin:0 0 6px 0;" placeholder="Cole o ID da Sala">
+                                <button class="btn btn-pix" style="width:100%; padding:5px; font-size:10px;" onclick="conectarPorIdDigitado()">CONECTAR</button>
+                            </div>
+
                             <button class="hax-side-btn" onclick="showScreen('screen-home')">⏴ Back</button>
                         </div>
                     </div>
@@ -709,7 +716,7 @@
         </div>
     </div>
 
-    <!-- MODAL ADMIN MASTER ULTRA COMPLETO -->
+    <!-- MODAL ADMIN MASTER -->
     <div id="modal-admin" class="modal-overlay">
         <div class="modal-box" style="border-color: #e67e22; max-width: 820px;">
             <div class="modal-header">
@@ -717,7 +724,6 @@
                 <span style="font-size:11px; background:#e74c3c; padding:3px 10px; border-radius:4px; font-weight:bold;">SUPERUSUÁRIO</span>
             </div>
 
-            <!-- NAVEGAÇÃO POR ABAS -->
             <div class="admin-tabs">
                 <button class="admin-tab-btn active" onclick="trocarAbaAdmin('admin-aba-pix')">💳 Gestão PIX</button>
                 <button class="admin-tab-btn" onclick="trocarAbaAdmin('admin-aba-jogadores')">👥 Jogadores</button>
@@ -727,7 +733,6 @@
                 <button class="admin-tab-btn" onclick="trocarAbaAdmin('admin-aba-servidor')">🌐 Servidor</button>
             </div>
 
-            <!-- ABA 1: GESTÃO PIX -->
             <div id="admin-aba-pix" class="admin-tab-content active">
                 <div style="background:rgba(10,36,20,0.85); border:1.5px solid #00f2fe; border-radius:8px; padding:12px;">
                     <div style="font-size:12px; font-weight:900; color:#00f2fe; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -740,7 +745,6 @@
                 </div>
             </div>
 
-            <!-- ABA 2: JOGADORES -->
             <div id="admin-aba-jogadores" class="admin-tab-content">
                 <div style="background:rgba(10,36,20,0.85); border:1px solid #1a4a2e; border-radius:8px; padding:12px;">
                     <div style="font-size:12px; font-weight:900; color:var(--primary-gold); margin-bottom:8px;">🔍 GERENCIAR CONTA DE JOGADOR</div>
@@ -754,7 +758,6 @@
                 </div>
             </div>
 
-            <!-- ABA 3: ECONOMIA -->
             <div id="admin-aba-economia" class="admin-tab-content">
                 <div style="background:rgba(10,36,20,0.85); border:1px solid #1a4a2e; border-radius:8px; padding:12px;">
                     <div style="font-size:12px; font-weight:900; color:var(--primary-gold); margin-bottom:8px;">🪙 CRÉDITO DE MOEDAS NO SEU PERFIL</div>
@@ -771,7 +774,6 @@
                 </div>
             </div>
 
-            <!-- ABA 4: PROGRESSÃO & RANKS -->
             <div id="admin-aba-progressao" class="admin-tab-content">
                 <div style="background:rgba(10,36,20,0.85); border:1px solid #1a4a2e; border-radius:8px; padding:12px;">
                     <div style="font-size:12px; font-weight:900; color:var(--primary-gold); margin-bottom:8px;">⭐ NÍVEL, PASSE E CLASSIFICAÇÃO</div>
@@ -789,7 +791,6 @@
                 </div>
             </div>
 
-            <!-- ABA 5: FÍSICA & PARTIDA -->
             <div id="admin-aba-fisica" class="admin-tab-content">
                 <div style="background:rgba(10,36,20,0.85); border:1px solid #1a4a2e; border-radius:8px; padding:12px;">
                     <div style="font-size:12px; font-weight:900; color:var(--primary-gold); margin-bottom:8px;">⚡ MODIFICADORES DE PARTIDA & FÍSICA</div>
@@ -807,7 +808,6 @@
                 </div>
             </div>
 
-            <!-- ABA 6: SERVIDOR -->
             <div id="admin-aba-servidor" class="admin-tab-content">
                 <div style="background:rgba(10,36,20,0.85); border:1px solid #1a4a2e; border-radius:8px; padding:12px;">
                     <div style="font-size:12px; font-weight:900; color:var(--primary-gold); margin-bottom:8px;">🌐 LIMPEZA & MANUTENÇÃO</div>
@@ -826,7 +826,7 @@
     <div id="modal-leaderboard" class="modal-overlay">
         <div class="modal-box" style="border-color: var(--primary-gold);">
             <div class="modal-header">
-                <h2 style="margin:0; color:var(--primary-gold);">🏆 RANKING GLOBAL DE PDL (JOGADORES REAIS)</h2>
+                <h2 style="margin:0; color:var(--primary-gold);">🏆 RANKING GLOBAL DE PDL</h2>
                 <span style="font-size:11px; color:#10b981; font-weight:bold;">OFICIAL</span>
             </div>
             <div style="max-height:340px; overflow-y:auto; margin-bottom:12px;">
@@ -917,7 +917,7 @@
         </div>
     </div>
 
-    <!-- TELA IN-GAME COM CHAT E NOME REAL ACIMA DOS JOGADORES -->
+    <!-- TELA IN-GAME COM CHAT E NOME REAL -->
     <div id="game-screen-container">
         <button id="btn-voltar-partida" class="btn-ingame" onclick="voltarMenu()">🚪 SAIR</button>
         <button id="btn-config-ingame" class="btn-ingame" onclick="abrirModalConfiguracoes()">⚙️ SOM</button>
@@ -971,6 +971,34 @@
 
     <script>
         const Engine = Matter.Engine, Render = Matter.Render, Runner = Matter.Runner, Bodies = Matter.Bodies, Body = Matter.Body, Composite = Matter.Composite, Events = Matter.Events;
+
+        // --- SISTEMA DE FIREBASE E SINCRONIZAÇÃO DE SALAS ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyIAESBallProMockKeyForBrowser2026",
+            authDomain: "iaes-ball-pro.firebaseapp.com",
+            projectId: "iaes-ball-pro",
+            storageBucket: "iaes-ball-pro.appspot.com",
+            messagingSenderId: "10987654321",
+            appId: "1:10987654321:web:iaesballpro999"
+        };
+        let auth = null, db = null;
+        try {
+            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.firestore();
+        } catch(e) {}
+
+        // BroadcastChannel para sincronização instantânea multi-abas e rede local
+        const roomBroadcastChannel = window.BroadcastChannel ? new BroadcastChannel('iaes_rooms_hub') : null;
+        if (roomBroadcastChannel) {
+            roomBroadcastChannel.onmessage = (e) => {
+                if (e.data && e.data.type === 'room_announced') {
+                    adicionarSalaNoCache(e.data.sala);
+                } else if (e.data && e.data.type === 'room_closed') {
+                    removerSalaDoCache(e.data.roomId);
+                }
+            };
+        }
 
         // --- SISTEMA DE ÁUDIO ---
         const AudioEngine = {
@@ -1205,7 +1233,7 @@
             ]
         };
 
-        // --- 20 NÍVEIS DO PASSE ---
+        // 20 NÍVEIS DO PASSE
         const PASSE_TIERS = [
             { tier: 1, recompensa: '🪙 150 Moedas', tipo: 'moedas', qtd: 150, icon: '🪙', nome: 'Estreia no Campo' },
             { tier: 2, recompensa: '✨ Rastro de Ouro', tipo: 'item', id: 'rastro_ouro', cat: 'rastros', icon: '✨', nome: 'Toque Dourado' },
@@ -1229,7 +1257,7 @@
             { tier: 20, recompensa: '🌌 Bola Cósmica + 3.000 🪙', tipo: 'combo', id: 'bola_arcoiris', qtd: 3000, icon: '🌌', nome: 'Lenda Suprema' }
         ];
 
-        // --- VARIÁVEIS DE PARTIDA ---
+        // --- VARIÁVEIS DE PARTIDA & PÊNALTIS REFINADOS ---
         let engine, render, runner, bola;
         let estadoJogo = 'MENU';
         let delayTimer = 0;
@@ -1247,10 +1275,13 @@
         let modoDeJogo = 'CLASSICO';
         let isRanked = false;
 
+        // PÊNALTIS (2 TOQUES & 3 SEGUNDOS)
         let isPenaltiesMode = false;
         let penaltyRound = 1, penaltyTurn = 1;
         let penaltyResultsP1 = [], penaltyResultsP2 = [];
-        let penaltyTimer = 0, penaltyKicked = false;
+        let penaltyKicked = false;
+        let penaltyTouchesCount = 0;
+        let penaltyCountdownFrames = 0; // Contagem regressiva de 180 frames = 3.0s após 1º toque
 
         let historicoPosicoes = [], particulas = [];
         let frameReplay = 0, rewindIndex = 0;
@@ -1313,7 +1344,7 @@
             while (log.children.length > 20) log.removeChild(log.firstChild);
         }
 
-        // MATCHMAKING & WEBRTC
+        // --- SISTEMA DE MATCHMAKING & WEBRTC ONLINE ---
         let matchmakingInterval = null, matchmakingSeconds = 0, myMatchTicketId = null;
         let meuGrupo = { id: null, lider: null, membros: [] };
         let convitePendente = null;
@@ -1339,7 +1370,10 @@
         let salaSelecionada = null;
 
         window.addEventListener('beforeunload', () => {
-            if (isHost && myRoomID && db) db.collection("salas").doc(myRoomID).delete().catch(() => {});
+            if (isHost && myRoomID) {
+                if (db) db.collection("salas").doc(myRoomID).delete().catch(() => {});
+                removerSalaDoCache(myRoomID);
+            }
             if (myMatchTicketId && db) db.collection("matchmaking").doc(myMatchTicketId).delete().catch(() => {});
         });
 
@@ -1374,6 +1408,7 @@
 
         window.onload = async () => {
             AudioEngine.carregarPreferencias();
+            carregarSalasLocais();
             if (auth) {
                 auth.onAuthStateChanged(async (user) => {
                     if (user) {
@@ -1496,7 +1531,7 @@
             }
         }
 
-        // AMIGOS & GRUPO
+        // NOTIFICAÇÕES & AMIGOS
         function escutarNotificacoesUsuario() {
             if (!db || !auth || !auth.currentUser) return;
             try {
@@ -1598,7 +1633,7 @@
         function sairDoGrupo() { meuGrupo = { id: null, lider: null, membros: [] }; atualizarGrupoUI(); }
         function puxarRankedEmGrupo() { fecharModalAmigos(); abrirMatchmakingRanked(); iniciarBuscaRanked(); }
 
-        // --- MATCHMAKING RANKED ESTABILIZADO ---
+        // --- MATCHMAKING RANKED ---
         function abrirMatchmakingRanked() {
             AudioEngine.playClick(); showScreen('screen-matchmaking');
             uiText('mm-status-txt', 'Pronto para buscar partida');
@@ -1722,20 +1757,19 @@
             });
         }
 
-        // --- PÊNALTIS NO MAPA TITÃ (1400x750) ---
+        // --- REGRAS DO MODO PÊNALTIS (2 TOQUES & 3 SEGUNDOS) NO MAPA TITÃ ---
         function iniciarModoPenaltis() {
             AudioEngine.playClick();
             isPenaltiesMode = true; isRanked = false; modoDeJogo = 'PENALTIS';
-            selCampoW = 1400; selCampoH = 750;
+            selCampoW = 1400; selCampoH = 750; // MAPA TITÃ
             currPlayer = 1; prepararTelaTime(); showScreen('screen-team');
         }
 
         function configurarPenaltis() {
             penaltyRound = 1; penaltyTurn = 1;
             penaltyResultsP1 = []; penaltyResultsP2 = [];
-            placar1 = 0; placar2 = 0; penaltyTimer = 600; penaltyKicked = false;
+            placar1 = 0; placar2 = 0;
             atualizarDotsPenaltis(); uiShow('p1-dots', 'flex'); uiShow('p2-dots', 'flex');
-            uiText('tv-badge-status', `🎯 PÊNALTIS (TITÃ) • COBRANÇA ${penaltyRound}`);
         }
 
         function atualizarDotsPenaltis() {
@@ -1750,14 +1784,21 @@
         }
 
         function prepararCobrancaPenalti() {
-            penaltyKicked = false; penaltyTimer = 600; resetarUICompleta();
+            penaltyKicked = false;
+            penaltyTouchesCount = 0;
+            penaltyCountdownFrames = 0;
+            resetarUICompleta();
+            
             const isP1Kicker = penaltyTurn === 1;
             const kickerTeam = isP1Kicker ? cfgP1.time : cfgP2.time;
+            const kickerName = isP1Kicker ? (playerNames[1] || 'P1') : (playerNames[2] || 'P2');
 
-            uiText('tv-badge-status', `🎯 PÊNALTIS • ${kickerTeam.toUpperCase()} CHUTA`);
-            uiText('texto-estado', `VEZ DE: ${kickerTeam.toUpperCase()} (P${penaltyTurn})`);
-            uiShow('texto-estado'); setTimeout(() => uiHide('texto-estado'), 1500);
+            uiText('tv-badge-status', `🎯 PÊNALTIS (TITÃ) • ${kickerTeam.toUpperCase()} CHUTA (${kickerName})`);
+            uiText('timer', `TOQUES: 0/2 • 3.0s`);
+            uiText('texto-estado', `VEZ DE: ${kickerTeam.toUpperCase()} (${kickerName})\nMÁXIMO 2 TOQUES • 3 SEGUNDOS`);
+            uiShow('texto-estado'); setTimeout(() => uiHide('texto-estado'), 1800);
 
+            // Marca do pênalti no mapa Titã
             Body.setVelocity(bola, { x: 0, y: 0 });
             Body.setPosition(bola, { x: selCampoW * 0.45, y: selCampoH / 2 });
 
@@ -1795,27 +1836,63 @@
             estadoJogo = 'GOL_CELEBRATION'; delayTimer = 90;
         }
 
-        // SALAS REAIS
-        function abrirNavegadorSalas() { AudioEngine.playClick(); isRanked = false; isPenaltiesMode = false; showScreen('screen-online-rooms'); carregarSalasOnline(); }
+        // --- SISTEMA DE SALAS ONLINE (MULTI-ABAS / FIRESTORE / WEBRTC) ---
+        function carregarSalasLocais() {
+            try {
+                const raw = localStorage.getItem('iaes_active_rooms');
+                if (raw) salasOnlineCache = JSON.parse(raw);
+            } catch(e) {}
+        }
+        function salvarSalasLocais() {
+            try { localStorage.setItem('iaes_active_rooms', JSON.stringify(salasOnlineCache)); } catch(e) {}
+        }
+        function adicionarSalaNoCache(sala) {
+            salasOnlineCache = salasOnlineCache.filter(s => s.peerId !== sala.peerId && s.id !== sala.id);
+            salasOnlineCache.push(sala);
+            salvarSalasLocais();
+            filtrarTabelaSalas();
+        }
+        function removerSalaDoCache(roomId) {
+            salasOnlineCache = salasOnlineCache.filter(s => s.peerId !== roomId && s.id !== roomId);
+            salvarSalasLocais();
+            filtrarTabelaSalas();
+        }
+
+        function abrirNavegadorSalas() {
+            AudioEngine.playClick(); isRanked = false; isPenaltiesMode = false;
+            showScreen('screen-online-rooms');
+            carregarSalasOnline();
+        }
 
         async function carregarSalasOnline() {
             const tbody = document.getElementById('hax-rooms-tbody');
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#a7f3d0;">Buscando salas...</td></tr>';
-            salasOnlineCache = []; salaSelecionada = null;
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#a7f3d0;">Atualizando lista de salas...</td></tr>';
+            carregarSalasLocais();
+            
+            // Limpa salas com mais de 10 minutos
+            const nowSec = Math.floor(Date.now() / 1000);
+            salasOnlineCache = salasOnlineCache.filter(s => !s.criadoEmSec || (nowSec - s.criadoEmSec < 600));
 
             try {
                 if (db) {
-                    const snap = await db.collection("salas").limit(30).get();
-                    snap.forEach(doc => salasOnlineCache.push({ id: doc.id, ...doc.data() }));
+                    const snap = await db.collection("salas").limit(25).get();
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        if (!salasOnlineCache.some(s => s.peerId === (d.peerId || doc.id))) {
+                            salasOnlineCache.push({ id: doc.id, ...d });
+                        }
+                    });
                 }
             } catch (e) {}
 
-            uiText('hax-counter', `${salasOnlineCache.length} sala(s)`);
+            uiText('hax-counter', `${salasOnlineCache.length} sala(s) disponível(is)`);
             filtrarTabelaSalas();
         }
 
         function filtrarTabelaSalas() {
-            const tbody = document.getElementById('hax-rooms-tbody'); tbody.innerHTML = '';
+            const tbody = document.getElementById('hax-rooms-tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
             if (salasOnlineCache.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:25px; color:#a7f3d0;">Nenhuma sala aberta. <button class="btn btn-avancar" style="display:inline-flex; padding:5px 10px; margin-left:10px;" onclick="abrirModalCriarSala()">➕ Criar Sala</button></td></tr>`;
                 return;
@@ -1824,7 +1901,12 @@
                 const tr = document.createElement('tr'); tr.className = 'hax-row';
                 tr.onclick = () => { salaSelecionada = s; document.querySelectorAll('.hax-row').forEach(r => r.classList.remove('selected')); tr.classList.add('selected'); };
                 tr.ondblclick = () => { salaSelecionada = s; conectarSalaSelecionada(); };
-                tr.innerHTML = `<td style="color:#fff;">${s.nome}</td><td style="color:#f1c40f;">${s.jogadores || 1}/${s.max}</td><td>${s.temSenha?'🔒 Sim':'Livre'}</td><td style="color:#cbd5e1;">${s.host||'BR'}</td>`;
+                tr.innerHTML = `
+                    <td style="color:#fff; font-weight:bold;">${s.nome}</td>
+                    <td style="color:#f1c40f; font-weight:bold;">${s.jogadores || 1}/${s.max || 2}</td>
+                    <td style="color:#a7f3d0;">${s.modo || '1v1'}</td>
+                    <td style="color:#00f2fe; font-family:monospace; font-size:10px;">${(s.peerId||s.id).substring(0,10)}...</td>
+                `;
                 tbody.appendChild(tr);
             });
         }
@@ -1851,7 +1933,7 @@
         }
 
         function copiarCodigoSala() {
-            if (myRoomID) navigator.clipboard.writeText(myRoomID).then(() => mostrarToast("📋 Código copiado!"));
+            if (myRoomID) navigator.clipboard.writeText(myRoomID).then(() => mostrarToast(`📋 Código copiado: ${myRoomID}`));
         }
 
         function iniciarPeerHost() {
@@ -1863,14 +1945,19 @@
 
             peer.on('open', (id) => {
                 myRoomID = id; uiText('txt-codigo-sala', `SALA: ${id}`);
+                uiText('host-network-status', `🟢 Sala aberta! Compartilhe o código.`);
                 const max = modoDeJogo.includes('5V5') ? 10 : (modoDeJogo.includes('3V3') ? 6 : (modoDeJogo.includes('2V2') ? 4 : 2));
-                if (db && pendingRoomConfig) {
-                    db.collection("salas").doc(myRoomID).set({
-                        nome: pendingRoomConfig.nome, host: meuPerfil.nome || "CRAQUE", modo: modoDeJogo, max: max,
-                        selCampoW: selCampoW, selCampoH: selCampoH, jogadores: 1, temSenha: pendingRoomConfig.pass.length > 0,
-                        senha: pendingRoomConfig.pass, peerId: id, criadoEmSec: Math.floor(Date.now() / 1000)
-                    }).catch(()=>{});
-                }
+                const salaData = {
+                    id: myRoomID, peerId: id, nome: pendingRoomConfig.nome, host: meuPerfil.nome || "CRAQUE",
+                    modo: modoDeJogo, max: max, selCampoW: selCampoW, selCampoH: selCampoH,
+                    jogadores: 1, temSenha: pendingRoomConfig.pass.length > 0,
+                    senha: pendingRoomConfig.pass, criadoEmSec: Math.floor(Date.now() / 1000)
+                };
+
+                adicionarSalaNoCache(salaData);
+                if (roomBroadcastChannel) roomBroadcastChannel.postMessage({ type: 'room_announced', sala: salaData });
+
+                if (db) db.collection("salas").doc(myRoomID).set(salaData).catch(()=>{});
             });
 
             peer.on('connection', (conn) => {
@@ -1895,6 +1982,13 @@
             });
         }
 
+        function conectarPorIdDigitado() {
+            const id = document.getElementById('input-join-id-direto').value.trim();
+            if (!id) { alert("Digite ou cole o ID da sala."); return; }
+            AudioEngine.playClick();
+            conectarSalaPorIdDireto(id);
+        }
+
         function conectarSalaSelecionada() {
             if (!salaSelecionada) return;
             AudioEngine.playClick();
@@ -1908,7 +2002,7 @@
         function conectarSalaPorIdDireto(targetPeerId) {
             isOnline = true; isHost = false; isRanked = false; isPenaltiesMode = false;
             showScreen('screen-client-waiting');
-            uiText('txt-status-client-lobby', `Conectando...`);
+            uiText('txt-status-client-lobby', `Conectando ao Host ${targetPeerId}...`);
             if (peer) { peer.destroy(); peer = null; }
             peer = new Peer(peerIceConfig);
 
@@ -1925,7 +2019,7 @@
                     if (d.type === 'chat_msg') { adicionarMensagemChat(d.sender, d.text); }
                     if (d.type === 'sync' && estadoJogo !== 'MENU') sincronizarJogoCliente(d);
                 });
-                myConn.on('close', () => { alert("Sala fechada."); cancelarOnline(); });
+                myConn.on('close', () => { alert("Sala fechada pelo Host."); cancelarOnline(); });
             });
         }
 
@@ -1970,7 +2064,11 @@
 
         function cancelarOnline() {
             AudioEngine.playClick();
-            if (isHost && myRoomID && db) db.collection("salas").doc(myRoomID).delete().catch(()=>{});
+            if (isHost && myRoomID) {
+                if (db) db.collection("salas").doc(myRoomID).delete().catch(()=>{});
+                removerSalaDoCache(myRoomID);
+                if (roomBroadcastChannel) roomBroadcastChannel.postMessage({ type: 'room_closed', roomId: myRoomID });
+            }
             if (myConn) myConn.close(); if (peer) peer.destroy();
             isOnline = false; isHost = true; showScreen('screen-home');
         }
@@ -2166,13 +2264,14 @@
         const GOAL_DEPTH = 55;
         const PITCH_INSET_X = 65;
 
-        // --- RENDER CLÁSSICO E DETALHADO DO GRAMADO ---
+        // --- RENDER DO CAMPO COM TORCIDA ANIMADA E ILUMINAÇÃO ---
         function desenharCampoRealista() {
             const bgCanvas = document.getElementById('field-canvas'); if (!bgCanvas) return;
             bgCanvas.width = selCampoW; bgCanvas.height = selCampoH;
             const ctx = bgCanvas.getContext('2d');
             const stripeWidth = 50;
 
+            // Gramado Listrado
             for (let i = 0; i < selCampoW; i += stripeWidth) {
                 ctx.fillStyle = (i / stripeWidth) % 2 === 0 ? '#1b5e20' : '#2e7d32';
                 ctx.fillRect(i, 0, stripeWidth, selCampoH);
@@ -2181,21 +2280,86 @@
             const golSize = selCampoH * 0.44;
             const yTop = (selCampoH - golSize) / 2, yBottom = (selCampoH + golSize) / 2;
 
+            // --- TORCIDA ANIMADA NAS ARQUIBANCADAS (TOPO E RODAPÉ) ---
+            const agora = Date.now();
+            const corT1 = (cfgP1 && cfgP1.cores) ? cfgP1.cores.bg : '#006437';
+            const corT2 = (cfgP2 && cfgP2.cores) ? cfgP2.cores.bg : '#c0392b';
+
+            // Placas de publicidade topo
+            ctx.fillStyle = '#061a0e';
+            ctx.fillRect(0, 0, selCampoW, 20);
+            ctx.strokeStyle = '#10b981'; ctx.lineWidth = 1.5;
+            ctx.strokeRect(0, 0, selCampoW, 20);
+            
+            // Torcedores Topo (pulando e balançando)
+            const numFans = Math.floor(selCampoW / 18);
+            for (let f = 0; f < numFans; f++) {
+                const fx = f * 18 + 9;
+                const pulo = Math.sin(agora / 200 + f * 0.7) * 4;
+                const isFanT1 = f < numFans / 2;
+                ctx.fillStyle = isFanT1 ? corT1 : corT2;
+                ctx.beginPath();
+                ctx.arc(fx, 9 + pulo, 5, 0, 2 * Math.PI);
+                ctx.fill();
+                // Olhos
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(fx - 2, 7 + pulo, 1.5, 1.5);
+                ctx.fillRect(fx + 1, 7 + pulo, 1.5, 1.5);
+            }
+
+            // Placas de publicidade rodapé
+            ctx.fillStyle = '#061a0e';
+            ctx.fillRect(0, selCampoH - 20, selCampoW, 20);
+            ctx.strokeStyle = '#10b981'; ctx.lineWidth = 1.5;
+            ctx.strokeRect(0, selCampoH - 20, selCampoW, 20);
+
+            // Torcedores Rodapé
+            for (let f = 0; f < numFans; f++) {
+                const fx = f * 18 + 9;
+                const pulo = Math.sin(agora / 220 + f * 0.9) * 4;
+                const isFanT1 = f < numFans / 2;
+                ctx.fillStyle = isFanT1 ? corT1 : corT2;
+                ctx.beginPath();
+                ctx.arc(fx, selCampoH - 9 + pulo, 5, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
             if (isPenaltiesMode) {
+                // Desenho Especial Pênaltis no Titã
                 ctx.fillStyle = 'rgba(10, 20, 30, 0.45)';
                 ctx.fillRect(selCampoW - PITCH_INSET_X, yTop, GOAL_DEPTH, golSize);
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)'; ctx.lineWidth = 3;
+                
+                // Redes 3D
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.lineWidth = 1.5;
+                for (let y = yTop; y <= yBottom; y += 12) {
+                    ctx.beginPath(); ctx.moveTo(selCampoW - PITCH_INSET_X, y); ctx.lineTo(selCampoW - PITCH_INSET_X + GOAL_DEPTH, y); ctx.stroke();
+                }
+
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)'; ctx.lineWidth = 3.5;
                 ctx.strokeRect(selCampoW * 0.25, 20, selCampoW * 0.75 - PITCH_INSET_X, selCampoH - 40);
-                ctx.beginPath(); ctx.arc(selCampoW * 0.45, selCampoH / 2, 5, 0, 2 * Math.PI); ctx.fillStyle = '#fff'; ctx.fill();
+
+                // Grande Área do Pênalti
+                const areaW = selCampoW * 0.3, areaH = selCampoH * 0.65;
+                ctx.strokeRect(selCampoW - PITCH_INSET_X - areaW, selCampoH/2 - areaH/2, areaW, areaH);
+
+                // Meia Lua da Área
+                ctx.beginPath();
+                ctx.arc(selCampoW - PITCH_INSET_X - areaW, selCampoH / 2, 70, Math.PI * 0.5, Math.PI * 1.5);
+                ctx.stroke();
+
+                // Marca do Pênalti
+                ctx.beginPath(); ctx.arc(selCampoW * 0.45, selCampoH / 2, 6, 0, 2 * Math.PI); ctx.fillStyle = '#f1c40f'; ctx.fill();
+                ctx.strokeStyle = '#ffffff'; ctx.stroke();
                 return;
             }
 
+            // Gols normais com redes 3D
             ctx.fillStyle = 'rgba(10, 20, 30, 0.45)';
             ctx.fillRect(PITCH_INSET_X - GOAL_DEPTH, yTop, GOAL_DEPTH, golSize);
             ctx.fillRect(selCampoW - PITCH_INSET_X, yTop, GOAL_DEPTH, golSize);
 
-            // Redes dos gols
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
             ctx.lineWidth = 1;
             for (let y = yTop; y <= yBottom; y += 10) {
                 ctx.beginPath(); ctx.moveTo(PITCH_INSET_X - GOAL_DEPTH, y); ctx.lineTo(PITCH_INSET_X, y); ctx.stroke();
@@ -2225,12 +2389,11 @@
                 if (!cfgP1 || !cfgP1.cores) cfgP1 = { time: "Palmeiras", uni: 1, cores: {bg: "#006437", line: "#fff", num: "#fff"} };
                 if (!cfgP2 || !cfgP2.cores) cfgP2 = { time: "Corinthians", uni: 1, cores: {bg: "#000000", line: "#fff", num: "#fff"} };
 
-                // NOMES REAIS DOS JOGADORES
                 playerNames[1] = meuPerfil.nome || "P1";
                 if (!playerNames[2] || playerNames[2] === 'P2') playerNames[2] = "ADVERSÁRIO";
 
                 uiText('score1', "0"); uiText('score2', "0");
-                uiText('timer', isPenaltiesMode ? "10s" : "1º T • 01:30");
+                uiText('timer', isPenaltiesMode ? "TOQUES: 0/2 • 3.0s" : "1º T • 01:30");
                 
                 if (isPenaltiesMode) {
                     uiText('tv-badge-status', "🎯 PÊNALTIS (TITÃ)");
@@ -2331,12 +2494,28 @@
                         historicoToques.push({ slot: slotNum, teamId: slotNum % 2 !== 0 ? 1 : 2, time: Date.now() });
                         if (historicoToques.length > 20) historicoToques.shift();
                         AudioEngine.playBallTouch(3);
-                        if (isPenaltiesMode && slotNum === 1) penaltyKicked = true;
+
+                        // REGRA OFICIAL DE PÊNALTI: MAX 2 TOQUES E 3 SEGUNDOS APÓS O 1º TOQUE
+                        if (isPenaltiesMode && slotNum === 1) {
+                            penaltyTouchesCount++;
+                            if (penaltyTouchesCount === 1) {
+                                penaltyKicked = true;
+                                penaltyCountdownFrames = 180; // 3.0s (60 FPS)
+                                AudioEngine.playDash();
+                            } else if (penaltyTouchesCount > 2) {
+                                // Excedeu os 2 toques permitidos
+                                AudioEngine.playPostHit();
+                                uiText('texto-gol', '❌ INFRAÇÃO: MAIS DE 2 TOQUES!');
+                                uiShow('texto-gol'); uiShow('mensagem-overlay', 'flex');
+                                registrarResultadoPenalti(false);
+                            }
+                        }
                     }
                     if ((bodyA.label === 'bola' && bodyB.label === 'trave') || (bodyB.label === 'bola' && bodyA.label === 'trave')) AudioEngine.playPostHit();
                 });
             });
 
+            // --- RENDERIZADOR ULTRA DETALHADO DOS JOGADORES 3D ---
             Events.on(render, 'afterRender', () => {
                 const ctx = render.context;
                 const auraEquipada = LOJA_ITENS.auras.find(a => a.id === meuPerfil.equipados.aura);
@@ -2347,28 +2526,77 @@
                     const isT1 = isPenaltiesMode ? (penaltyTurn === 1 ? i === 1 : i === 2) : (i % 2 !== 0);
                     const cfg = isT1 ? cfgP1.cores : cfgP2.cores;
 
+                    // 1. Sombra suave sob o jogador no gramado
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.ellipse(p.position.x, p.position.y + 6, p.circleRadius + 2, p.circleRadius * 0.7, 0, 0, 2 * Math.PI);
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+                    ctx.fill();
+                    ctx.restore();
+
+                    // 2. Aura Especial
                     if (auraEquipada && auraEquipada.cor && i === mySlot) {
                         ctx.beginPath(); ctx.arc(p.position.x, p.position.y, p.circleRadius + 8 + Math.sin(Date.now()/150)*3, 0, 2*Math.PI);
                         ctx.strokeStyle = auraEquipada.cor; ctx.lineWidth = 3; ctx.stroke();
                     }
 
-                    // NÚMERO / AVATAR DENTRO DO CÍRCULO
-                    const textoCirculo = playerAvatars[i] || playerNumbers[i] || 10;
-                    ctx.fillStyle = cfg.num || '#000'; ctx.font = textoCirculo.length > 2 ? 'bold 13px Rajdhani' : 'bold 16px Rajdhani';
-                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                    ctx.fillText(textoCirculo, p.position.x, p.position.y);
+                    // 3. Disco do jogador com efeito de relevo 3D esférico
+                    ctx.save();
+                    const grad = ctx.createRadialGradient(
+                        p.position.x - 6, p.position.y - 6, 2,
+                        p.position.x, p.position.y, p.circleRadius
+                    );
+                    grad.addColorStop(0, '#ffffff');
+                    grad.addColorStop(0.3, cfg.bg);
+                    grad.addColorStop(1, '#05180e');
 
-                    // NOME REAL DO JOGADOR ACIMA DO CÍRCULO
+                    ctx.beginPath();
+                    ctx.arc(p.position.x, p.position.y, p.circleRadius, 0, 2 * Math.PI);
+                    ctx.fillStyle = grad;
+                    ctx.fill();
+
+                    // Borda dupla metálica
+                    ctx.strokeStyle = cfg.line || '#ffffff';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+
+                    // 4. Indicador Direcional (Visor de mira do jogador)
+                    const vel = p.velocity;
+                    const spd = Math.hypot(vel.x, vel.y);
+                    if (spd > 0.3) {
+                        const ang = Math.atan2(vel.y, vel.x);
+                        ctx.beginPath();
+                        ctx.arc(p.position.x + Math.cos(ang) * (p.circleRadius - 3), p.position.y + Math.sin(ang) * (p.circleRadius - 3), 4, 0, 2 * Math.PI);
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fill();
+                    }
+                    ctx.restore();
+
+                    // 5. Número / Avatar Central
+                    const textoCirculo = playerAvatars[i] || playerNumbers[i] || 10;
+                    ctx.fillStyle = cfg.num || '#000';
+                    ctx.font = textoCirculo.length > 2 ? 'bold 13px Rajdhani' : 'bold 16px Rajdhani';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                    ctx.shadowBlur = 4;
+                    ctx.fillText(textoCirculo, p.position.x, p.position.y);
+                    ctx.shadowBlur = 0;
+
+                    // 6. Plaquinha de Identificação com Nome Real Acima do Jogador
                     const nomeRealJogador = (i === 1 ? (meuPerfil.nome || 'P1') : (playerNames[i] || (i === 2 ? 'ADVERSÁRIO' : `P${i}`))).substring(0, 10);
-                    ctx.fillStyle = 'rgba(0,0,0,0.75)';
-                    const boxW = Math.max(48, nomeRealJogador.length * 8 + 8);
+                    const boxW = Math.max(50, nomeRealJogador.length * 8 + 10);
+                    ctx.fillStyle = 'rgba(4, 18, 10, 0.88)';
                     ctx.fillRect(p.position.x - boxW/2, p.position.y - 36, boxW, 14);
                     ctx.strokeStyle = '#10b981'; ctx.lineWidth = 1;
                     ctx.strokeRect(p.position.x - boxW/2, p.position.y - 36, boxW, 14);
-                    ctx.fillStyle = '#fff'; ctx.font = 'bold 9.5px Montserrat';
+                    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 9.5px Montserrat';
                     ctx.fillText(nomeRealJogador, p.position.x, p.position.y - 28);
                 }
 
+                // Partículas
                 for (let i = particulas.length - 1; i >= 0; i--) {
                     let pt = particulas[i]; pt.x += pt.vx; pt.y += pt.vy; pt.life--;
                     ctx.fillStyle = pt.color || '#fff'; ctx.globalAlpha = Math.max(0, pt.life / 40);
@@ -2410,26 +2638,42 @@
                     const golSize = selCampoH * 0.44;
                     const golTop = (selCampoH / 2) - (golSize / 2), golBottom = (selCampoH / 2) + (golSize / 2);
 
+                    // LÓGICA OFICIAL DE PÊNALTIS (3 SEGUNDOS APÓS 1º TOQUE + MAX 2 TOQUES)
                     if (isPenaltiesMode) {
-                        penaltyTimer--;
-                        uiText('timer', `${Math.max(0, Math.ceil(penaltyTimer / 60))}s`);
+                        if (penaltyKicked && penaltyCountdownFrames > 0) {
+                            penaltyCountdownFrames--;
+                            const segsRestantes = (penaltyCountdownFrames / 60).toFixed(1);
+                            uiText('timer', `⏱️ ${segsRestantes}s | TOQUES: ${penaltyTouchesCount}/2`);
+
+                            if (penaltyCountdownFrames <= 0) {
+                                AudioEngine.playPostHit();
+                                uiText('texto-gol', '⏰ TEMPO ESGOTADO (3s)!');
+                                uiShow('texto-gol'); uiShow('mensagem-overlay', 'flex');
+                                registrarResultadoPenalti(false);
+                                return;
+                            }
+                        }
+
+                        // Movimento do Goleiro
                         const keeper = window.player2;
                         if (penaltyKicked) {
                             const dy = bola.position.y - keeper.position.y;
-                            Body.setVelocity(keeper, { x: 0, y: Math.sign(dy) * Math.min(Math.abs(dy), 4.5) });
+                            Body.setVelocity(keeper, { x: 0, y: Math.sign(dy) * Math.min(Math.abs(dy), 4.8) });
                         } else {
-                            const targetY = (selCampoH / 2) + Math.sin(Date.now() / 300) * (golSize * 0.35);
-                            Body.setVelocity(keeper, { x: 0, y: (targetY - keeper.position.y) * 0.1 });
+                            const targetY = (selCampoH / 2) + Math.sin(Date.now() / 250) * (golSize * 0.35);
+                            Body.setVelocity(keeper, { x: 0, y: (targetY - keeper.position.y) * 0.12 });
                         }
 
+                        // Verificação de Gol
                         if (bola.position.x > selCampoW - PITCH_INSET_X + 5 && bola.position.y > golTop && bola.position.y < golBottom) {
-                            AudioEngine.playConfetti(); uiText('texto-gol', '⚽ GOL DE PÊNALTI!'); uiShow('texto-gol'); uiShow('mensagem-overlay', 'flex');
+                            AudioEngine.playConfetti();
+                            uiText('texto-gol', '⚽ GOL DE PÊNALTI!');
+                            uiShow('texto-gol'); uiShow('mensagem-overlay', 'flex');
                             registrarResultadoPenalti(true);
-                        } else if (penaltyKicked && (bola.position.x > selCampoW - PITCH_INSET_X + 20 || Math.hypot(bola.velocity.x, bola.velocity.y) < 0.2 || bola.position.x < selCampoW * 0.2)) {
-                            AudioEngine.playPostHit(); uiText('texto-gol', '❌ PERDEU O PÊNALTI!'); uiShow('texto-gol'); uiShow('mensagem-overlay', 'flex');
-                            registrarResultadoPenalti(false);
-                        } else if (penaltyTimer <= 0) {
-                            AudioEngine.playPostHit(); uiText('texto-gol', '⏰ TEMPO ESGOTADO!'); uiShow('texto-gol'); uiShow('mensagem-overlay', 'flex');
+                        } else if (penaltyKicked && (bola.position.x > selCampoW - PITCH_INSET_X + 20 || (penaltyTouchesCount >= 2 && Math.hypot(bola.velocity.x, bola.velocity.y) < 0.15) || bola.position.x < selCampoW * 0.2)) {
+                            AudioEngine.playPostHit();
+                            uiText('texto-gol', '❌ PERDEU O PÊNALTI!');
+                            uiShow('texto-gol'); uiShow('mensagem-overlay', 'flex');
                             registrarResultadoPenalti(false);
                         }
                         processarControles(); return;
@@ -2645,7 +2889,6 @@
                 const pForward = Math.max(0, jogador.velocity.x * dirX + jogador.velocity.y * dirY);
                 Body.setVelocity(bola, { x: dirX * (10.5 + pForward * 0.4), y: dirY * (10.5 + pForward * 0.4) });
                 AudioEngine.playKick(1.1);
-                if (isPenaltiesMode) penaltyKicked = true;
             }
         }
 
@@ -2661,7 +2904,7 @@
             uiShow('main-content-wrapper'); showScreen('screen-home');
         }
 
-        // PIX OFICIAL 67981520229
+        // PIX OFICIAL
         const CHAVE_PIX_OFICIAL = "67981520229";
         let pixPendente = null;
 
@@ -2849,13 +3092,17 @@
         function adminCongelarBola() { if (bola) Body.setVelocity(bola, { x: 0, y: 0 }); mostrarToast("Bola congelada!"); }
 
         async function adminLimparSalasServidor() {
-            if (!verificarAdminAutorizado() || !db) return;
-            try {
-                const snap = await db.collection("salas").get();
-                snap.forEach(doc => doc.ref.delete().catch(()=>{}));
-                mostrarToast("🧹 Salas fantasmas limpas!");
-                carregarSalasOnline();
-            } catch(e) {}
+            if (!verificarAdminAutorizado()) return;
+            salasOnlineCache = [];
+            salvarSalasLocais();
+            if (db) {
+                try {
+                    const snap = await db.collection("salas").get();
+                    snap.forEach(doc => doc.ref.delete().catch(()=>{}));
+                } catch(e) {}
+            }
+            mostrarToast("🧹 Salas limpas!");
+            carregarSalasOnline();
         }
 
         async function adminLimparFilaMatchmaking() {
@@ -2867,7 +3114,7 @@
             } catch(e) {}
         }
 
-        // --- LEADERBOARD GLOBAL (SOMENTE JOGADORES REAIS DO FIRESTORE) ---
+        // --- LEADERBOARD GLOBAL (JOGADORES REAIS DO FIRESTORE) ---
         async function abrirLeaderboardGlobal() {
             AudioEngine.playClick(); uiShow('modal-leaderboard', 'flex');
             const tbody = document.getElementById('leaderboard-tbody');
@@ -2883,7 +3130,6 @@
                 }
             } catch(e) {}
 
-            // Se ainda não houver outros no banco, inclui apenas o jogador logado
             if (lista.length === 0 && meuPerfil && meuPerfil.nome) {
                 lista.push({ nome: meuPerfil.nome, elo: meuPerfil.elo || 1000, nivel: meuPerfil.nivel || 1 });
             }
