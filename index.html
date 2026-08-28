@@ -1478,12 +1478,20 @@
             while (log.children.length > 20) log.removeChild(log.firstChild);
         }
 
-        // --- SISTEMA MULTIPLAYER ---
+        // --- SISTEMA MULTIPLAYER WEBRTC (PEERJS) & BROADCASTCHANNEL ---
         let isOnline = false, isHost = true, mySlot = 1;
         let remoteInputs = { 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {} };
         let myRoomID = "";
         let salasOnlineCache = [];
         let salaSelecionada = null;
+        let peerInstance = null;
+        let activePeerConn = null;
+        let localBroadcastChannel = null;
+        try {
+            if (typeof BroadcastChannel !== 'undefined') {
+                localBroadcastChannel = new BroadcastChannel('iaes_ball_global_net');
+            }
+        } catch(e) {}
 
         // TECLADO ROBUSTO COM TECLAS MÚLTIPLAS PARA CHUTE
         const keys = {};
@@ -1796,7 +1804,11 @@
         }
 
         function copiarCodigoSala() {
-            if (myRoomID) navigator.clipboard.writeText(myRoomID).then(() => mostrarToast(`📋 Código da Sala copiado: ${myRoomID}`));
+            if (myRoomID) {
+                navigator.clipboard.writeText(myRoomID).then(() => mostrarToast(`📋 Código da Sala copiado: ${myRoomID}`)).catch(() => {
+                    prompt("Copie o código da sala:", myRoomID);
+                });
+            }
         }
 
         function iniciarPeerHost() {
@@ -1804,39 +1816,63 @@
             playerNumbers[1] = meuPerfil.numero || 10;
             playerNames[2] = null;
             
-            myRoomID = 'sala_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            myRoomID = 'IAES_' + Math.random().toString(36).substring(2, 7).toUpperCase();
             uiText('txt-codigo-sala', `SALA: ${myRoomID}`);
-            uiText('host-network-status', `🟢 Sala aberta e pronta para conexões!`);
+            uiText('host-network-status', `🟡 Abrindo conexão global WebRTC...`);
 
             const salaData = {
-                id: myRoomID, nome: pendingRoomConfig.nome, host: meuPerfil.nome || "CRAQUE",
+                id: myRoomID, nome: (pendingRoomConfig && pendingRoomConfig.nome) || "SALA OFICIAL", host: meuPerfil.nome || "CRAQUE",
                 modo: modoDeJogo, max: 2, selCampoW: selCampoW, selCampoH: selCampoH,
                 jogadores: 1, criadoEmSec: Math.floor(Date.now() / 1000)
             };
             adicionarSalaNoCache(salaData);
             renderLobbySlotsHost();
 
-            if (roomBroadcastChannel) {
-                roomBroadcastChannel.onmessage = (e) => {
-                    if (e.data && e.data.targetRoom === myRoomID) {
-                        if (e.data.type === 'client_join') {
-                            playerNames[2] = e.data.nome || "CLIENT";
-                            playerNumbers[2] = e.data.numero || 7;
-                            renderLobbySlotsHost();
-                            roomBroadcastChannel.postMessage({
+            if (peerInstance) { try { peerInstance.destroy(); } catch(e) {} peerInstance = null; }
+            if (typeof Peer !== 'undefined') {
+                try {
+                    peerInstance = new Peer(myRoomID, {
+                        debug: 1,
+                        config: {
+                            iceServers: [
+                                { urls: 'stun:stun.l.google.com:19302' },
+                                { urls: 'stun:stun1.l.google.com:19302' },
+                                { urls: 'stun:global.stun.twilio.com:3478' }
+                            ]
+                        }
+                    });
+                    peerInstance.on('open', (id) => {
+                        uiText('host-network-status', `🟢 Sala aberta! Conexões globais prontas.`);
+                    });
+                    peerInstance.on('connection', (conn) => {
+                        activePeerConn = conn;
+                        conn.on('open', () => {
+                            conn.send({
                                 type: 'host_ack', targetRoom: myRoomID,
                                 hostName: meuPerfil.nome, modo: modoDeJogo, w: selCampoW, h: selCampoH
                             });
-                        }
-                        if (e.data.type === 'client_input') remoteInputs[2] = e.data.keys;
-                        if (e.data.type === 'client_skip_replay') finalizarReplay();
-                    }
+                        });
+                        conn.on('data', (data) => {
+                            processarPacoteRede(data);
+                        });
+                    });
+                    peerInstance.on('error', (err) => {
+                        console.warn("PeerJS Host:", err);
+                        uiText('host-network-status', `🟢 Sala aberta e pronta!`);
+                    });
+                } catch(e) { console.error(e); }
+            }
+
+            if (localBroadcastChannel) {
+                localBroadcastChannel.onmessage = (e) => {
+                    processarPacoteRede(e.data);
                 };
             }
         }
 
         function conectarPorIdDigitado() {
-            const id = document.getElementById('input-join-id-direto').value.trim().toUpperCase();
+            const input = document.getElementById('input-join-id-direto');
+            const id = input ? input.value.trim().toUpperCase() : '';
             if (!id) { alert("Digite o ID da sala."); return; }
             AudioEngine.playClick();
             conectarSalaPorIdDireto(id);
@@ -1851,43 +1887,110 @@
         let clientJoinTimer = null;
         function conectarSalaPorIdDireto(targetRoomId) {
             isOnline = true; isHost = false; isRanked = false; isPenaltiesMode = false; mySlot = 2;
-            myRoomID = targetRoomId;
+            const cleanTargetId = targetRoomId.trim().toUpperCase();
+            myRoomID = cleanTargetId;
             showScreen('screen-client-waiting');
-            uiText('txt-status-client-lobby', `Conectando à sala ${targetRoomId}...`);
+            uiText('txt-status-client-lobby', `Conectando à sala ${myRoomID}...`);
 
             if (clientJoinTimer) clearInterval(clientJoinTimer);
 
-            const enviarTentativaJoin = () => {
-                if (roomBroadcastChannel) {
-                    roomBroadcastChannel.postMessage({
-                        type: 'client_join', targetRoom: targetRoomId,
-                        nome: meuPerfil.nome || 'JOGADOR 2', numero: meuPerfil.numero || 7
+            if (peerInstance) { try { peerInstance.destroy(); } catch(e) {} peerInstance = null; }
+            if (typeof Peer !== 'undefined') {
+                try {
+                    peerInstance = new Peer({
+                        debug: 1,
+                        config: {
+                            iceServers: [
+                                { urls: 'stun:stun.l.google.com:19302' },
+                                { urls: 'stun:stun1.l.google.com:19302' },
+                                { urls: 'stun:global.stun.twilio.com:3478' }
+                            ]
+                        }
                     });
+                    peerInstance.on('open', () => {
+                        activePeerConn = peerInstance.connect(myRoomID, { reliable: true });
+                        activePeerConn.on('open', () => {
+                            uiText('txt-status-client-lobby', `🟢 Conectado ao Host via WebRTC! Entrando na sala...`);
+                            activePeerConn.send({
+                                type: 'client_join', targetRoom: myRoomID,
+                                nome: meuPerfil.nome || 'JOGADOR 2', numero: meuPerfil.numero || 7
+                            });
+                        });
+                        activePeerConn.on('data', (data) => {
+                            processarPacoteRede(data);
+                        });
+                    });
+                    peerInstance.on('error', (err) => {
+                        console.warn("PeerJS Client connect warning:", err);
+                    });
+                } catch(e) { console.error(e); }
+            }
+
+            if (localBroadcastChannel) {
+                localBroadcastChannel.onmessage = (e) => {
+                    processarPacoteRede(e.data);
+                };
+            }
+
+            const enviarTentativaJoin = () => {
+                const joinPacket = {
+                    type: 'client_join', targetRoom: myRoomID,
+                    nome: meuPerfil.nome || 'JOGADOR 2', numero: meuPerfil.numero || 7
+                };
+                if (activePeerConn && activePeerConn.open) {
+                    try { activePeerConn.send(joinPacket); } catch(e) {}
+                }
+                if (localBroadcastChannel) {
+                    try { localBroadcastChannel.postMessage(joinPacket); } catch(e) {}
                 }
             };
 
             enviarTentativaJoin();
-            clientJoinTimer = setInterval(enviarTentativaJoin, 600);
+            clientJoinTimer = setInterval(enviarTentativaJoin, 500);
+        }
 
-            if (roomBroadcastChannel) {
-                roomBroadcastChannel.onmessage = (e) => {
-                    if (e.data && e.data.targetRoom === targetRoomId) {
-                        if (e.data.type === 'host_ack') {
-                            if (clientJoinTimer) { clearInterval(clientJoinTimer); clientJoinTimer = null; }
-                            modoDeJogo = e.data.modo; selCampoW = e.data.w; selCampoH = e.data.h;
-                            uiText('txt-status-client-lobby', `🟢 Conectado ao Host (${e.data.hostName})! Aguardando início...`);
-                        }
-                        if (e.data.type === 'start_match') {
-                            if (clientJoinTimer) { clearInterval(clientJoinTimer); clientJoinTimer = null; }
-                            cfgP1 = e.data.cfgP1; cfgP2 = e.data.cfgP2;
-                            selCampoW = e.data.w; selCampoH = e.data.h; modoDeJogo = e.data.modo;
-                            playerNames = e.data.names; playerNumbers = e.data.nums;
-                            uiHide('main-content-wrapper');
-                            iniciarEngineJogo();
-                        }
-                        if (e.data.type === 'sync' && estadoJogo !== 'MENU') sincronizarJogoCliente(e.data);
-                    }
-                };
+        function processarPacoteRede(data) {
+            if (!data) return;
+            if (data.targetRoom && myRoomID && data.targetRoom.toUpperCase() !== myRoomID.toUpperCase()) return;
+
+            if (isHost) {
+                if (data.type === 'client_join') {
+                    playerNames[2] = data.nome || "CLIENT";
+                    playerNumbers[2] = data.numero || 7;
+                    renderLobbySlotsHost();
+                    broadcast({
+                        type: 'host_ack', targetRoom: myRoomID,
+                        hostName: meuPerfil.nome, modo: modoDeJogo, w: selCampoW, h: selCampoH
+                    });
+                }
+                if (data.type === 'client_input') remoteInputs[2] = data.keys;
+                if (data.type === 'client_skip_replay') finalizarReplay();
+                if (data.type === 'chat_msg') {
+                    adicionarMensagemChat(data.sender, data.text, '#00d2d3');
+                    broadcast(data);
+                }
+                if (data.type === 'avatar_change') {
+                    playerAvatars[data.slot] = data.avatar;
+                    broadcast(data);
+                }
+            } else {
+                // Client
+                if (data.type === 'host_ack') {
+                    if (clientJoinTimer) { clearInterval(clientJoinTimer); clientJoinTimer = null; }
+                    modoDeJogo = data.modo; selCampoW = data.w; selCampoH = data.h;
+                    uiText('txt-status-client-lobby', `🟢 Conectado ao Host (${data.hostName})! Aguardando início...`);
+                }
+                if (data.type === 'start_match') {
+                    if (clientJoinTimer) { clearInterval(clientJoinTimer); clientJoinTimer = null; }
+                    cfgP1 = data.cfgP1; cfgP2 = data.cfgP2;
+                    selCampoW = data.w; selCampoH = data.h; modoDeJogo = data.modo;
+                    playerNames = data.names; playerNumbers = data.nums;
+                    uiHide('main-content-wrapper');
+                    iniciarEngineJogo();
+                }
+                if (data.type === 'sync' && estadoJogo !== 'MENU') sincronizarJogoCliente(data);
+                if (data.type === 'chat_msg') adicionarMensagemChat(data.sender, data.text, '#00d2d3');
+                if (data.type === 'avatar_change') playerAvatars[data.slot] = data.avatar;
             }
         }
 
@@ -1899,8 +2002,12 @@
         }
 
         function broadcast(msg) {
-            if (roomBroadcastChannel && myRoomID) {
-                roomBroadcastChannel.postMessage({ ...msg, targetRoom: myRoomID });
+            const packet = { ...msg, targetRoom: myRoomID };
+            if (activePeerConn && activePeerConn.open) {
+                try { activePeerConn.send(packet); } catch(e) {}
+            }
+            if (localBroadcastChannel && myRoomID) {
+                try { localBroadcastChannel.postMessage(packet); } catch(e) {}
             }
         }
 
@@ -2598,8 +2705,12 @@
 
             Events.on(engine, 'beforeUpdate', () => {
                 if (isOnline && !isHost) {
-                    if (roomBroadcastChannel && myRoomID) {
-                        roomBroadcastChannel.postMessage({ type: 'client_input', targetRoom: myRoomID, keys: getOnlineClientInputs() });
+                    const clientPacket = { type: 'client_input', targetRoom: myRoomID, keys: getOnlineClientInputs() };
+                    if (activePeerConn && activePeerConn.open) {
+                        try { activePeerConn.send(clientPacket); } catch(e) {}
+                    }
+                    if (localBroadcastChannel && myRoomID) {
+                        try { localBroadcastChannel.postMessage(clientPacket); } catch(e) {}
                     }
                     return;
                 }
@@ -2874,8 +2985,12 @@
         function votarPular() {
             AudioEngine.playClick();
             if (isOnline && !isHost) {
-                if (roomBroadcastChannel && myRoomID) {
-                    roomBroadcastChannel.postMessage({ type: 'client_skip_replay', targetRoom: myRoomID });
+                const skipPacket = { type: 'client_skip_replay', targetRoom: myRoomID };
+                if (activePeerConn && activePeerConn.open) {
+                    try { activePeerConn.send(skipPacket); } catch(e) {}
+                }
+                if (localBroadcastChannel && myRoomID) {
+                    try { localBroadcastChannel.postMessage(skipPacket); } catch(e) {}
                 }
                 finalizarReplay();
             } else {
