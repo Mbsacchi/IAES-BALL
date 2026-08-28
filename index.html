@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IAES BALL PRO - Futebol & HaxBall Champions</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&family=Rajdhani:wght@600;700;900&display=swap" rel="stylesheet">
     
@@ -31,33 +32,40 @@
             --admin-orange: #f39c12;
         }
 
+        /* CUSTOM SCROLLBARS */
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: rgba(3, 18, 10, 0.8); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #165b33; border-radius: 4px; border: 1px solid #10b981; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+
         body {
             margin: 0; padding: 0;
-            background: radial-gradient(ellipse at center top, #144627 0%, #082816 45%, #03120a 100%);
+            background: radial-gradient(ellipse at center top, #144627 0%, #082816 50%, #03120a 100%);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            height: 100vh; font-family: 'Montserrat', sans-serif; overflow: hidden; color: white;
+            height: 100vh; width: 100vw; font-family: 'Montserrat', sans-serif; overflow: hidden; color: white;
             user-select: none;
         }
 
         .glass-panel {
-            background: rgba(6, 26, 16, 0.94); backdrop-filter: blur(16px);
-            border: 1.5px solid rgba(16, 185, 129, 0.25);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 30px rgba(16, 185, 129, 0.15);
-            border-radius: 14px;
+            background: rgba(6, 26, 16, 0.95); backdrop-filter: blur(16px);
+            border: 1.5px solid rgba(16, 185, 129, 0.35);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 35px rgba(16, 185, 129, 0.2);
+            border-radius: 16px;
         }
 
         #menu-container {
-            padding: 26px 30px; text-align: center; position: absolute; z-index: 100;
-            max-height: 95vh; overflow-y: auto; width: 960px; max-width: 96%;
+            padding: 24px 30px; text-align: center; position: absolute; z-index: 100;
+            max-height: 94vh; overflow-y: auto; overflow-x: hidden;
+            width: 95vw; max-width: 1100px;
         }
 
         h1, h2, h3 { margin: 0 0 10px 0; text-transform: uppercase; font-weight: 900; }
-        h1 { font-size: 36px; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.6); }
+        h1 { font-size: 34px; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.6); }
         h2 { font-size: 20px; color: var(--primary-gold); }
 
-        /* BOTÕES ESTILO FUTEBOL */
+        /* BOTÕES */
         .btn {
-            background: linear-gradient(135deg, #165b33, #10b981); color: white; border: none; padding: 12px 20px;
+            background: linear-gradient(135deg, #165b33, #10b981); color: white; border: none; padding: 11px 18px;
             font-size: 12px; font-weight: 900; border-radius: 6px; cursor: pointer; transition: all 0.2s;
             text-transform: uppercase; outline: none; letter-spacing: 0.5px;
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -66,12 +74,11 @@
         .btn:hover { transform: translateY(-2px); filter: brightness(1.15); box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4); }
         .btn:active { transform: translateY(1px); }
         
-        .btn-avancar { background: linear-gradient(135deg, #10b981, #059669); width: 100%; font-size: 14px; margin-top: 15px; }
+        .btn-avancar { background: linear-gradient(135deg, #10b981, #059669); width: 100%; font-size: 13px; margin-top: 15px; }
         .btn-voltar { background: linear-gradient(135deg, #962d22, #e74c3c); font-size: 11px; padding: 8px 16px; }
         .btn-gold { background: linear-gradient(135deg, #d4ac0d, #f1c40f); color: #0b131b; }
         .btn-ranked { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: #fff; }
         .btn-pix { background: linear-gradient(135deg, #00b4d8, #0077b6); color: #fff; }
-        .btn-penaltis { background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; }
 
         .screen { display: none; flex-direction: column; align-items: center; width: 100%; }
         .active-screen { display: flex; animation: fadeIn 0.25s ease; }
@@ -98,10 +105,10 @@
         /* TOAST DE NOTIFICAÇÃO */
         #toast-notif {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(6, 26, 16, 0.96); border: 2px solid var(--pitch-emerald);
+            background: rgba(6, 26, 16, 0.98); border: 2px solid var(--pitch-emerald);
             padding: 10px 24px; border-radius: 8px; font-weight: 900; font-size: 13px;
             color: #fff; z-index: 1000; display: none; box-shadow: 0 8px 25px rgba(0,0,0,0.8);
-            animation: slideDown 0.3s ease;
+            animation: slideDown 0.3s ease; text-align: center;
         }
         @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
 
@@ -115,7 +122,7 @@
         @keyframes slideUp { from { bottom: -80px; opacity: 0; } to { bottom: 25px; opacity: 1; } }
 
         /* MENU PRINCIPAL GRID */
-        .menu-modes-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; margin: 12px 0; }
+        .menu-modes-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; margin: 12px 0; }
         .mode-card {
             background: linear-gradient(145deg, rgba(13, 45, 25, 0.85), rgba(6, 24, 14, 0.95));
             border: 2px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 14px;
@@ -187,9 +194,9 @@
             background: rgba(0,0,0,0.85); z-index: 500; justify-content: center; align-items: center;
         }
         .modal-box {
-            background: #082012; border: 2px solid #10b981; border-radius: 10px; padding: 25px;
-            width: 560px; max-width: 92%; text-align: left; box-shadow: 0 15px 40px rgba(0,0,0,0.9);
-            max-height: 88vh; overflow-y: auto;
+            background: #082012; border: 2px solid #10b981; border-radius: 12px; padding: 22px 24px;
+            width: 90vw; max-width: 650px; text-align: left; box-shadow: 0 20px 50px rgba(0,0,0,0.95);
+            max-height: 90vh; overflow-y: auto; overflow-x: hidden;
         }
 
         /* PAINEL ADMIN STYLES */
@@ -257,7 +264,7 @@
             font-weight: 900; font-family: 'Rajdhani', sans-serif; margin: 0 10px;
         }
 
-        /* CAMPO */
+        /* CAMPO DE JOGO RESPONSIVO */
         #game-wrapper {
             position: relative; display: none; border-radius: 12px; overflow: hidden;
             box-shadow: 0 25px 60px rgba(0,0,0,0.9), 0 0 0 3px rgba(16, 185, 129, 0.3);
@@ -304,7 +311,7 @@
         #btn-skip-replay { bottom: 20px; right: 20px; display: none; background: #c0392b; }
 
         .input-sala {
-            padding: 10px; font-size: 15px; border-radius: 6px; border: 2px solid #10b981;
+            padding: 10px; font-size: 14px; border-radius: 6px; border: 2px solid #10b981;
             background: #04140b; color: #fff; text-align: center; margin-bottom: 10px; width: 80%;
             font-family: 'Rajdhani', sans-serif; font-weight: 800; outline: none;
         }
@@ -347,15 +354,21 @@
         .penalty-dot.miss { background: #e74c3c; box-shadow: 0 0 6px #e74c3c; }
 
         /* PACOTES PIX COMPRA DE MOEDAS */
-        .pix-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+        .pix-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         .pix-card {
             background: linear-gradient(145deg, #092615, #04140b); border: 2px solid #10b981;
-            border-radius: 8px; padding: 12px; text-align: center; display: flex; flex-direction: column;
+            border-radius: 8px; padding: 12px 10px; text-align: center; display: flex; flex-direction: column;
             justify-content: space-between; gap: 6px; cursor: pointer; transition: 0.2s;
         }
         .pix-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(16,185,129,0.4); }
-        .pix-moedas { font-size: 18px; font-weight: 900; color: var(--primary-gold); font-family: 'Rajdhani'; }
-        .pix-preco { font-size: 14px; font-weight: 900; color: #fff; }
+        .pix-moedas { font-size: 16px; font-weight: 900; color: var(--primary-gold); font-family: 'Rajdhani'; }
+        .pix-preco { font-size: 13px; font-weight: 900; color: #fff; }
+
+        /* PEDIDOS PIX NO PAINEL ADM */
+        .admin-pix-item {
+            background: #05180e; border: 1px solid #10b981; border-radius: 6px; padding: 8px 10px;
+            margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 11px;
+        }
     </style>
 </head>
 <body>
@@ -385,17 +398,17 @@
         <div class="xp-bar-container"><div class="xp-bar-fill" id="perfil-xp-bar"></div></div>
     </div>
 
-    <!-- CONTAINER DOS MENUS -->
+    <!-- CONTAINER DOS MENUS EM TELA CHEIA RESPONSIVA -->
     <div id="menu-container" class="glass-panel">
         
         <!-- TELA DE LOGIN / REGISTRO -->
         <div id="screen-login" class="screen active-screen">
-            <h1 style="color:#10b981;">🏆 IAES BALL PRO</h1>
+            <h1 style="color:#10b981; font-size:38px;">🏆 IAES BALL PRO</h1>
             <p style="color:#a7f3d0; margin-bottom: 20px; font-size: 13px;">Entre com seu Nickname para jogar online ou offline</p>
             <input type="text" id="input-nickname" class="input-sala" placeholder="SEU NICKNAME (MÍN. 3 LETRAS)" maxlength="16">
             <input type="password" id="input-senha" class="input-sala" placeholder="SENHA (MÍN. 6 DÍGITOS)" maxlength="32">
             
-            <div style="display: flex; gap: 12px; width: 80%; margin-top: 8px;">
+            <div style="display: flex; gap: 12px; width: 80%; max-width: 380px; margin-top: 8px;">
                 <button id="btn-login" class="btn btn-avancar" style="margin-top: 0;" onclick="fazerLogin()"><span id="btn-login-txt">⚽ ENTRAR</span></button>
                 <button id="btn-criar" class="btn" style="margin-top: 0; background: #059669; width: 100%;" onclick="criarConta()"><span id="btn-criar-txt">CRIAR CONTA</span></button>
             </div>
@@ -404,7 +417,7 @@
 
         <!-- MENU PRINCIPAL -->
         <div id="screen-home" class="screen">
-            <h1 style="font-size: 38px; color: #10b981; margin-bottom: 2px; text-shadow: 0 0 20px rgba(16,185,129,0.5);">IAES BALL</h1>
+            <h1 style="font-size: 40px; color: #10b981; margin-bottom: 2px; text-shadow: 0 0 20px rgba(16,185,129,0.5);">IAES BALL</h1>
             <div style="font-size: 11px; color: #a7f3d0; margin-bottom: 16px; letter-spacing: 2px; font-weight: 700;">HAXBALL & FUTEBOL CHAMPIONS</div>
             
             <div class="menu-modes-grid">
@@ -412,7 +425,7 @@
                 <div class="mode-card" style="border-color: rgba(155, 89, 182, 0.8);" onclick="abrirMatchmakingRanked()">
                     <div>
                         <div class="mode-card-title" style="color: #d2a8ff;">⚔️ BUSCAR RANKED</div>
-                        <div class="mode-card-desc">1v1 (Padrão), 2v2 (Maracanã) e 3v3 (Titã) valendo PDL no ranking!</div>
+                        <div class="mode-card-desc">1v1 (Padrão), 2v2 (Maracanã) e 3v3 (Titã) valendo PDL!</div>
                     </div>
                     <div class="mode-card-badge" style="background: rgba(142, 68, 173, 0.4); color:#d2a8ff;">MATCHMAKING • PDL</div>
                 </div>
@@ -430,7 +443,7 @@
                 <div class="mode-card" style="border-color: rgba(230, 126, 34, 0.8);" onclick="iniciarModoPenaltis()">
                     <div>
                         <div class="mode-card-title" style="color: #f39c12;">🎯 PÊNALTIS</div>
-                        <div class="mode-card-desc">Disputa de pênaltis eletrizante com 5 cobranças alternadas e goleiro!</div>
+                        <div class="mode-card-desc">Disputa de pênaltis eletrizante com 5 cobranças e goleiro!</div>
                     </div>
                     <div class="mode-card-badge" style="background: rgba(230, 126, 34, 0.3); color:#f39c12;">DISPUTA 5 CHUTES</div>
                 </div>
@@ -448,7 +461,7 @@
             <div class="menu-sub-grid" id="menu-sub-botoes">
                 <div class="sub-btn-card" onclick="abrirModalAmigos()" style="border-color: rgba(0,242,254,0.4);"><span>👥</span><div>AMIGOS/GRUPO</div></div>
                 <div class="sub-btn-card" onclick="abrirLeaderboardGlobal()" style="border-color: rgba(241,196,15,0.4);"><span>🏆</span><div>RANK GLOBAL</div></div>
-                <div class="sub-btn-card" onclick="abrirModalComprarMoedasPix()" style="border-color: rgba(0, 180, 216, 0.5); background: rgba(0,180,216,0.15);"><span>🪙</span><div style="color:#00f2fe;">COMPRAR MOEDAS</div></div>
+                <div class="sub-btn-card" onclick="abrirModalComprarMoedasPix()" style="border-color: rgba(0, 180, 216, 0.6); background: rgba(0,180,216,0.15);"><span>🪙</span><div style="color:#00f2fe;">COMPRAR MOEDAS</div></div>
                 <div class="sub-btn-card" onclick="abrirPasseBatalha()" style="border-color: rgba(16,185,129,0.5);"><span>🎫</span><div>PASSE (20)</div></div>
                 <div class="sub-btn-card" onclick="abrirLoja()"><span>🛒</span><div>MERCADO</div></div>
                 <div class="sub-btn-card" onclick="abrirModalConfiguracoes()"><span>⚙️</span><div>ÁUDIO</div></div>
@@ -484,66 +497,79 @@
             <button class="btn btn-voltar" onclick="sairTelaMatchmaking()">⏴ VOLTAR AO MENU</button>
         </div>
 
-        <!-- MODAL DE COMPRA DE MOEDAS COM DINHEIRO REAL (R$ 1,00 = 1000 MOEDAS) -->
+        <!-- MODAL DE COMPRA DE MOEDAS COM DINHEIRO REAL (CHAVE PIX: 67981520229) -->
         <div id="modal-comprar-moedas" class="modal-overlay">
-            <div class="modal-box" style="border-color: #00f2fe; width: 620px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div class="modal-box" style="border-color: #00f2fe;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                     <h2 style="margin:0; color:#00f2fe;">🪙 BANCO IAES - COMPRAR MOEDAS</h2>
                     <span style="font-size:11px; color:#10b981; font-weight:bold;">⚡ 1 REAL = 1.000 MOEDAS</span>
                 </div>
-                <p style="font-size:11px; color:#a7f3d0; margin-bottom:12px;">Selecione seu pacote de moedas para desbloquear itens lendários e cosméticos do jogo:</p>
+                <p style="font-size:11px; color:#a7f3d0; margin:0 0 10px 0;">Faça o PIX para a chave oficial. O Administrador confirmará seu pagamento para liberar suas moedas!</p>
+
+                <!-- CHAVE PIX OFICIAL DO USUÁRIO -->
+                <div style="background:#04140b; border:1px solid #10b981; border-radius:8px; padding:10px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <div>
+                        <div style="font-size:10px; color:#a7f3d0; font-weight:bold;">CHAVE PIX OFICIAL (CELULAR):</div>
+                        <div style="font-size:16px; font-weight:900; color:var(--primary-gold); font-family:monospace; letter-spacing:1px;" id="txt-chave-pix">67981520229</div>
+                    </div>
+                    <button class="btn btn-gold" style="padding:6px 12px; font-size:10px;" onclick="copiarChavePix()">📋 COPIAR CHAVE PIX</button>
+                </div>
 
                 <div class="pix-grid">
-                    <div class="pix-card" onclick="comprarPacoteMoedas(1000, 1.00, 'PACOTE INICIANTE')">
-                        <div style="font-size:24px;">🪙</div>
+                    <div class="pix-card" onclick="selecionarPacoteMoedas(1000, 1.00, 'PACOTE INICIANTE')">
+                        <div style="font-size:22px;">🪙</div>
                         <div class="pix-moedas">1.000 MOEDAS</div>
                         <div class="pix-preco">R$ 1,00</div>
-                        <button class="btn btn-pix" style="padding:5px; font-size:10px;">COMPRAR VIA PIX</button>
+                        <button class="btn btn-pix" style="padding:4px; font-size:9px;">SELECIONAR</button>
                     </div>
 
-                    <div class="pix-card" onclick="comprarPacoteMoedas(5000, 5.00, 'PACOTE CRAQUE')">
-                        <div style="font-size:24px;">🪙🪙</div>
+                    <div class="pix-card" onclick="selecionarPacoteMoedas(5000, 5.00, 'PACOTE CRAQUE')">
+                        <div style="font-size:22px;">🪙🪙</div>
                         <div class="pix-moedas">5.000 MOEDAS</div>
                         <div class="pix-preco">R$ 5,00</div>
-                        <button class="btn btn-pix" style="padding:5px; font-size:10px;">COMPRAR VIA PIX</button>
+                        <button class="btn btn-pix" style="padding:4px; font-size:9px;">SELECIONAR</button>
                     </div>
 
-                    <div class="pix-card" style="border-color:var(--primary-gold);" onclick="comprarPacoteMoedas(12000, 10.00, 'PACOTE CAMPEÃO (+20% BÔNUS)')">
-                        <div style="font-size:24px;">👑</div>
+                    <div class="pix-card" style="border-color:var(--primary-gold);" onclick="selecionarPacoteMoedas(12000, 10.00, 'PACOTE CAMPEÃO (+20% BÔNUS)')">
+                        <div style="font-size:22px;">👑</div>
                         <div class="pix-moedas">12.000 MOEDAS</div>
-                        <div class="pix-preco">R$ 10,00 <span style="font-size:9px; color:#10b981;">(+2k BÔNUS)</span></div>
-                        <button class="btn btn-gold" style="padding:5px; font-size:10px;">POPULAR ⭐</button>
+                        <div class="pix-preco">R$ 10,00 <span style="font-size:8px; color:#10b981;">(+2k BÔNUS)</span></div>
+                        <button class="btn btn-gold" style="padding:4px; font-size:9px;">POPULAR ⭐</button>
                     </div>
 
-                    <div class="pix-card" onclick="comprarPacoteMoedas(31000, 25.00, 'PACOTE PROFISSIONAL')">
-                        <div style="font-size:24px;">💎</div>
+                    <div class="pix-card" onclick="selecionarPacoteMoedas(31000, 25.00, 'PACOTE PROFISSIONAL')">
+                        <div style="font-size:22px;">💎</div>
                         <div class="pix-moedas">31.000 MOEDAS</div>
-                        <div class="pix-preco">R$ 25,00 <span style="font-size:9px; color:#10b981;">(+6k BÔNUS)</span></div>
-                        <button class="btn btn-pix" style="padding:5px; font-size:10px;">COMPRAR VIA PIX</button>
+                        <div class="pix-preco">R$ 25,00 <span style="font-size:8px; color:#10b981;">(+6k BÔNUS)</span></div>
+                        <button class="btn btn-pix" style="padding:4px; font-size:9px;">SELECIONAR</button>
                     </div>
 
-                    <div class="pix-card" style="border-color:#e74c3c;" onclick="comprarPacoteMoedas(65000, 50.00, 'PACOTE MITOLÓGICO')">
-                        <div style="font-size:24px;">🌌</div>
+                    <div class="pix-card" style="border-color:#e74c3c;" onclick="selecionarPacoteMoedas(65000, 50.00, 'PACOTE MITOLÓGICO')">
+                        <div style="font-size:22px;">🌌</div>
                         <div class="pix-moedas">65.000 MOEDAS</div>
-                        <div class="pix-preco">R$ 50,00 <span style="font-size:9px; color:#10b981;">(+15k BÔNUS)</span></div>
-                        <button class="btn" style="background:#e74c3c; padding:5px; font-size:10px;">MEGA OFERTA 🔥</button>
+                        <div class="pix-preco">R$ 50,00 <span style="font-size:8px; color:#10b981;">(+15k BÔNUS)</span></div>
+                        <button class="btn" style="background:#e74c3c; padding:4px; font-size:9px;">MEGA OFERTA 🔥</button>
                     </div>
 
-                    <div class="pix-card" style="border-color:var(--primary-gold);" onclick="comprarPacoteMoedas(140000, 100.00, 'PACOTE DONO DA BOLA')">
-                        <div style="font-size:24px;">🏆</div>
+                    <div class="pix-card" style="border-color:var(--primary-gold);" onclick="selecionarPacoteMoedas(140000, 100.00, 'PACOTE DONO DA BOLA')">
+                        <div style="font-size:22px;">🏆</div>
                         <div class="pix-moedas">140.000 MOEDAS</div>
-                        <div class="pix-preco">R$ 100,00 <span style="font-size:9px; color:#10b981;">(+40k BÔNUS)</span></div>
-                        <button class="btn btn-gold" style="padding:5px; font-size:10px;">LENDA V.I.P 🏆</button>
+                        <div class="pix-preco">R$ 100,00 <span style="font-size:8px; color:#10b981;">(+40k BÔNUS)</span></div>
+                        <button class="btn btn-gold" style="padding:4px; font-size:9px;">V.I.P 🏆</button>
                     </div>
                 </div>
 
-                <div id="pix-checkout-box" style="display:none; background:#04140b; border:1px dashed #10b981; border-radius:8px; padding:12px; margin-top:14px; text-align:center;">
-                    <div id="pix-checkout-title" style="font-weight:900; color:var(--primary-gold); font-size:13px;">PAGAMENTO PIX GERADO</div>
-                    <div style="font-size:11px; color:#a7f3d0; margin:4px 0;" id="pix-checkout-desc">Valor: R$ 1,00 | Crédito: 1.000 Moedas</div>
-                    <div style="background:#fff; color:#000; padding:6px; font-size:10px; font-family:monospace; margin:8px auto; max-width:80%; border-radius:4px;" id="pix-copia-cola">00020126360014BR.GOV.BCB.PIX0114iaesball@pix.br52040000530398654041.005802BR5910IAES BALL6009SAO PAULO62070503***6304E8F2</div>
-                    <div style="display:flex; gap:8px; justify-content:center; margin-top:8px;">
-                        <button class="btn btn-gold" style="padding:6px 12px; font-size:11px;" onclick="confirmarPixSimulado()">✅ CONFIRMAR PAGAMENTO</button>
-                        <button class="btn btn-voltar" style="padding:6px 12px; font-size:11px;" onclick="fecharCheckoutPix()">CANCELAR</button>
+                <!-- CHECKOUT COM ENVIO PARA APROVAÇÃO DO ADMIN -->
+                <div id="pix-checkout-box" style="display:none; background:#04140b; border:1px solid #10b981; border-radius:8px; padding:12px; margin-top:12px; text-align:center;">
+                    <div id="pix-checkout-title" style="font-weight:900; color:var(--primary-gold); font-size:13px;">PEDIDO SELECIONADO</div>
+                    <div style="font-size:12px; color:#a7f3d0; margin:4px 0;" id="pix-checkout-desc">Valor: R$ 1,00 | Moedas: +1.000 🪙</div>
+                    
+                    <div style="font-size:11px; color:#cbd5e1; margin:8px 0 4px 0; text-align:left;">Nome de quem fez o PIX (Opcional):</div>
+                    <input type="text" id="input-pix-nome-pagador" class="input-sala" style="width:100%; margin:0 0 8px 0; text-align:left;" placeholder="Ex: Murilo Silva (Nome no comprovante)">
+
+                    <div style="display:flex; gap:8px; justify-content:center;">
+                        <button class="btn btn-avancar" style="margin:0; padding:8px 14px; font-size:11px;" onclick="enviarPedidoPixParaAdmin()">✅ JÁ FIZ O PIX / ENVIAR PARA O ADM</button>
+                        <button class="btn btn-voltar" style="margin:0; padding:8px 14px; font-size:11px;" onclick="fecharCheckoutPix()">CANCELAR</button>
                     </div>
                 </div>
 
@@ -553,7 +579,7 @@
 
         <!-- MODAL DE RANK GLOBAL DE PDL (HALL DA FAMA) -->
         <div id="modal-leaderboard" class="modal-overlay">
-            <div class="modal-box" style="border-color: var(--primary-gold); width: 580px;">
+            <div class="modal-box" style="border-color: var(--primary-gold);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                     <h2 style="margin:0; color:var(--primary-gold);">🏆 RANKING GLOBAL DE PDL</h2>
                     <span style="font-size:11px; color:#10b981; font-weight:bold;">TEMPORADA 1</span>
@@ -754,12 +780,23 @@
         </div>
     </div>
 
-    <!-- MODAL DO PAINEL DE ADMINISTRAÇÃO EXCLUSIVO -->
+    <!-- MODAL DO PAINEL DE ADMINISTRAÇÃO EXCLUSIVO COM GESTÃO DE PIX -->
     <div id="modal-admin" class="modal-overlay">
         <div class="modal-box" style="border-color: #e67e22;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <h2 style="margin:0; color:#f39c12;">👑 PAINEL MASTER ADMIN</h2>
                 <span style="font-size:10px; background:#e74c3c; padding:2px 6px; border-radius:4px; font-weight:bold;">AUTORIZADO</span>
+            </div>
+
+            <!-- SEÇÃO DE APROVAÇÃO DE PEDIDOS PIX -->
+            <div class="admin-section" style="border-color:#00f2fe;">
+                <div class="admin-section-title" style="color:#00f2fe; display:flex; justify-content:space-between;">
+                    <span>💳 Pedidos de PIX Pendentes (Chave: 67981520229)</span>
+                    <button class="btn" style="padding:2px 6px; font-size:9px;" onclick="carregarPedidosPixAdmin()">🔄 Atualizar</button>
+                </div>
+                <div id="admin-pix-pedidos-container" style="max-height:160px; overflow-y:auto; margin-top:6px;">
+                    <div style="font-size:11px; color:#a7f3d0; padding:6px;">Nenhum pedido de PIX pendente no momento.</div>
+                </div>
             </div>
 
             <!-- ECONOMIA & RECURSOS -->
@@ -1152,7 +1189,7 @@
             const toast = document.getElementById('toast-notif');
             if (!toast) return;
             toast.innerText = msg; toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 3500);
+            setTimeout(() => { toast.style.display = 'none'; }, 4000);
         }
 
         // --- CONFIGURAÇÕES DE ÁUDIO ---
@@ -1199,6 +1236,7 @@
             }
             AudioEngine.playClick();
             uiShow('modal-admin', 'flex');
+            carregarPedidosPixAdmin();
         }
         function fecharModalAdmin() { AudioEngine.playClick(); uiHide('modal-admin'); }
 
@@ -1297,8 +1335,17 @@
             }
         }
 
-        // --- SISTEMA DE COMPRA DE MOEDAS COM DINHEIRO REAL (1 REAL = 1.000 MOEDAS) ---
+        // --- SISTEMA DE COMPRA DE MOEDAS COM DINHEIRO REAL & GESTÃO PIX ---
+        const CHAVE_PIX_OFICIAL = "67981520229";
         let pixPendente = null;
+
+        function copiarChavePix() {
+            navigator.clipboard.writeText(CHAVE_PIX_OFICIAL).then(() => {
+                mostrarToast(`📋 Chave PIX (${CHAVE_PIX_OFICIAL}) copiada com sucesso!`);
+            }).catch(() => {
+                prompt("Copie a Chave PIX abaixo:", CHAVE_PIX_OFICIAL);
+            });
+        }
 
         function abrirModalComprarMoedasPix() {
             AudioEngine.playClick();
@@ -1307,25 +1354,145 @@
         }
         function fecharModalComprarMoedas() { AudioEngine.playClick(); uiHide('modal-comprar-moedas'); }
 
-        function comprarPacoteMoedas(qtdMoedas, valorReais, pacoteNome) {
+        function selecionarPacoteMoedas(qtdMoedas, valorReais, pacoteNome) {
             AudioEngine.playClick();
             pixPendente = { moedas: qtdMoedas, valor: valorReais, nome: pacoteNome };
-            uiText('pix-checkout-title', `⚡ PAGAMENTO PIX: ${pacoteNome}`);
-            uiText('pix-checkout-desc', `Valor: R$ ${valorReais.toFixed(2)} | Moedas creditadas: +${qtdMoedas.toLocaleString()} 🪙`);
+            uiText('pix-checkout-title', `⚡ ${pacoteNome}`);
+            uiText('pix-checkout-desc', `Valor a transferir: R$ ${valorReais.toFixed(2)} | Você receberá: +${qtdMoedas.toLocaleString()} 🪙`);
             uiShow('pix-checkout-box', 'block');
         }
         function fecharCheckoutPix() { uiHide('pix-checkout-box'); pixPendente = null; }
 
-        function confirmarPixSimulado() {
+        async function enviarPedidoPixParaAdmin() {
             if (!pixPendente) return;
-            AudioEngine.playVictoryFanfare();
-            const moedasGanhas = pixPendente.moedas;
-            meuPerfil.moedas = (meuPerfil.moedas || 0) + moedasGanhas;
-            salvarPerfil();
-            atualizarPerfilUI();
+            AudioEngine.playClick();
+            const pagadorNome = document.getElementById('input-pix-nome-pagador').value.trim() || meuPerfil.nome;
+            const pedidoId = 'pix_' + Math.random().toString(36).substring(2, 10);
+
+            try {
+                if (db && auth && auth.currentUser) {
+                    await db.collection("pedidos_pix").doc(pedidoId).set({
+                        pedidoId: pedidoId,
+                        jogadorUid: auth.currentUser.uid,
+                        jogadorNome: meuPerfil.nome,
+                        pagadorNome: pagadorNome,
+                        valor: pixPendente.valor,
+                        moedas: pixPendente.moedas,
+                        pacote: pixPendente.nome,
+                        chavePix: CHAVE_PIX_OFICIAL,
+                        status: 'pendente',
+                        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    // Notifica o admin
+                    await db.collection("notificacoes").add({
+                        tipo: 'pix_pendente',
+                        remetenteUid: auth.currentUser.uid,
+                        remetenteNome: meuPerfil.nome,
+                        destinatarioUid: 'admin_all',
+                        valor: pixPendente.valor,
+                        moedas: pixPendente.moedas,
+                        pedidoId: pedidoId,
+                        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                    }).catch(()=>{});
+
+                    // Escuta aprovação do pedido em tempo real para o jogador
+                    db.collection("pedidos_pix").doc(pedidoId).onSnapshot(doc => {
+                        if (doc.exists) {
+                            const d = doc.data();
+                            if (d.status === 'aprovado') {
+                                AudioEngine.playVictoryFanfare();
+                                meuPerfil.moedas = (meuPerfil.moedas || 0) + d.moedas;
+                                salvarPerfil();
+                                atualizarPerfilUI();
+                                mostrarToast(`🎉 SEU PIX FOI APROVADO PELO ADMIN! +${d.moedas.toLocaleString()} 🪙 adicionadas!`);
+                            }
+                        }
+                    });
+                }
+            } catch(e) {}
+
             fecharCheckoutPix();
             fecharModalComprarMoedas();
-            mostrarToast(`🎉 Pagamento de R$ ${pixPendente.valor.toFixed(2)} APROVADO! +${moedasGanhas.toLocaleString()} 🪙 adicionadas!`);
+            mostrarToast("⏳ Pedido enviado para o Administrador! Assim que o pagamento for confirmado, suas moedas serão creditadas!");
+        }
+
+        async function carregarPedidosPixAdmin() {
+            if (!verificarAdminAutorizado()) return;
+            const container = document.getElementById('admin-pix-pedidos-container');
+            if (!container) return;
+            container.innerHTML = '<div style="font-size:11px; color:#a7f3d0;">Buscando pedidos...</div>';
+
+            try {
+                if (db) {
+                    const snap = await db.collection("pedidos_pix").where("status", "==", "pendente").limit(20).get();
+                    if (snap.empty) {
+                        container.innerHTML = '<div style="font-size:11px; color:#a7f3d0; padding:4px;">Nenhum pedido de PIX pendente no momento.</div>';
+                        return;
+                    }
+                    container.innerHTML = '';
+                    snap.forEach(doc => {
+                        const p = doc.data();
+                        const item = document.createElement('div');
+                        item.className = 'admin-pix-item';
+                        item.innerHTML = `
+                            <div>
+                                <span style="font-weight:900; color:#fff;">👤 ${p.jogadorNome}</span> 
+                                <span style="color:#a7f3d0;">(Pagador: ${p.pagadorNome || p.jogadorNome})</span>
+                                <div style="color:var(--primary-gold); font-weight:bold;">R$ ${p.valor.toFixed(2)} ➔ +${p.moedas.toLocaleString()} 🪙</div>
+                            </div>
+                            <div style="display:flex; gap:6px;">
+                                <button class="btn btn-avancar" style="margin:0; padding:4px 8px; font-size:10px;" onclick="adminAprovarPix('${doc.id}', '${p.jogadorUid}', ${p.moedas}, ${p.valor}, '${p.jogadorNome}')">✅ APROVAR</button>
+                                <button class="btn btn-voltar" style="margin:0; padding:4px 8px; font-size:10px;" onclick="adminRecusarPix('${doc.id}', '${p.jogadorNome}')">❌ RECUSAR</button>
+                            </div>
+                        `;
+                        container.appendChild(item);
+                    });
+                }
+            } catch(e) {
+                container.innerHTML = '<div style="font-size:11px; color:#a7f3d0;">Nenhum pedido pendente no momento.</div>';
+            }
+        }
+
+        async function adminAprovarPix(docId, jogadorUid, moedas, valor, jogadorNome) {
+            if (!verificarAdminAutorizado()) return;
+            AudioEngine.playVictoryFanfare();
+
+            try {
+                if (db) {
+                    await db.collection("pedidos_pix").doc(docId).update({ status: 'aprovado' });
+
+                    // Se for o próprio perfil do admin logado
+                    if (meuPerfil.uid === jogadorUid) {
+                        meuPerfil.moedas = (meuPerfil.moedas || 0) + moedas;
+                        salvarPerfil();
+                        atualizarPerfilUI();
+                    } else {
+                        // Atualiza o documento do jogador no Firestore
+                        try {
+                            const userRef = db.collection("jogadores").doc(jogadorUid);
+                            const userDoc = await userRef.get();
+                            if (userDoc.exists) {
+                                const currentCoins = userDoc.data().moedas || 0;
+                                await userRef.update({ moedas: currentCoins + moedas });
+                            }
+                        } catch(e) {}
+                    }
+                }
+            } catch(e) {}
+
+            mostrarToast(`✅ PIX de ${jogadorNome} (R$ ${valor.toFixed(2)}) APROVADO! +${moedas.toLocaleString()} 🪙 creditadas.`);
+            carregarPedidosPixAdmin();
+        }
+
+        async function adminRecusarPix(docId, jogadorNome) {
+            if (!verificarAdminAutorizado()) return;
+            AudioEngine.playClick();
+            if (db) {
+                await db.collection("pedidos_pix").doc(docId).update({ status: 'recusado' }).catch(()=>{});
+            }
+            mostrarToast(`❌ Pedido de ${jogadorNome} marcado como recusado.`);
+            carregarPedidosPixAdmin();
         }
 
         // --- SISTEMA DE LEADERBOARD GLOBAL DE PDL (HALL DA FAMA) ---
@@ -1696,7 +1863,7 @@
             uiShow('perfil-ui'); uiText('perfil-nome', meuPerfil.nome);
             uiText('perfil-nivel-badge', `NVL ${meuPerfil.nivel}`);
             uiText('perfil-rank', `RANKED (${meuPerfil.elo || 1000} PDL)`);
-            uiText('perfil-moedas-val', meuPerfil.moedas);
+            uiText('perfil-moedas-val', (meuPerfil.moedas || 0).toLocaleString());
 
             const isAdm = verificarAdminAutorizado();
             if (isAdm) {
@@ -1719,15 +1886,19 @@
         function escutarNotificacoesUsuario() {
             if (!db || !auth || !auth.currentUser) return;
             try {
-                db.collection("notificacoes").where("destinatarioUid", "==", auth.currentUser.uid)
+                db.collection("notificacoes").where("destinatarioUid", "in", [auth.currentUser.uid, 'admin_all'])
                   .onSnapshot(snap => {
                       snap.docChanges().forEach(change => {
                           if (change.type === "added") {
                               const n = change.doc.data();
-                              if (n.tipo === 'convite_grupo') {
+                              if (n.tipo === 'convite_grupo' && n.destinatarioUid === auth.currentUser.uid) {
                                   convitePendente = { id: change.doc.id, ...n };
                                   uiText('invite-popup-txt', `${n.remetenteNome} convidou você para o grupo!`);
                                   uiShow('invite-popup');
+                              }
+                              if (n.tipo === 'pix_pendente' && verificarAdminAutorizado()) {
+                                  mostrarToast(`🔔 NOVO PIX PENDENTE: ${n.remetenteNome} (R$ ${n.valor.toFixed(2)})! Abra o Painel ADM para aprovar.`);
+                                  carregarPedidosPixAdmin();
                               }
                           }
                       });
@@ -2123,7 +2294,7 @@
             penaltyResultsP1 = [];
             penaltyResultsP2 = [];
             placar1 = 0; placar2 = 0;
-            penaltyTimer = 600; // 10 segundos
+            penaltyTimer = 600;
             penaltyKicked = false;
             atualizarDotsPenaltis();
             uiShow('p1-dots', 'flex');
@@ -2146,19 +2317,18 @@
 
         function prepararCobrancaPenalti() {
             penaltyKicked = false;
-            penaltyTimer = 600; // 10s
+            penaltyTimer = 600;
             resetarUICompleta();
             
             const isP1Kicker = penaltyTurn === 1;
             const kickerTeam = isP1Kicker ? cfgP1.time : cfgP2.time;
-            const keeperTeam = isP1Kicker ? cfgP2.time : cfgP1.time;
 
             uiText('tv-badge-status', `🎯 PÊNALTIS • ${kickerTeam.toUpperCase()} CHUTA`);
             uiText('texto-estado', `VEZ DE: ${kickerTeam.toUpperCase()} (P${penaltyTurn})`);
             uiShow('texto-estado');
             setTimeout(() => uiHide('texto-estado'), 1500);
 
-            // Bola na marca da cal (pênalti à direita)
+            // Bola na marca da cal
             Body.setVelocity(bola, { x: 0, y: 0 });
             Body.setPosition(bola, { x: selCampoW * 0.45, y: selCampoH / 2 });
 
@@ -2184,7 +2354,6 @@
 
             atualizarDotsPenaltis();
 
-            // Verifica se a disputa de pênaltis terminou
             if (penaltyTurn === 2) {
                 penaltyRound++;
             }
@@ -2204,7 +2373,6 @@
                 if (placar2 > placar1 + p1Remaining) { finalizarPartida('P2'); return; }
             }
 
-            // Alterna o cobrador
             penaltyTurn = penaltyTurn === 1 ? 2 : 1;
             estadoJogo = 'GOL_CELEBRATION';
             delayTimer = 90;
@@ -2564,7 +2732,7 @@
         }
 
         // --- LOJA & PASSE DE BATALHA COM 20 NÍVEIS ---
-        function abrirLoja() { AudioEngine.playClick(); uiText('shop-moedas-val', meuPerfil.moedas); filtrarLoja('bolas'); showScreen('screen-shop'); }
+        function abrirLoja() { AudioEngine.playClick(); uiText('shop-moedas-val', (meuPerfil.moedas || 0).toLocaleString()); filtrarLoja('bolas'); showScreen('screen-shop'); }
         function filtrarLoja(cat) {
             AudioEngine.playClick();
             document.querySelectorAll('.shop-tab-btn').forEach(b => b.classList.remove('active'));
@@ -2576,7 +2744,7 @@
                 const comp = (meuPerfil.itensComprados || []).includes(item.id);
                 const chave = cat === 'bolas' ? 'bola' : (cat === 'rastros' ? 'rastro' : (cat === 'auras' ? 'aura' : 'explosao'));
                 const equip = meuPerfil.equipados[chave] === item.id;
-                let btn = equip ? '<button class="shop-item-btn btn-equipado">EQUIPADO</button>' : (comp ? `<button class="shop-item-btn btn-equipar" onclick="equiparItem('${cat}', '${item.id}')">EQUIPAR</button>` : `<button class="shop-item-btn btn-comprar" onclick="comprarItem('${cat}', '${item.id}', ${item.preco})">🪙 ${item.preco}</button>`);
+                let btn = equip ? '<button class="shop-item-btn btn-equipado">EQUIPADO</button>' : (comp ? `<button class="shop-item-btn btn-equipar" onclick="equiparItem('${cat}', '${item.id}')">EQUIPAR</button>` : `<button class="shop-item-btn btn-comprar" onclick="comprarItem('${cat}', '${item.id}', ${item.preco})">🪙 ${item.preco.toLocaleString()}</button>`);
 
                 grid.innerHTML += `<div class="shop-item-card ${equip ? 'equipped' : ''}"><div class="shop-item-preview" style="background:${item.cor||'#082012'}">${item.icon}</div><div class="shop-item-name">${item.nome}</div><div class="shop-item-desc">${item.desc}</div>${btn}</div>`;
             });
@@ -2621,7 +2789,7 @@
             if(t.tipo === 'moedas' || t.tipo === 'combo') meuPerfil.moedas += (t.qtd || 0);
             if(t.id && !meuPerfil.itensComprados.includes(t.id)) meuPerfil.itensComprados.push(t.id);
             salvarPerfil(); atualizarPerfilUI(); abrirPasseBatalha();
-            mostrarToast(`🎁 Parabéns! Você resgatou a recompensa do Nível ${tier}: ${t.recompensa}!`);
+            mostrarToast(`🎁 Recompensa do Nível ${tier} resgatada: ${t.recompensa}!`);
         }
 
         function abrirEstatisticas() {
@@ -2697,7 +2865,6 @@
             const yBottom = (selCampoH + golSize) / 2;
 
             if (isPenaltiesMode) {
-                // No modo de pênaltis, foca na grande área direita
                 ctx.fillStyle = 'rgba(10, 20, 30, 0.45)';
                 ctx.fillRect(selCampoW - PITCH_INSET_X, yTop, GOAL_DEPTH, golSize);
 
@@ -2714,7 +2881,6 @@
                 ctx.lineWidth = 3;
                 ctx.strokeRect(selCampoW * 0.25, 20, selCampoW * 0.75 - PITCH_INSET_X, selCampoH - 40);
 
-                // Marca da cal (Pênalti)
                 ctx.beginPath(); ctx.arc(selCampoW * 0.45, selCampoH / 2, 5, 0, 2 * Math.PI); ctx.fillStyle = '#fff'; ctx.fill();
                 ctx.beginPath(); ctx.arc(selCampoW * 0.45, selCampoH / 2, selCampoH * 0.2, -0.65, 0.65); ctx.stroke();
                 return;
@@ -3046,26 +3212,20 @@
                     const golTop = (selCampoH / 2) - (golSize / 2), golBottom = (selCampoH / 2) + (golSize / 2);
 
                     if (isPenaltiesMode) {
-                        // LÓGICA DE COBRANÇA DE PÊNALTI
                         penaltyTimer--;
                         const segs = Math.max(0, Math.ceil(penaltyTimer / 60));
                         uiText('timer', `${segs}s`);
 
-                        // Movimento do Goleiro no Modo Pênaltis (IA ou Player 2)
                         const keeper = window.player2;
-                        const kicker = window.player1;
                         
                         if (penaltyKicked) {
-                            // Goleiro tenta defender a bola
                             const dy = bola.position.y - keeper.position.y;
                             Body.setVelocity(keeper, { x: 0, y: Math.sign(dy) * Math.min(Math.abs(dy), 4.5) });
                         } else {
-                            // Goleiro ginga no centro do gol
                             const targetY = (selCampoH / 2) + Math.sin(Date.now() / 300) * (golSize * 0.35);
                             Body.setVelocity(keeper, { x: 0, y: (targetY - keeper.position.y) * 0.1 });
                         }
 
-                        // Verificação de Gol ou Defesa no Pênalti
                         if (bola.position.x > selCampoW - PITCH_INSET_X + 5 && bola.position.y > golTop && bola.position.y < golBottom) {
                             AudioEngine.playConfetti();
                             uiText('texto-gol', '⚽ GOL DE PÊNALTI!');
