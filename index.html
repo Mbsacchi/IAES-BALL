@@ -25,6 +25,7 @@
             --hax-green: #2ecc71;
             --hax-red: #e74c3c;
             --accent-cyan: #00f2fe;
+            --admin-purple: #9b59b6;
         }
 
         body {
@@ -66,6 +67,7 @@
         .btn-voltar { background: linear-gradient(135deg, #962d22, #e74c3c); font-size: 11px; padding: 8px 16px; }
         .btn-gold { background: linear-gradient(135deg, #d4ac0d, #f1c40f); color: #0b131b; }
         .btn-ranked { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: #fff; }
+        .btn-admin { background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; }
 
         .screen { display: none; flex-direction: column; align-items: center; width: 100%; }
         .active-screen { display: flex; animation: fadeIn 0.25s ease; }
@@ -83,6 +85,7 @@
         #perfil-nome-linha { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
         #perfil-nome { font-weight: 900; font-size: 15px; color: #fff; text-transform: uppercase; }
         #perfil-nivel-badge { background: #e67e22; color: #000; font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 4px; }
+        #perfil-admin-badge { background: #e74c3c; color: #fff; font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 4px; display:none; }
         #perfil-rank { font-weight: 800; font-size: 11px; color: var(--primary-gold); }
         #perfil-moedas { font-size: 13px; color: var(--primary-gold); font-weight: 900; font-family: 'Rajdhani', sans-serif; }
         .xp-bar-container { width: 130px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; margin-top: 5px; overflow: hidden; margin-left: auto; }
@@ -120,7 +123,7 @@
         .mode-card-desc { font-size: 10px; color: #a0aec0; margin-top: 4px; line-height: 1.3; }
         .mode-card-badge { align-self: flex-start; margin-top: 8px; font-size: 9px; font-weight: 900; padding: 2px 7px; border-radius: 4px; }
 
-        .menu-sub-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; margin-top: 8px; }
+        .menu-sub-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; width: 100%; margin-top: 8px; }
         .sub-btn-card {
             background: rgba(18, 30, 46, 0.85); border: 1px solid rgba(255,255,255,0.12);
             border-radius: 8px; padding: 10px 6px; text-align: center; cursor: pointer; transition: 0.2s;
@@ -181,9 +184,16 @@
         }
         .modal-box {
             background: #111a24; border: 2px solid #3498db; border-radius: 10px; padding: 25px;
-            width: 500px; max-width: 92%; text-align: left; box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+            width: 540px; max-width: 92%; text-align: left; box-shadow: 0 15px 40px rgba(0,0,0,0.9);
             max-height: 88vh; overflow-y: auto;
         }
+
+        /* PAINEL ADMIN STYLES */
+        .admin-section {
+            background: rgba(18, 30, 46, 0.85); border: 1px solid #3b4e61; border-radius: 8px;
+            padding: 12px 14px; margin-bottom: 12px;
+        }
+        .admin-section-title { font-size: 12px; font-weight: 900; color: var(--primary-gold); margin-bottom: 8px; text-transform: uppercase; }
 
         /* CONFIGURAÇÕES DE ÁUDIO */
         .config-row { margin-bottom: 14px; }
@@ -286,6 +296,7 @@
         }
         #btn-voltar-partida { top: 15px; left: 15px; display: none; }
         #btn-config-ingame { top: 15px; right: 15px; display: none; }
+        #btn-admin-ingame { top: 15px; right: 90px; display: none; background: #e67e22; border-color: #d35400; }
         #btn-skip-replay { bottom: 20px; right: 20px; display: none; background: #c0392b; }
 
         .input-sala {
@@ -344,6 +355,7 @@
     <!-- CARD DE PERFIL -->
     <div id="perfil-ui" onclick="abrirEstatisticas()">
         <div id="perfil-nome-linha">
+            <span id="perfil-admin-badge">👑 ADM</span>
             <span id="perfil-nivel-badge">NVL 1</span>
             <div id="perfil-nome">CRAQUE</div>
         </div>
@@ -371,7 +383,7 @@
 
         <!-- MENU PRINCIPAL -->
         <div id="screen-home" class="screen">
-            <h1 style="font-size: 36px; color: var(--primary-gold); margin-bottom: 2px;">IAES BALL</h1>
+            <h1 style="font-size: 36px; color: var(--primary-gold); margin-bottom: 2px; cursor:pointer;" title="Clique 5 vezes para abrir o Admin" onclick="contarCliquesAdmin()">IAES BALL</h1>
             <div style="font-size: 11px; color: #94a3b8; margin-bottom: 16px; letter-spacing: 2px; font-weight: 700;">HAXBALL CHAMPIONS & RANKED</div>
             
             <div class="menu-modes-grid">
@@ -409,6 +421,7 @@
                 <div class="sub-btn-card" onclick="abrirLoja()"><span>🛒</span><div>MERCADO</div></div>
                 <div class="sub-btn-card" onclick="abrirEstatisticas()"><span>📊</span><div>STATS</div></div>
                 <div class="sub-btn-card" onclick="abrirModalConfiguracoes()"><span>⚙️</span><div>ÁUDIO</div></div>
+                <div class="sub-btn-card" onclick="abrirModalAdmin()" style="border-color: #e67e22; background: rgba(230, 126, 34, 0.15);"><span>👑</span><div style="color:#f39c12;">PAINEL ADM</div></div>
             </div>
 
             <button class="btn btn-voltar" style="margin-top: 16px;" onclick="deslogar()">Sair da Conta</button>
@@ -609,6 +622,62 @@
         </div>
     </div>
 
+    <!-- MODAL DO PAINEL DE ADMINISTRAÇÃO -->
+    <div id="modal-admin" class="modal-overlay">
+        <div class="modal-box" style="border-color: #e67e22;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h2 style="margin:0; color:#f39c12;">👑 PAINEL MASTER ADMIN</h2>
+                <span style="font-size:10px; background:#e74c3c; padding:2px 6px; border-radius:4px; font-weight:bold;">MODO SUPERUSUÁRIO</span>
+            </div>
+
+            <!-- ECONOMIA & RECURSOS -->
+            <div class="admin-section">
+                <div class="admin-section-title">🪙 Economia & Moedas</div>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px;">
+                    <button class="btn" style="padding:6px; font-size:10px;" onclick="adminAdicionarMoedas(1000)">+1.000 🪙</button>
+                    <button class="btn" style="padding:6px; font-size:10px;" onclick="adminAdicionarMoedas(10000)">+10.000 🪙</button>
+                    <button class="btn btn-gold" style="padding:6px; font-size:10px;" onclick="adminAdicionarMoedas(999999)">999k 🪙 (MAX)</button>
+                </div>
+            </div>
+
+            <!-- PROGRESSÃO & PASSE -->
+            <div class="admin-section">
+                <div class="admin-section-title">⭐ Nível, Elo & Loja</div>
+                <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:6px;">
+                    <button class="btn btn-ranked" style="padding:6px; font-size:10px;" onclick="adminSubirNivel()">⭐ SUBIR +1 NÍVEL</button>
+                    <button class="btn btn-ranked" style="padding:6px; font-size:10px;" onclick="adminDefinirNivelMax()">🎫 PASSE NVL 20 (MAX)</button>
+                    <button class="btn" style="padding:6px; font-size:10px; background:#27ae60;" onclick="adminDefinirElo(2000)">⚔️ ELO 2000 PDL (MESTRE)</button>
+                    <button class="btn btn-gold" style="padding:6px; font-size:10px;" onclick="adminDesbloquearLojaToda()">🛍️ DESBLOQUEAR TODA LOJA</button>
+                </div>
+            </div>
+
+            <!-- MODIFICAÇÃO DE FÍSICA IN-GAME -->
+            <div class="admin-section">
+                <div class="admin-section-title">⚡ Modificadores de Partida & Física</div>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px;">
+                    <button class="btn" style="padding:6px; font-size:10px;" onclick="adminToggleVelocidade(1.0)">Velocidade 1x</button>
+                    <button class="btn" style="padding:6px; font-size:10px;" onclick="adminToggleVelocidade(1.5)">⚡ Turbo 1.5x</button>
+                    <button class="btn btn-admin" style="padding:6px; font-size:10px;" onclick="adminToggleVelocidade(2.2)">🔥 Flash 2.2x</button>
+                </div>
+                <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:6px; margin-top:6px;">
+                    <button class="btn" style="padding:6px; font-size:10px;" onclick="adminZerarPlacar()">🔄 Zerar Placar (0x0)</button>
+                    <button class="btn btn-voltar" style="padding:6px; font-size:10px; margin:0;" onclick="adminEncerrarPartida()">🏁 Encerrar Jogo Agora</button>
+                </div>
+            </div>
+
+            <!-- SERVIDOR E SALAS -->
+            <div class="admin-section">
+                <div class="admin-section-title">🌐 Servidor & Manutenção</div>
+                <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:6px;">
+                    <button class="btn btn-voltar" style="padding:6px; font-size:10px; margin:0;" onclick="adminLimparSalasServidor()">🧹 Limpar Salas Fantasmas</button>
+                    <button class="btn btn-voltar" style="padding:6px; font-size:10px; margin:0;" onclick="adminLimparFilaMatchmaking()">🧹 Limpar Fila Ranked</button>
+                </div>
+            </div>
+
+            <button class="btn btn-avancar" style="margin:0; padding:10px;" onclick="fecharModalAdmin()">FECHAR PAINEL ADM</button>
+        </div>
+    </div>
+
     <!-- MODAL DE AMIGOS & GRUPO -->
     <div id="modal-amigos" class="modal-overlay">
         <div class="modal-box">
@@ -704,6 +773,7 @@
     <!-- HUD DA PARTIDA - PLACAR TV -->
     <button id="btn-voltar-partida" class="btn-ingame" onclick="voltarMenu()">🚪 SAIR</button>
     <button id="btn-config-ingame" class="btn-ingame" onclick="abrirModalConfiguracoes()">⚙️ SOM</button>
+    <button id="btn-admin-ingame" class="btn-ingame" onclick="abrirModalAdmin()">👑 ADM</button>
 
     <div id="top-bar">
         <div class="tv-scoreboard-badge" id="tv-badge-status">1º TEMPO • IAES CUP</div>
@@ -981,6 +1051,112 @@
             AudioEngine.salvarPreferencias();
         }
 
+        // --- PAINEL DE ADMINISTRAÇÃO MASTER ---
+        let cliquesTituloAdmin = 0;
+        let adminVelocidadeMultiplicador = 1.0;
+
+        function contarCliquesAdmin() {
+            cliquesTituloAdmin++;
+            if (cliquesTituloAdmin >= 5) {
+                cliquesTituloAdmin = 0;
+                abrirModalAdmin();
+            }
+        }
+
+        function abrirModalAdmin() {
+            AudioEngine.playClick();
+            meuPerfil.isAdmin = true;
+            uiShow('perfil-admin-badge', 'inline-block');
+            uiShow('btn-admin-ingame', 'block');
+            uiShow('modal-admin', 'flex');
+        }
+        function fecharModalAdmin() { AudioEngine.playClick(); uiHide('modal-admin'); }
+
+        function adminAdicionarMoedas(qtd) {
+            AudioEngine.playVictoryFanfare();
+            meuPerfil.moedas = (meuPerfil.moedas || 0) + qtd;
+            salvarPerfil(); atualizarPerfilUI();
+            mostrarToast(`👑 ADM: +${qtd.toLocaleString()} Moedas adicionadas!`);
+        }
+
+        function adminSubirNivel() {
+            AudioEngine.playVictoryFanfare();
+            meuPerfil.nivel = (meuPerfil.nivel || 1) + 1;
+            salvarPerfil(); atualizarPerfilUI();
+            mostrarToast(`👑 ADM: Nível aumentado para ${meuPerfil.nivel}!`);
+        }
+
+        function adminDefinirNivelMax() {
+            AudioEngine.playVictoryFanfare();
+            meuPerfil.nivel = 20;
+            meuPerfil.xp = 0;
+            salvarPerfil(); atualizarPerfilUI();
+            mostrarToast("👑 ADM: Nível 20 Definido! Todos os prêmios do Passe desbloqueados!");
+        }
+
+        function adminDefinirElo(eloVal) {
+            AudioEngine.playClick();
+            meuPerfil.elo = eloVal;
+            salvarPerfil(); atualizarPerfilUI();
+            mostrarToast(`👑 ADM: Elo Ranked definido para ${eloVal} PDL!`);
+        }
+
+        function adminDesbloquearLojaToda() {
+            AudioEngine.playVictoryFanfare();
+            if (!meuPerfil.itensComprados) meuPerfil.itensComprados = [];
+            Object.keys(LOJA_ITENS).forEach(cat => {
+                LOJA_ITENS[cat].forEach(it => {
+                    if (!meuPerfil.itensComprados.includes(it.id)) {
+                        meuPerfil.itensComprados.push(it.id);
+                    }
+                });
+            });
+            salvarPerfil();
+            mostrarToast("👑 ADM: Todos os 32 itens da Loja foram DESBLOQUEADOS!");
+        }
+
+        function adminToggleVelocidade(mult) {
+            AudioEngine.playClick();
+            adminVelocidadeMultiplicador = mult;
+            mostrarToast(`👑 ADM: Multiplicador de velocidade alterado para ${mult}x!`);
+        }
+
+        function adminZerarPlacar() {
+            AudioEngine.playClick();
+            placar1 = 0; placar2 = 0;
+            uiText('score1', "0"); uiText('score2', "0");
+            mostrarToast("👑 ADM: Placar zerado (0 x 0)!");
+        }
+
+        function adminEncerrarPartida() {
+            AudioEngine.playVictoryFanfare();
+            fecharModalAdmin();
+            finalizarPartida(placar1 >= placar2 ? 'P1' : 'P2');
+        }
+
+        async function adminLimparSalasServidor() {
+            AudioEngine.playClick();
+            if (db) {
+                try {
+                    const snap = await db.collection("salas").get();
+                    snap.forEach(doc => doc.ref.delete().catch(()=>{}));
+                    mostrarToast("🧹 ADM: Todas as salas foram removidas do servidor!");
+                    carregarSalasOnline();
+                } catch(e) { console.warn(e); }
+            }
+        }
+
+        async function adminLimparFilaMatchmaking() {
+            AudioEngine.playClick();
+            if (db) {
+                try {
+                    const snap = await db.collection("matchmaking").get();
+                    snap.forEach(doc => doc.ref.delete().catch(()=>{}));
+                    mostrarToast("🧹 ADM: Fila de Matchmaking limpa!");
+                } catch(e) { console.warn(e); }
+            }
+        }
+
         // --- FIREBASE CONFIGURAÇÃO ---
         const firebaseConfig = {
             apiKey: "AIzaSyADvWiZTDiXzncheT3qljukYVOGcaemBDQ",
@@ -1075,7 +1251,7 @@
 
         let meuPerfil = {
             nome: 'CRAQUE', uid: 'local_uid', elo: 1000, vitorias: 0, derrotas: 0, numero: 10,
-            moedas: 300, xp: 0, nivel: 1, gols: 0, assistencias: 0, partidas: 0,
+            moedas: 300, xp: 0, nivel: 1, gols: 0, assistencias: 0, partidas: 0, isAdmin: false,
             itensComprados: ['bola_classica', 'rastro_nenhum', 'aura_nenhuma', 'exp_padrao'],
             equipados: { bola: 'bola_classica', rastro: 'rastro_nenhum', aura: 'aura_nenhuma', explosao: 'exp_padrao' },
             passeResgatados: [], amigos: []
@@ -1119,6 +1295,7 @@
         const keys = {};
         function handleKeyDown(e) {
             AudioEngine.init();
+            if (e.key === 'F2') { abrirModalAdmin(); return; }
             if (e.target && e.target.tagName === 'INPUT') return;
             if (e.code) keys[e.code.toLowerCase()] = true;
             if (e.key) keys[e.key.toLowerCase()] = true;
@@ -1155,6 +1332,11 @@
                             const doc = await db.collection("jogadores").doc(user.uid).get();
                             if (doc.exists) {
                                 meuPerfil = { ...meuPerfil, ...doc.data(), uid: user.uid };
+                                if (meuPerfil.nome && (meuPerfil.nome.startsWith('ADM') || meuPerfil.isAdmin)) {
+                                    meuPerfil.isAdmin = true;
+                                    uiShow('perfil-admin-badge', 'inline-block');
+                                    uiShow('btn-admin-ingame', 'block');
+                                }
                                 atualizarPerfilUI();
                                 escutarNotificacoesUsuario();
                                 showScreen('screen-home');
@@ -1179,6 +1361,12 @@
             if(senha.length < 6) { uiText('auth-status-msg', 'Senha mín. 6 caracteres'); return; }
 
             meuPerfil.nome = nick;
+            if (nick.startsWith('ADM') || nick === 'ADMIN') {
+                meuPerfil.isAdmin = true;
+                uiShow('perfil-admin-badge', 'inline-block');
+                uiShow('btn-admin-ingame', 'block');
+            }
+
             try {
                 uiText('btn-login-txt', 'CARREGANDO...');
                 const cred = await auth.signInWithEmailAndPassword(emailFromNick(nick), senha);
@@ -1210,6 +1398,12 @@
             if(senha.length < 6) { uiText('auth-status-msg', 'Senha mín. 6 caracteres'); return; }
 
             meuPerfil.nome = nick;
+            if (nick.startsWith('ADM') || nick === 'ADMIN') {
+                meuPerfil.isAdmin = true;
+                uiShow('perfil-admin-badge', 'inline-block');
+                uiShow('btn-admin-ingame', 'block');
+            }
+
             try {
                 uiText('btn-criar-txt', 'CRIANDO...');
                 const cred = await auth.createUserWithEmailAndPassword(emailFromNick(nick), senha);
@@ -1253,6 +1447,7 @@
             uiText('perfil-nivel-badge', `NVL ${meuPerfil.nivel}`);
             uiText('perfil-rank', `RANKED (${meuPerfil.elo || 1000} PDL)`);
             uiText('perfil-moedas-val', meuPerfil.moedas);
+            if (meuPerfil.isAdmin) uiShow('perfil-admin-badge', 'inline-block');
             const perc = Math.min(100, Math.floor((meuPerfil.xp / (meuPerfil.nivel * 500)) * 100));
             const bar = document.getElementById('perfil-xp-bar'); if(bar) bar.style.width = perc + '%';
         }
@@ -1469,13 +1664,11 @@
                     let docs = [];
                     snap.forEach(d => {
                         const data = d.data();
-                        // Ignora se for seu próprio ticket
                         if (data.uid !== meuPerfil.uid) {
                             docs.push({ id: d.id, ...data });
                         }
                     });
 
-                    // Ordena pelo ticket mais antigo
                     if (docs.length > 0) {
                         docs.sort((a, b) => (a.criadoEmSec || 0) - (b.criadoEmSec || 0));
                         foundTicket = docs[0];
@@ -1503,7 +1696,6 @@
 
                 conectarPeerMatchmaking(foundTicket.peerId, foundTicket.nome);
             } else {
-                // Se a fila estiver vazia: cria ticket e aguarda desafiante
                 myMatchTicketId = 'mm_' + (meuPerfil.uid || Math.random().toString(36).substring(2, 8));
                 iniciarHostMatchmaking(mode);
             }
@@ -1548,7 +1740,6 @@
                         criadoEm: firebase.firestore.FieldValue.serverTimestamp()
                     }).catch(e => console.warn("Aviso gravar ticket:", e.message));
 
-                    // Escuta se o ticket for aceito
                     try {
                         db.collection("matchmaking").doc(myMatchTicketId).onSnapshot(doc => {
                             if (doc.exists && doc.data().status === 'matched') {
@@ -2218,6 +2409,7 @@
                 uiText('tv-badge-status', isRanked ? "⚔️ RANKED • 1º TEMPO" : "1º TEMPO • IAES CUP");
                 
                 uiShow('btn-voltar-partida'); uiShow('btn-config-ingame'); uiShow('top-bar', 'flex'); 
+                if (meuPerfil.isAdmin) uiShow('btn-admin-ingame', 'block');
                 document.getElementById('top-bar').style.maxWidth = selCampoW + 'px';
                 
                 uiText('nome-p1', cfgP1.time.substring(0, 3).toUpperCase());
@@ -2655,12 +2847,12 @@
                     AudioEngine.playDash();
                 }
 
-                let maxSpeed = 4.65;
+                let maxSpeed = 4.65 * adminVelocidadeMultiplicador;
                 let accelRate = 0.35;
 
                 if (window['dashActiveP' + i] && window['dashActiveP' + i] > 0) {
                     window['dashActiveP' + i]--;
-                    maxSpeed = 7.2;
+                    maxSpeed = 7.2 * adminVelocidadeMultiplicador;
                     accelRate = 0.50;
                 }
 
@@ -2683,7 +2875,7 @@
                     const distT = Math.hypot(dirX, dirY);
 
                     if (distT > 8) {
-                        const botSpeed = 3.8;
+                        const botSpeed = 3.8 * adminVelocidadeMultiplicador;
                         Body.setVelocity(p, {
                             x: p.velocity.x + ((dirX / distT) * botSpeed - p.velocity.x) * 0.25,
                             y: p.velocity.y + ((dirY / distT) * botSpeed - p.velocity.y) * 0.25
@@ -2708,7 +2900,7 @@
             if (dist < reach && dist > 0.001) {
                 const dirX = dx / dist, dirY = dy / dist;
                 const pForward = Math.max(0, jogador.velocity.x * dirX + jogador.velocity.y * dirY);
-                const kickSpeed = 10.5 + (pForward * 0.4);
+                const kickSpeed = (10.5 + (pForward * 0.4)) * adminVelocidadeMultiplicador;
 
                 Body.setVelocity(bola, { x: dirX * kickSpeed, y: dirY * kickSpeed });
                 AudioEngine.playKick(1.1);
@@ -2722,7 +2914,7 @@
         }
         function voltarMenu() {
             AudioEngine.playClick(); estadoJogo = 'MENU'; limparMotorFisico();
-            uiHide('game-wrapper'); uiHide('top-bar'); uiHide('btn-voltar-partida'); uiHide('btn-config-ingame');
+            uiHide('game-wrapper'); uiHide('top-bar'); uiHide('btn-voltar-partida'); uiHide('btn-config-ingame'); uiHide('btn-admin-ingame');
             resetarUICompleta(); if(isOnline) cancelarOnline();
             uiShow('menu-container'); showScreen('screen-home');
         }
